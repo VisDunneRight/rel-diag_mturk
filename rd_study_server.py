@@ -8,31 +8,27 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_heroku import Heroku
 from post_hits import get_connection, qualification_id
 
-#Start Configuration Variables
-AWS_ACCESS_KEY_ID = "AWS_ACCESS_KEY_ID"
-AWS_SECRET_ACCESS_KEY = "AWS_SECRET_ACCESS_KEY"
-DEV_ENVIROMENT_BOOLEAN = False
-DEBUG = True
-LOCAL = False
-#End Configuration Variables
 
-#This allows us to specify whether we are pushing to the sandbox or live site.
-if DEV_ENVIROMENT_BOOLEAN:
+app = Flask(__name__, static_url_path='')
+
+# app.config.from_object(os.environ['APP_SETTINGS'])
+# app.config.from_object('config.Config')
+#app.config.from_pyfile('config.py')
+
+app.secret_key = os.environ.get('FLASK_SECRET_KEY')
+
+# This allows us to specify whether we are pushing to the sandbox or live site.
+if os.environ.get('TESTING'):
     AMAZON_HOST = "https://workersandbox.mturk.com/mturk/externalSubmit"
 else:
     AMAZON_HOST = "https://www.mturk.com/mturk/externalSubmit"
 
-app = Flask(__name__, static_url_path='')
-app.secret_key="TODO:change-this-to-something-else"
-app.config.from_object(os.environ['APP_SETTINGS'])
-
-# Set up SQLAlchemy variables and settings
-if (LOCAL):
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'replace_with_database_url_on_local_computer'
+# # Set up SQLAlchemy variables and settings
+if (os.environ.get('LOCAL')):
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('LOCAL_SQLALCHEMY_DATABASE_URI')
 else:
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'replace_with_database_url_on_heroku'
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('REMOTE_SQLALCHEMY_DATABASE_URI')
 
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 from models import *
@@ -41,14 +37,16 @@ from models import *
 returning_workers_filename = 'data/worker_ids_taken_old_hit.csv'
 returning_workers_sequence_num_amount = [0, 0, 0, 0, 0, 0]
 
-# Creates the questions dictionary that includes the choices (a-d) for each of the 12 questions  
+# Creates the questions dictionary that includes the choices (a-d) for each of the 12 questions
+
+
 def create_questions_dict():
     questions = {}
-    num_questions=12
+    num_questions = 12
     choices = ["a", "b", "c", "d"]
 
     # Loop through all questions
-    for i in range(1,num_questions+1):
+    for i in range(1, num_questions+1):
         question_key = "Q" + str(i)
         questions[question_key] = {}
 
@@ -57,20 +55,23 @@ def create_questions_dict():
             question_str = ""
             # Read choices files
             with open('static/questions/' + str(i) + '/' + c + '.txt', 'r') as choice_file:
-                question_str=choice_file.read().replace('\n', '')
+                question_str = choice_file.read().replace('\n', '')
             questions[question_key][c] = question_str
 
     return questions
 
 # Creates the answers dictionary that includes the letter answer (a-d) for each of the 12 questions
+
 def create_answers_dict():
     answers_json = open('static/questions/answers.json')
     answer_str = answers_json.read()
     answers = json.loads(answer_str)
     return answers
 
-# Returns a sequence number for a given worker. The sequence number is assigned so that the sizes of the different sequence number groups are balanced
+# Returns a sequence number for a given worker. The sequence number is assigned
+# so that the sizes of the different sequence number groups are balanced
 # It also tries to balance groups when assigning returning workers
+
 def assign_sequence_num(worker_id):
     # Read the returning workers
     with open(returning_workers_filename) as f:
@@ -80,18 +81,23 @@ def assign_sequence_num(worker_id):
     # check if current worker is a returning worker
     if worker_id in returning_workers:
         print(worker_id, "is a returning worker")
-        lowest_sequence_num_amount = returning_workers_sequence_num_amount.index(min(returning_workers_sequence_num_amount))
+        lowest_sequence_num_amount = returning_workers_sequence_num_amount.index(
+            min(returning_workers_sequence_num_amount))
     else:
         sequence_num_amount = []
         # sequence_num = "sequence_num"
         for i in range(6):
-            amount = db.session.query(User.sequence_num).filter_by(sequence_num=i).count()
+            amount = db.session.query(User.sequence_num).filter_by(
+                sequence_num=i).count()
             sequence_num_amount.append(amount)
-            print("There are " + str(amount) + " users with sequence_num = " + str(i))
+            print("There are " + str(amount) +
+                  " users with sequence_num = " + str(i))
 
-        lowest_sequence_num_amount = sequence_num_amount.index(min(sequence_num_amount))
-    
-    print("The sequence_num with the lowest assigned workers is: " + str(lowest_sequence_num_amount))
+        lowest_sequence_num_amount = sequence_num_amount.index(
+            min(sequence_num_amount))
+
+    print("The sequence_num with the lowest assigned workers is: " +
+          str(lowest_sequence_num_amount))
 
     # Set sequence_num in the database
     user = db.session.query(User).filter_by(worker_id=worker_id).first()
@@ -99,12 +105,13 @@ def assign_sequence_num(worker_id):
     db.session.commit()
 
     return lowest_sequence_num_amount
-    
 
-#---------------------------------------------- ROUTES ----------------------------------------------#
+
+# ---------------------------------------------- ROUTES ----------------------------------------------#
 @app.route('/favicon.ico')
 def favicon():
-    return send_from_directory(os.path.join(app.root_path, 'static'),'favicon.ico')
+    return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico')
+
 
 @app.route('/', methods=['GET', 'POST'])
 def main():
@@ -114,22 +121,25 @@ def main():
     if request.args.get("assignmentId") == "ASSIGNMENT_ID_NOT_AVAILABLE":
         print("Worker has clicked to preview the task")
         preview = True
-        resp = make_response(render_template("instructions.html", preview = preview))
+        resp = make_response(render_template(
+            "instructions.html", preview=preview))
         resp.headers['x-frame-options'] = '*'
         return resp
 
     worker_id = request.args.get("workerId")
     assignment_id = request.args.get("assignmentId")
     hit_id = request.args.get("hitId")
-    print("worker_id:", worker_id, "assignment_id:", assignment_id, "hit_id:", hit_id)
+    print("worker_id:", worker_id, "assignment_id:",
+          assignment_id, "hit_id:", hit_id)
 
-    if (LOCAL):
+    if (os.environ.get('LOCAL')):
         worker_id = "TEST"
         assignment_id = "TEST"
         hit_id = "TEST"
 
     # TODO: Check if user exists with the same worker_id in the database
-    exists = db.session.query(User.worker_id).filter_by(worker_id=worker_id).scalar()
+    exists = db.session.query(User.worker_id).filter_by(
+        worker_id=worker_id).scalar()
 
     if (exists):
         # TODO: Throw error, prevent the user from taking the study again
@@ -141,9 +151,9 @@ def main():
         user = User(worker_id)
         db.session.add(user)
         db.session.commit()
-    
+
     # Get the user and insert the amazon variables in the database
-    user=db.session.query(User).filter_by(worker_id=worker_id).first()
+    user = db.session.query(User).filter_by(worker_id=worker_id).first()
     user.worker_id = worker_id
     user.assignment_id = assignment_id
     user.hit_id = hit_id
@@ -154,33 +164,36 @@ def main():
     user.start_datetime = start_datetime
 
     # Grab the user's qualification score and place it in the database
-    if (not LOCAL):
+    if (not os.environ.get('LOCAL')):
         conn = get_connection()
         response = conn.get_qualification_score(
-            QualificationTypeId = qualification_id,
-            WorkerId = worker_id
+            QualificationTypeId=qualification_id,
+            WorkerId=worker_id
         )
         qualification_score = response['Qualification']['IntegerValue']
         user.qualification_score = qualification_score
-        print("Worker: " + worker_id + " had a qualification score of " + str(qualification_score))
+        print("Worker: " + worker_id +
+              " had a qualification score of " + str(qualification_score))
 
     db.session.commit()
 
-    resp = make_response(render_template("instructions.html", preview = preview,
-    worker_id = worker_id, assignment_id=assignment_id, hit_id=hit_id))
-    
-    #This is particularly nasty gotcha.
-    #Without this header, your iFrame will not render in Amazon
+    resp = make_response(render_template("instructions.html", preview=preview,
+                                         worker_id=worker_id, assignment_id=assignment_id, hit_id=hit_id))
+
+    # This is particularly nasty gotcha.
+    # Without this header, your iFrame will not render in Amazon
     resp.headers['x-frame-options'] = '*'
     return resp
 
-@app.route('/tutorial', methods=['GET','POST'])
+
+@app.route('/tutorial', methods=['GET', 'POST'])
 def tutorial():
     resp = make_response(render_template("tutorial.html"))
     resp.headers['x-frame-options'] = '*'
     return resp
 
-@app.route('/tutorial_record_time', methods=['GET','POST'])
+
+@app.route('/tutorial_record_time', methods=['GET', 'POST'])
 def tutorialClick():
     print("Tutorial record time called")
     if request.method == 'POST':
@@ -191,11 +204,11 @@ def tutorialClick():
         time_spent = data['time_spent']
         worker_id = data['worker_id']
 
-        print("Worker: "+ worker_id + " moved away from tutorial page " + tutorial_page_num +
-        ", elapsed time increased by " + str(time_spent))
+        print("Worker: " + worker_id + " moved away from tutorial page " + tutorial_page_num +
+              ", elapsed time increased by " + str(time_spent))
 
         # Get the user
-        user = db.session.query(User).filter_by(worker_id = worker_id).first()
+        user = db.session.query(User).filter_by(worker_id=worker_id).first()
 
         # Apply the changes to the database
         question_time = getattr(user, "tutorial_time")
@@ -209,22 +222,22 @@ def tutorialClick():
 
         print("Set tutorial_time to " + str(question_time))
 
-
     if request.method == 'GET':
         print("Wrong request, request should be POST not GET")
 
     return "OK"
 
 
-@app.route('/test', methods=['GET','POST'])
+@app.route('/test', methods=['GET', 'POST'])
 def test():
     print("Test route called")
 
     # Create dictionary for the questions and answers data
     questions = create_questions_dict()
-    resp = make_response(render_template("page.html", questions = questions))
+    resp = make_response(render_template("page.html", questions=questions))
     resp.headers['x-frame-options'] = '*'
     return resp
+
 
 @app.route('/get_question_answer', methods=['POST'])
 def get_question_answer():
@@ -244,7 +257,8 @@ def get_question_answer():
 
     return "OK"
 
-@app.route('/assign_sequence_num', methods=['GET','POST'])
+
+@app.route('/assign_sequence_num', methods=['GET', 'POST'])
 def assign_sequence_num_route():
     '''
     Mode 1: Show SQL
@@ -273,6 +287,7 @@ def assign_sequence_num_route():
         print("User assigned sequence number " + str(sequence_num))
     return str(sequence_num)
 
+
 @app.route('/demographics', methods=['GET', 'POST'])
 def demographics():
     print("Demographics route called")
@@ -280,6 +295,7 @@ def demographics():
     resp = make_response(render_template("demographics.html"))
     resp.headers['x-frame-options'] = '*'
     return resp
+
 
 @app.route('/demographics_submit', methods=['POST'])
 def demographics_submit():
@@ -308,7 +324,7 @@ def demographics_submit():
 
         # Get the user
         worker_id = data['worker_id']
-        user=db.session.query(User).filter_by(worker_id=worker_id).first()
+        user = db.session.query(User).filter_by(worker_id=worker_id).first()
 
         # Apply the changes to the database
         user.feedback = feedback
@@ -326,7 +342,7 @@ def demographics_submit():
         if (likert_q3 != ''):
             user.likert_q3 = likert_q3
         if (likert_q4 != ''):
-            user.likert_q4 = likert_q4  
+            user.likert_q4 = likert_q4
         if (likert_q5 != ''):
             user.likert_q5 = likert_q5
         if (likert_q6 != ''):
@@ -347,11 +363,14 @@ def demographics_submit():
     return "OK"
 
 # val is either an empty string or an integer string, custom_to_int converts the string to an integer if it wasn't empty
+
+
 def custom_to_int(val):
-    if (val==''):
+    if (val == ''):
         return val
     else:
         return int(val)
+
 
 @app.route('/results', methods=['GET', 'POST'])
 def results():
@@ -381,7 +400,7 @@ def results():
     for i in range(1, num_questions + 1):
         q_col = "q" + str(i)
         q_time_col = "q" + str(i) + "_time"
-        
+
         user_answer = getattr(user, q_col)
         user_time = getattr(user, q_time_col)
 
@@ -405,7 +424,8 @@ def results():
         failure_reason = "you failed to answer 5 or more questions correctly."
     if (total_time > max_allowed_time*1000):
         accept = False
-        failure_reason = "you failed to answer all questions within " + str(max_allowed_time/60) + " minutes."
+        failure_reason = "you failed to answer all questions within " + \
+            str(max_allowed_time/60) + " minutes."
 
     print("The hit acceptance is: " + str(accept))
 
@@ -419,8 +439,9 @@ def results():
 
     # Calculate bonuses only if we accept the hit and submit the bonus
     if (accept):
-        bonus_correctness = round(((num_correct - min_num_correct_questions) * correctness_per_question_bonus if (num_correct - min_num_correct_questions > 0) else 0), 2)
-        
+        bonus_correctness = round(((num_correct - min_num_correct_questions) *
+                                  correctness_per_question_bonus if (num_correct - min_num_correct_questions > 0) else 0), 2)
+
         if total_time < 14 * 60 * 1000:
             bonus_time = 0.32 * (base_pay + bonus_correctness)
         elif total_time < 15 * 60 * 1000:
@@ -435,17 +456,19 @@ def results():
             bonus_time = 0.12 * (base_pay + bonus_correctness)
         bonus_time = round(bonus_time, 2)
 
-        print("Bonus from correctness: " + str(bonus_correctness) + " bonus from time: " + str(bonus_time))
+        print("Bonus from correctness: " + str(bonus_correctness) +
+              " bonus from time: " + str(bonus_time))
         total_bonus = round(bonus_correctness + bonus_time, 2)
 
     total_pay = base_pay + total_bonus
 
     resp = make_response(render_template("results.html", AMAZON_HOST=AMAZON_HOST, percentage_correct=percentage_correct,
-        num_correct=num_correct, total_time=int(round(total_time/1000)), accept=accept,
-        failure_reason=failure_reason, bonus_time=str("{:.2f}".format(bonus_time)),
-        bonus_correctness=str("{:.2f}".format(bonus_correctness)), total_bonus=str("{:.2f}".format(total_bonus)),
-        total_pay=str("{:.2f}".format(total_pay)))
-    )
+                                         num_correct=num_correct, total_time=int(round(total_time/1000)), accept=accept,
+                                         failure_reason=failure_reason, bonus_time=str(
+                                             "{:.2f}".format(bonus_time)),
+                                         bonus_correctness=str("{:.2f}".format(bonus_correctness)), total_bonus=str("{:.2f}".format(total_bonus)),
+                                         total_pay=str("{:.2f}".format(total_pay)))
+                         )
     resp.headers['x-frame-options'] = '*'
     return resp
 
@@ -453,7 +476,8 @@ def results():
 # Modifies the database in order to record a user's question choice and time spent on that question
 @app.route('/record_question_and_time', methods=['POST'])
 def record_question_and_time():
-    print("record_question_and_time was called as a " + request.method + " request")
+    print("record_question_and_time was called as a " +
+          request.method + " request")
     if request.method == 'POST':
         data = json.loads(request.form['data'])
         print(data)
@@ -462,15 +486,17 @@ def record_question_and_time():
         user_choice = data['user_choice']
         question_time_val = str(data['time_spent'])
 
-        worker_id = data['worker_id']   
+        worker_id = data['worker_id']
 
         # Insert the user answer
-        SQL_question = "UPDATE users SET " + question + "='" + user_choice + "' WHERE worker_id='" + worker_id + "';"
+        SQL_question = "UPDATE users SET " + question + "='" + \
+            user_choice + "' WHERE worker_id='" + worker_id + "';"
         print("Executing SQL", SQL_question)
         result = db.engine.execute(SQL_question)
 
         # Insert the time spent on the question
-        SQL_question_time = "UPDATE users SET " + question_time_col  +"=" + question_time_val + " WHERE worker_id='" + worker_id + "';"
+        SQL_question_time = "UPDATE users SET " + question_time_col + "=" + \
+            question_time_val + " WHERE worker_id='" + worker_id + "';"
         print("Executing SQL", SQL_question_time)
         result = db.engine.execute(SQL_question_time)
 
@@ -478,6 +504,7 @@ def record_question_and_time():
         print("Wrong request, request should be POST not GET")
 
     return "OK"
+
 
 if __name__ == "__main__":
     # app.debug = DEBUG

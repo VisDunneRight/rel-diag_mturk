@@ -1,15 +1,16 @@
 import os
 import sys
 import boto3
+import config
 
 #Start Configuration Variables
-AWS_ACCESS_KEY_ID = "AWS_ACCESS_KEY_ID"
-AWS_SECRET_ACCESS_KEY = "AWS_SECRET_ACCESS_KEY"
-DEV_ENVIROMENT_BOOLEAN = False
+appConfig = config.Config()
+
+DEV_ENVIRONMENT_BOOLEAN = False
 #End Configuration Variables
 
 #This allows us to specify whether we are pushing to the sandbox or live site.
-if DEV_ENVIROMENT_BOOLEAN:
+if DEV_ENVIRONMENT_BOOLEAN:
     AMAZON_HOST = "mechanicalturk.sandbox.amazonaws.com"            # For Sandbox only
     qualification_id = "qualification_id"                           # For Sandbox only
     custom_qualification_id = "custom_qualification_id"             # For Sandbox only
@@ -39,17 +40,17 @@ was not successful' error message."
 usa = [{'Country': "US"}]
 
 def get_connection():
-    if DEV_ENVIROMENT_BOOLEAN:
+    if DEV_ENVIRONMENT_BOOLEAN:
         return  boto3.client('mturk',
-            aws_access_key_id=AWS_ACCESS_KEY_ID,
-            aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+            aws_access_key_id=appConfig.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=appConfig.AWS_SECRET_ACCESS_KEY,
             region_name = 'us-east-1',
             endpoint_url='https://mturk-requester-sandbox.us-east-1.amazonaws.com'
         )
     else:
         return  boto3.client('mturk',
-            aws_access_key_id=AWS_ACCESS_KEY_ID,
-            aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+            aws_access_key_id=appConfig.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=appConfig.AWS_SECRET_ACCESS_KEY,
             region_name = 'us-east-1',
             endpoint_url='https://mturk-requester.us-east-1.amazonaws.com'
         )
@@ -199,7 +200,7 @@ if __name__ == "__main__":
     yes = {'yes','y', 'ye', ''}
     no = {'no','n'}
 
-    setting = "on SANDBOX" if DEV_ENVIROMENT_BOOLEAN else "LIVE"
+    setting = "on SANDBOX" if DEV_ENVIRONMENT_BOOLEAN else "LIVE"
     print("Are you sure you want to deploy a " + arg1 + " HIT " + setting + "? [Y/N]")
     choice = input().lower()
     if choice in yes:

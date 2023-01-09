@@ -4,24 +4,24 @@ import time
 from datetime import datetime
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+import config
 
+appConfig = config.Config()
 
-AWS_ACCESS_KEY_ID = "AWS_ACCESS_KEY_ID"
-AWS_SECRET_ACCESS_KEY = "AWS_SECRET_ACCESS_KEY"
 DEV_ENVIRONMENT_BOOLEAN = False
 
 def get_connection():
     if DEV_ENVIRONMENT_BOOLEAN:
         return  boto3.client('mturk',
-            aws_access_key_id=AWS_ACCESS_KEY_ID,
-            aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+            aws_access_key_id=appConfig.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=appConfig.AWS_SECRET_ACCESS_KEY,
             region_name = 'us-east-1',
             endpoint_url='https://mturk-requester-sandbox.us-east-1.amazonaws.com'
         )
     else:
         return  boto3.client('mturk',
-            aws_access_key_id=AWS_ACCESS_KEY_ID,
-            aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+            aws_access_key_id=appConfig.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=appConfig.AWS_SECRET_ACCESS_KEY,
             region_name = 'us-east-1',
             endpoint_url='https://mturk-requester.us-east-1.amazonaws.com'
         )
@@ -78,7 +78,7 @@ def clear():
 
 # Extend HIT to have an additional num_additional_assignments assignments
 def extend_hit(num_additional_assignments):
-    hit_id = "306996CF6WKT6MUWN06276YLZXHB10"
+    hit_id = "306996CF6WKT6MUWN06276YLZXHB10"# XXX Hard coded!!!
 
     response = conn.create_additional_assignments_for_hit(
         HITId = hit_id,

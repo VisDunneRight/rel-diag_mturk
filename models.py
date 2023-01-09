@@ -1,4 +1,4 @@
-from main import db
+from rd_study_server import db
 
 # Create our database model
 class User(db.Model):

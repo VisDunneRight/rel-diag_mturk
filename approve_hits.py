@@ -9,26 +9,27 @@ import pandas as pd
 from models import *
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+import config
 
 # Heroku Database URL
 DATABASE_URL = "replace_with_database_url_on_heroku"
 
-AWS_ACCESS_KEY_ID = "AWS_ACCESS_KEY_ID"
-AWS_SECRET_ACCESS_KEY = "AWS_SECRET_ACCESS_KEY"
-DEV_ENVIROMENT_BOOLEAN = False
+appConfig = config.Config()
+
+DEV_ENVIRONMENT_BOOLEAN = False
 
 def get_connection():
-    if DEV_ENVIROMENT_BOOLEAN:
+    if DEV_ENVIRONMENT_BOOLEAN:
         return  boto3.client('mturk',
-            aws_access_key_id=AWS_ACCESS_KEY_ID,
-            aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+            aws_access_key_id=appConfig.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=appConfig.AWS_SECRET_ACCESS_KEY,
             region_name = 'us-east-1',
             endpoint_url='https://mturk-requester-sandbox.us-east-1.amazonaws.com'
         )
     else:
         return  boto3.client('mturk',
-            aws_access_key_id=AWS_ACCESS_KEY_ID,
-            aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+            aws_access_key_id=appConfig.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=appConfig.AWS_SECRET_ACCESS_KEY,
             region_name = 'us-east-1',
             endpoint_url='https://mturk-requester.us-east-1.amazonaws.com'
         )

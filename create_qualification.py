@@ -2,7 +2,7 @@ import boto3
 import sys
 from post_hits import get_connection
 
-# Make sure to check the value of DEV_ENVIROMENT_BOOLEAN from post_hits.py before running to make sure it is in Sandbox or Live mode
+# Make sure to check the value of DEV_ENVIRONMENT_BOOLEAN from post_hits.py before running to make sure it is in Sandbox or Live mode
 
 questions = open(name='qualification_questions.xml', mode='r').read()
 answers = open(name='qualification_answers.xml', mode='r').read()
