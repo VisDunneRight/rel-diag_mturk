@@ -1,4 +1,4 @@
-from main import db
+from rd_study_server import db
 from models import User
 
 # create the database and the db table
