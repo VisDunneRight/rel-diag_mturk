@@ -406,7 +406,7 @@ def tutorialClick():
 # actual route used for questions
 @app.route('/test', methods=['GET', 'POST'])
 def test():
-    user = getUser(request=request, createUser=True)
+    user = getUser(request=request, createUser=False)
 
     possibleRedirect = updateProgressAndGetRedirect(user, Sections.TEST, request.args.get('nextSection'))
     if possibleRedirect:
@@ -419,6 +419,7 @@ def test():
         worker_id=user.worker_id,
         assignment_id=user.assignment_id,
         hit_id=user.hit_id,
+        current_page=user.current_page,
         questions=app.questions))
     resp.headers['x-frame-options'] = '*'
     return resp
@@ -594,6 +595,7 @@ def get_next_question():
         
         question_start = datetime.datetime.utcnow()
         setattr(user, question_start_col, question_start)
+        setattr(user, 'current_page', question_num)
 
         db.session.commit()
 

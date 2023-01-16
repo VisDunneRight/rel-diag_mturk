@@ -36,21 +36,26 @@
   window.onload = function () {
 
     // Throw away extra arguments
-    let params = new URLSearchParams(location.search)
-    params.delete('nextSection')
-    history.replaceState(null, '', '?' + params + location.hash)
+    let params = new URLSearchParams(location.search);
+    params.delete('nextSection');
+    history.replaceState(null, '', '?' + params + location.hash);
 
-    load_next_question()
+    let t_question_num = {{ current_page | tojson | safe
+  }};
+  // Can't do directly w/o goofy jinja issue
+  question_num = t_question_num;
+  console.log('question_num' + question_num)
+  load_next_question();
 
-    window.static_folder = "{{url_for('static', filename='')}}";
+  window.static_folder = "{{url_for('static', filename='')}}";
 
-    // Start the timer
-    start_timer();
+  // Start the timer
+  start_timer();
 
-    // Set Progress bar
-    apply_progress_changes();
+  // Set Progress bar
+  apply_progress_changes();
 
-    CountDown.Start(50 * 60 * 1000);
+  CountDown.Start(50 * 60 * 1000);
   };
 </script>
 
