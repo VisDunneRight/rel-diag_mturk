@@ -142,9 +142,10 @@ def getPatternOrder():
     pattern_order = []
     for sequence in range(1, num_sequences+1):
         temp_order = []
-        for pattern in range(1,NUM_PATTERNS+1):
-            for mode in range(1, NUM_MODES+1):
-                temp_order.append(pattern)
+        for i in [1, 2]:
+            for pattern in range(1,NUM_PATTERNS+1):
+                for mode in range(1, NUM_MODES+1):
+                    temp_order.append(pattern)
         random.shuffle(temp_order)
         pattern_order.extend(temp_order)
     return pattern_order
