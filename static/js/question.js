@@ -1,8 +1,9 @@
+
 // Check if a radio button is selected and show and hide the warning appropriately
 function radio_is_checked() {
-    var input_ids = ["#QA", "#QB", "#QC", "#QD"];
-    for (i=0; i<input_ids.length; i++){
-        if ($(input_ids[i]).is(':checked')) {
+    for (i = 1; i <= num_question_choices; i++) {
+        let radioButton = $('#Q' + i);
+        if (radioButton.is(':checked')) {
             $("#radio_selection_warning").hide()
             return true;
         }
@@ -14,83 +15,114 @@ function radio_is_checked() {
 
 // Checks if the user answered correctly and visually displays the correct answer
 function check_answer() {
-    var input_ids = ["#QA", "#QB", "#QC", "#QD"];
-    user_choice = "";
-    for (i=0; i<input_ids.length; i++){
-        if ($(input_ids[i]).is(':checked')) {
-            user_choice = $(input_ids[i]).val();
+    user_choice = '';
+    for (i = 1; i <= num_question_choices; i++) {
+        let radioButton = $('#Q' + i);
+        if (radioButton.is(':checked')) {
+            user_choice = radioButton.val();
             break;
         }
     }
 
     // Perform an AJAX request to check the answer for the current question number
     // The answers for other questions is not shown until the user submits their selection on that question
-    var url = "/get_question_answer";
-    data = {question_num: question_num};
+    var url = "/record_choice_get_answer";
+    data = { worker_id: worker_id, question_num: question_num, user_choice: user_choice };
     $.ajax({
         url: url,
         type: 'POST',
         contentType: 'application/json;charset=UTF-8',
         data: JSON.stringify(data, null, '\t'),
-        success: function(data) {
-            correct_answer = data
-            console.log("Correct choice is:", correct_answer, ",user chose:", user_choice);
+        success: function (data) {
+
+            // data = {
+            //     'answerNum': ...,
+            //     'answerText': '...'
+            // }
+
+            correct_answer = data.answerNum;
+            console.log("Correct choice is:", correct_answer, ", user chose:", user_choice);
 
             // HTML Colors for correct and wrong answers
-            var correct_color = "#6C9A33"
-            var wrong_color = "#672770"
+            let correct_color = "#6C9A33"
+            let wrong_color = "#672770"
 
             // Change the color of the choices to suggest (in)/correctness
+
+            let correctAnswerLabel = $('#Q_label_' + correct_answer);
+
             if (user_choice == correct_answer) {
                 console.log("Correct Answer!");
-                $('#Q'+correct_answer+'_label').after("<p id='feedback_id_correct' style='display:inline;margin-left:12px';><strong>Correct</strong></p>");
+                correctAnswerLabel.after("<p id='feedback_id_correct' style='display:inline;margin-left:12px';><strong>Correct</strong></p>");
                 $('#feedback_id_correct').css("color", correct_color);
             }
             else {
                 console.log("Wrong Answer!");
-                $('#Q'+user_choice+'_label').css("color", wrong_color);
-                $('#Q'+user_choice+'_label').after("<p id='feedback_id_wrong' style='display:inline;margin-left:12px';><strong>Wrong</strong></p>");
+                let userChoiceLabel = $('#Q_label_' + user_choice);
+                userChoiceLabel.css("color", wrong_color);
+                userChoiceLabel.after("<p id='feedback_id_wrong' style='display:inline;margin-left:12px';><strong>Wrong</strong></p>");
                 $('#feedback_id_wrong').css("color", wrong_color);
             }
-            $('#Q'+correct_answer+'_label').css("color", correct_color);
+            correctAnswerLabel.css("color", correct_color);
 
             // Disable all the radio buttons
             $('input[type=radio').attr('disabled', true);
 
             // Change the text on the button
             $('#submit_answer').prop('value', 'Next');
-
-            // Perform time measurement and record it in the database
-            record_question_and_time(user_choice);
         },
-        error: function(xhr, testStatus, errorThrown) {
+        error: function (xhr, testStatus, errorThrown) {
             console.log("AJAX to get_question_answer() route failed!");
         }
     });
 }
 
 // Loads the next question in the list and updates the image, schema and SQL 
-function load_next_question(schema_src, sql_src) {
+function load_next_question() {
     // Update the schema
     // var schema_iframe = $('.sql_schema_iframe');
     // schema_src = schema_src.replace("1", question_num.toString());
     // schema_iframe[0].src = schema_src;
     // $('.sql_schema_iframe').load(document.URL +  ' .sql_schema_iframe');
 
-    // Update the SQL
-    var sql_iframe = $('.sql_query_iframe');
-    sql_src = sql_src.replace("1", question_num.toString());
-    sql_iframe[0].src = sql_src;
-    $('.sql_query_iframe').load(document.URL +  ' .sql_query_iframe');
+
+    worker_id = localStorage.getItem('worker_id');
+    data = { worker_id: worker_id, question_num: question_num };
+    let url = "/get_next_question";
+    $.ajax({
+        url: url,
+        type: 'POST',
+        data: JSON.stringify(data, null, '\t'),
+        contentType: 'application/json;charset=UTF-8',
+        success: function (data) {
+            console.log("XXXX ", data)
+            // data = {
+            //     'image': '...',
+            //     'answerStrings': ['...', '...', ...]
+            let filename = 'img/question/' + data.image;
+            $('.question_div_mid img').attr("src", static_folder + filename);
+
+            for (i = 0; i < num_question_choices; i++) {
+                let text_val = data.answerStrings[i];
+                let html_val = text_val.replace(/\*\*(\**[\s\S]*?\**)\*\*/g, "<b>$1</b>");// make it bold
+
+                $('#Q_label_' + (i + 1)).html(html_val);
+            }
+
+        },
+        error: function (xhr, testStatus, errorThrown) {
+            console.log("AJAX failed");
+        }
+    });
+
 
     // Enable all radio buttons
     $('input[type=radio').attr('disabled', false);
 
     // Change the color of all choices to black
-    $('#Qa_label').css("color", "black");
-    $('#Qb_label').css("color", "black");
-    $('#Qc_label').css("color", "black");
-    $('#Qd_label').css("color", "black");
+    for (i = 0; i < 4; i++) {
+        $('#Q_label_' + (i + 1)).css("color", "black");
+    }
 
     $('#feedback_id_correct').remove();
     $('#feedback_id_wrong').remove();

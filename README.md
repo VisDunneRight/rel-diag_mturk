@@ -103,6 +103,7 @@ On Windows with WSL, install https://marketplace.visualstudio.com/items?itemName
 
 
 ```python db_create.py```
+Actually, this only currently works with debugpy from VSCode... Why?
 
 
 ``` sudo -u postgres psql -d rdstudy```
@@ -116,6 +117,8 @@ in postgres
 ```bash
 flask run
 ```
+
+http://127.0.0.1:5000/?workerId=a&assignmentId=b&hitId=c
 
 ## Basic/useful Postgres psql commands
 To connect in psql as user aristotle: `sudo -u aristotle psql postgres`\

@@ -1,0 +1,862 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="730.08pt" height="442.08pt" viewBox="0 0 730.08 442.08" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2023-01-09T13:19:07.840580</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.6.2, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 442.08 
+L 730.08 442.08 
+L 730.08 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="text_1">
+    <!-- SELECT -->
+    <g style="fill: #990088" transform="translate(38.022857 47.088) scale(0.32 -0.32)">
+     <defs>
+      <path id="SourceCodePro-Regular-53" d="M 1952 -77 
+C 2874 -77 3437 454 3437 1120 
+C 3437 1741 3027 2029 2509 2240 
+L 1920 2496 
+C 1562 2643 1171 2790 1171 3194 
+C 1171 3571 1498 3808 1984 3808 
+C 2419 3808 2739 3654 3014 3411 
+L 3296 3757 
+C 2989 4064 2528 4275 2003 4275 
+C 1203 4275 627 3802 627 3162 
+C 627 2547 1114 2246 1536 2080 
+L 2138 1818 
+C 2566 1632 2893 1504 2893 1056 
+C 2893 666 2554 390 1978 390 
+C 1498 390 1062 602 749 915 
+L 429 544 
+C 806 166 1338 -77 1952 -77 
+z
+" transform="scale(0.015625)"/>
+      <path id="SourceCodePro-Regular-45" d="M 730 0 
+L 3392 0 
+L 3392 454 
+L 1267 454 
+L 1267 1978 
+L 3008 1978 
+L 3008 2432 
+L 1267 2432 
+L 1267 3750 
+L 3328 3750 
+L 3328 4198 
+L 730 4198 
+L 730 0 
+z
+" transform="scale(0.015625)"/>
+      <path id="SourceCodePro-Regular-4c" d="M 858 0 
+L 3462 0 
+L 3462 454 
+L 1382 454 
+L 1382 4198 
+L 858 4198 
+L 858 0 
+z
+" transform="scale(0.015625)"/>
+      <path id="SourceCodePro-Regular-43" d="M 2246 -77 
+C 2803 -77 3213 147 3546 531 
+L 3245 858 
+C 2976 557 2682 390 2298 390 
+C 1491 390 966 1056 966 2112 
+C 966 3155 1491 3808 2298 3808 
+C 2650 3808 2925 3654 3142 3424 
+L 3443 3763 
+C 3200 4032 2797 4275 2298 4275 
+C 1203 4275 416 3450 416 2099 
+C 416 730 1210 -77 2246 -77 
+z
+" transform="scale(0.015625)"/>
+      <path id="SourceCodePro-Regular-54" d="M 1651 0 
+L 2189 0 
+L 2189 3750 
+L 3571 3750 
+L 3571 4198 
+L 269 4198 
+L 269 3750 
+L 1651 3750 
+L 1651 0 
+z
+" transform="scale(0.015625)"/>
+     </defs>
+     <use xlink:href="#SourceCodePro-Regular-53"/>
+     <use xlink:href="#SourceCodePro-Regular-45" x="59.999985"/>
+     <use xlink:href="#SourceCodePro-Regular-4c" x="119.999969"/>
+     <use xlink:href="#SourceCodePro-Regular-45" x="179.999954"/>
+     <use xlink:href="#SourceCodePro-Regular-43" x="239.999939"/>
+     <use xlink:href="#SourceCodePro-Regular-54" x="299.999924"/>
+    </g>
+   </g>
+   <g id="text_2">
+    <!-- M.name -->
+    <g transform="translate(172.960457 47.088) scale(0.32 -0.32)">
+     <defs>
+      <path id="SourceCodePro-Regular-4d" d="M 461 0 
+L 960 0 
+L 960 2099 
+C 960 2509 909 3226 870 3584 
+L 883 3584 
+L 1126 2765 
+L 1715 1114 
+L 2099 1114 
+L 2701 2765 
+L 2938 3584 
+L 2957 3584 
+C 2931 3226 2867 2509 2867 2099 
+L 2867 0 
+L 3379 0 
+L 3379 4198 
+L 2726 4198 
+L 2131 2406 
+L 1933 1728 
+L 1907 1728 
+L 1702 2406 
+L 1114 4198 
+L 461 4198 
+L 461 0 
+z
+" transform="scale(0.015625)"/>
+      <path id="SourceCodePro-Regular-2e" d="M 1920 -77 
+C 2208 -77 2438 141 2438 461 
+C 2438 787 2208 1005 1920 1005 
+C 1632 1005 1402 787 1402 461 
+C 1402 141 1632 -77 1920 -77 
+z
+" transform="scale(0.015625)"/>
+      <path id="SourceCodePro-Regular-6e" d="M 595 0 
+L 1120 0 
+L 1120 2170 
+C 1485 2547 1734 2733 2106 2733 
+C 2618 2733 2822 2451 2822 1862 
+L 2822 0 
+L 3347 0 
+L 3347 1933 
+C 3347 2752 3008 3187 2272 3187 
+C 1786 3187 1427 2925 1101 2579 
+L 1075 2579 
+L 1030 3110 
+L 595 3110 
+L 595 0 
+z
+" transform="scale(0.015625)"/>
+      <path id="SourceCodePro-Regular-61" d="M 1574 -77 
+C 2016 -77 2458 154 2803 422 
+L 2822 422 
+L 2867 0 
+L 3296 0 
+L 3296 1907 
+C 3296 2682 2886 3187 2035 3187 
+C 1491 3187 966 2944 653 2739 
+L 858 2381 
+C 1146 2560 1542 2752 1946 2752 
+C 2547 2752 2758 2394 2771 1971 
+C 1165 1843 518 1504 518 806 
+C 518 250 992 -77 1574 -77 
+z
+M 1715 346 
+C 1357 346 1030 493 1030 845 
+C 1030 1254 1440 1517 2771 1626 
+L 2771 806 
+C 2419 512 2067 346 1715 346 
+z
+" transform="scale(0.015625)"/>
+      <path id="SourceCodePro-Regular-6d" d="M 371 0 
+L 896 0 
+L 896 2253 
+C 1050 2573 1190 2733 1408 2733 
+C 1638 2733 1728 2547 1728 2189 
+L 1728 0 
+L 2214 0 
+L 2214 2253 
+C 2381 2573 2496 2733 2714 2733 
+C 2944 2733 3046 2547 3046 2189 
+L 3046 0 
+L 3571 0 
+L 3571 2227 
+C 3571 2848 3315 3187 2880 3187 
+C 2522 3187 2330 2982 2150 2650 
+C 2061 3008 1869 3187 1562 3187 
+C 1203 3187 1011 2989 851 2701 
+L 838 2701 
+L 794 3110 
+L 371 3110 
+L 371 0 
+z
+" transform="scale(0.015625)"/>
+      <path id="SourceCodePro-Regular-65" d="M 2112 -77 
+C 2611 -77 3008 90 3315 294 
+L 3123 640 
+C 2842 461 2547 346 2176 346 
+C 1530 346 1030 704 966 1408 
+L 3418 1408 
+C 3430 1491 3443 1606 3443 1728 
+C 3443 2605 2918 3187 2022 3187 
+C 1190 3187 435 2573 435 1562 
+C 435 525 1178 -77 2112 -77 
+z
+M 2035 2771 
+C 2566 2771 2918 2458 2963 1818 
+L 979 1818 
+C 1075 2432 1523 2771 2035 2771 
+z
+" transform="scale(0.015625)"/>
+     </defs>
+     <use xlink:href="#SourceCodePro-Regular-4d"/>
+     <use xlink:href="#SourceCodePro-Regular-2e" x="59.999985"/>
+     <use xlink:href="#SourceCodePro-Regular-6e" x="119.999969"/>
+     <use xlink:href="#SourceCodePro-Regular-61" x="179.999954"/>
+     <use xlink:href="#SourceCodePro-Regular-6d" x="239.999939"/>
+     <use xlink:href="#SourceCodePro-Regular-65" x="299.999924"/>
+    </g>
+   </g>
+   <g id="text_3">
+    <!-- FROM -->
+    <g style="fill: #990088" transform="translate(38.022857 88.4016) scale(0.32 -0.32)">
+     <defs>
+      <path id="SourceCodePro-Regular-46" d="M 851 0 
+L 1389 0 
+L 1389 1882 
+L 3117 1882 
+L 3117 2330 
+L 1389 2330 
+L 1389 3750 
+L 3430 3750 
+L 3430 4198 
+L 851 4198 
+L 851 0 
+z
+" transform="scale(0.015625)"/>
+      <path id="SourceCodePro-Regular-52" d="M 640 0 
+L 1171 0 
+L 1171 1773 
+L 1920 1773 
+L 2931 0 
+L 3539 0 
+L 2470 1830 
+C 3040 1978 3411 2368 3411 3021 
+C 3411 3891 2797 4198 1946 4198 
+L 640 4198 
+L 640 0 
+z
+M 1171 2208 
+L 1171 3770 
+L 1869 3770 
+C 2522 3770 2880 3571 2880 3021 
+C 2880 2477 2522 2208 1869 2208 
+L 1171 2208 
+z
+" transform="scale(0.015625)"/>
+      <path id="SourceCodePro-Regular-4f" d="M 1920 -77 
+C 2867 -77 3533 742 3533 2118 
+C 3533 3475 2867 4275 1920 4275 
+C 973 4275 307 3475 307 2118 
+C 307 742 973 -77 1920 -77 
+z
+M 1920 390 
+C 1280 390 858 1043 858 2118 
+C 858 3174 1280 3808 1920 3808 
+C 2560 3808 2982 3174 2982 2118 
+C 2982 1043 2560 390 1920 390 
+z
+" transform="scale(0.015625)"/>
+     </defs>
+     <use xlink:href="#SourceCodePro-Regular-46"/>
+     <use xlink:href="#SourceCodePro-Regular-52" x="59.999985"/>
+     <use xlink:href="#SourceCodePro-Regular-4f" x="119.999969"/>
+     <use xlink:href="#SourceCodePro-Regular-4d" x="179.999954"/>
+    </g>
+   </g>
+   <g id="text_4">
+    <!-- Merchant M -->
+    <g transform="translate(134.406857 88.4016) scale(0.32 -0.32)">
+     <defs>
+      <path id="SourceCodePro-Regular-72" d="M 934 0 
+L 1459 0 
+L 1459 1824 
+C 1830 2470 2272 2714 2739 2714 
+C 2982 2714 3098 2682 3315 2605 
+L 3437 3059 
+C 3245 3155 3053 3187 2822 3187 
+C 2246 3187 1760 2874 1434 2374 
+L 1414 2374 
+L 1370 3110 
+L 934 3110 
+L 934 0 
+z
+" transform="scale(0.015625)"/>
+      <path id="SourceCodePro-Regular-63" d="M 2214 -77 
+C 2675 -77 3104 102 3450 410 
+L 3213 749 
+C 2957 531 2637 358 2253 358 
+C 1536 358 1056 838 1056 1549 
+C 1056 2266 1549 2752 2266 2752 
+C 2592 2752 2861 2618 3117 2394 
+L 3379 2733 
+C 3123 2982 2752 3187 2246 3187 
+C 1306 3187 512 2592 512 1549 
+C 512 518 1242 -77 2214 -77 
+z
+" transform="scale(0.015625)"/>
+      <path id="SourceCodePro-Regular-68" d="M 595 0 
+L 1120 0 
+L 1120 2170 
+C 1485 2547 1734 2733 2106 2733 
+C 2618 2733 2822 2451 2822 1862 
+L 2822 0 
+L 3347 0 
+L 3347 1933 
+C 3347 2752 3008 3187 2272 3187 
+C 1786 3187 1427 2925 1107 2579 
+L 1088 2579 
+L 1120 3315 
+L 1120 4557 
+L 595 4557 
+L 595 0 
+z
+" transform="scale(0.015625)"/>
+      <path id="SourceCodePro-Regular-74" d="M 2522 -77 
+C 2912 -77 3213 6 3494 109 
+L 3379 493 
+C 3155 410 2925 352 2630 352 
+C 2029 352 1843 646 1843 1203 
+L 1843 2682 
+L 3373 2682 
+L 3373 3110 
+L 1843 3110 
+L 1843 4109 
+L 1408 4109 
+L 1338 3110 
+L 442 3078 
+L 442 2682 
+L 1318 2682 
+L 1318 1210 
+C 1318 442 1613 -77 2522 -77 
+z
+" transform="scale(0.015625)"/>
+      <path id="SourceCodePro-Regular-20" transform="scale(0.015625)"/>
+     </defs>
+     <use xlink:href="#SourceCodePro-Regular-4d"/>
+     <use xlink:href="#SourceCodePro-Regular-65" x="59.999985"/>
+     <use xlink:href="#SourceCodePro-Regular-72" x="119.999969"/>
+     <use xlink:href="#SourceCodePro-Regular-63" x="179.999954"/>
+     <use xlink:href="#SourceCodePro-Regular-68" x="239.999939"/>
+     <use xlink:href="#SourceCodePro-Regular-61" x="299.999924"/>
+     <use xlink:href="#SourceCodePro-Regular-6e" x="359.999908"/>
+     <use xlink:href="#SourceCodePro-Regular-74" x="419.999893"/>
+     <use xlink:href="#SourceCodePro-Regular-20" x="479.999878"/>
+     <use xlink:href="#SourceCodePro-Regular-4d" x="539.999863"/>
+    </g>
+   </g>
+   <g id="text_5">
+    <!-- WHERE NOT EXISTS -->
+    <g style="fill: #990088" transform="translate(38.022857 129.7152) scale(0.32 -0.32)">
+     <defs>
+      <path id="SourceCodePro-Regular-57" d="M 704 0 
+L 1357 0 
+L 1766 1690 
+C 1830 1946 1869 2189 1914 2445 
+L 1933 2445 
+C 1971 2189 2022 1946 2086 1690 
+L 2496 0 
+L 3162 0 
+L 3776 4205 
+L 3200 4205 
+L 2906 1562 
+C 2867 1216 2854 1011 2829 595 
+L 2803 595 
+C 2726 1011 2688 1216 2598 1562 
+L 2202 3123 
+L 1690 3123 
+L 1280 1562 
+C 1197 1216 1152 1011 1075 595 
+L 1056 595 
+C 1037 1011 1011 1216 973 1568 
+L 666 4205 
+L 64 4205 
+L 704 0 
+z
+" transform="scale(0.015625)"/>
+      <path id="SourceCodePro-Regular-48" d="M 506 0 
+L 1043 0 
+L 1043 1978 
+L 2797 1978 
+L 2797 0 
+L 3334 0 
+L 3334 4198 
+L 2797 4198 
+L 2797 2438 
+L 1043 2438 
+L 1043 4198 
+L 506 4198 
+L 506 0 
+z
+" transform="scale(0.015625)"/>
+      <path id="SourceCodePro-Regular-4e" d="M 525 0 
+L 1037 0 
+L 1037 2195 
+C 1037 2630 986 3078 966 3507 
+L 979 3507 
+L 1382 2637 
+L 2726 0 
+L 3315 0 
+L 3315 4198 
+L 2803 4198 
+L 2803 2022 
+C 2803 1581 2854 1107 2874 691 
+L 2861 691 
+L 2458 1562 
+L 1114 4198 
+L 525 4198 
+L 525 0 
+z
+" transform="scale(0.015625)"/>
+      <path id="SourceCodePro-Regular-58" d="M 346 0 
+L 909 0 
+L 1536 1133 
+C 1645 1338 1754 1549 1875 1805 
+L 1901 1805 
+C 2042 1549 2157 1338 2272 1133 
+L 2906 0 
+L 3494 0 
+L 2240 2144 
+L 3411 4198 
+L 2848 4198 
+L 2272 3123 
+C 2170 2931 2086 2758 1971 2515 
+L 1946 2515 
+C 1811 2758 1715 2931 1606 3123 
+L 1018 4198 
+L 429 4198 
+L 1600 2170 
+L 346 0 
+z
+" transform="scale(0.015625)"/>
+      <path id="SourceCodePro-Regular-49" d="M 608 0 
+L 3232 0 
+L 3232 454 
+L 2189 454 
+L 2189 3750 
+L 3232 3750 
+L 3232 4198 
+L 608 4198 
+L 608 3750 
+L 1651 3750 
+L 1651 454 
+L 608 454 
+L 608 0 
+z
+" transform="scale(0.015625)"/>
+     </defs>
+     <use xlink:href="#SourceCodePro-Regular-57"/>
+     <use xlink:href="#SourceCodePro-Regular-48" x="59.999985"/>
+     <use xlink:href="#SourceCodePro-Regular-45" x="119.999969"/>
+     <use xlink:href="#SourceCodePro-Regular-52" x="179.999954"/>
+     <use xlink:href="#SourceCodePro-Regular-45" x="239.999939"/>
+     <use xlink:href="#SourceCodePro-Regular-20" x="299.999924"/>
+     <use xlink:href="#SourceCodePro-Regular-4e" x="359.999908"/>
+     <use xlink:href="#SourceCodePro-Regular-4f" x="419.999893"/>
+     <use xlink:href="#SourceCodePro-Regular-54" x="479.999878"/>
+     <use xlink:href="#SourceCodePro-Regular-20" x="539.999863"/>
+     <use xlink:href="#SourceCodePro-Regular-45" x="599.999847"/>
+     <use xlink:href="#SourceCodePro-Regular-58" x="659.999832"/>
+     <use xlink:href="#SourceCodePro-Regular-49" x="719.999817"/>
+     <use xlink:href="#SourceCodePro-Regular-53" x="779.999802"/>
+     <use xlink:href="#SourceCodePro-Regular-54" x="839.999786"/>
+     <use xlink:href="#SourceCodePro-Regular-53" x="899.999771"/>
+    </g>
+   </g>
+   <g id="text_6">
+    <!-- ( -->
+    <g transform="translate(346.451657 129.7152) scale(0.32 -0.32)">
+     <defs>
+      <path id="SourceCodePro-Regular-28" d="M 2771 -1126 
+L 3059 -858 
+C 2202 -134 1805 704 1805 1779 
+C 1805 2854 2202 3693 3059 4416 
+L 2771 4685 
+C 1882 3994 1331 3014 1331 1779 
+C 1331 544 1882 -435 2771 -1126 
+z
+" transform="scale(0.015625)"/>
+     </defs>
+     <use xlink:href="#SourceCodePro-Regular-28"/>
+    </g>
+   </g>
+   <g id="text_7">
+    <!-- SELECT -->
+    <g style="fill: #990088" transform="translate(76.576457 171.0288) scale(0.32 -0.32)">
+     <use xlink:href="#SourceCodePro-Regular-53"/>
+     <use xlink:href="#SourceCodePro-Regular-45" x="59.999985"/>
+     <use xlink:href="#SourceCodePro-Regular-4c" x="119.999969"/>
+     <use xlink:href="#SourceCodePro-Regular-45" x="179.999954"/>
+     <use xlink:href="#SourceCodePro-Regular-43" x="239.999939"/>
+     <use xlink:href="#SourceCodePro-Regular-54" x="299.999924"/>
+    </g>
+   </g>
+   <g id="text_8">
+    <!-- * -->
+    <g transform="translate(211.514057 171.0288) scale(0.32 -0.32)">
+     <defs>
+      <path id="SourceCodePro-Regular-2a" d="M 1152 710 
+L 1920 1728 
+L 2688 710 
+L 2957 902 
+L 2266 1958 
+L 3302 2406 
+L 3200 2701 
+L 2131 2349 
+L 2074 3558 
+L 1766 3558 
+L 1709 2349 
+L 640 2701 
+L 538 2406 
+L 1574 1958 
+L 883 902 
+L 1152 710 
+z
+" transform="scale(0.015625)"/>
+     </defs>
+     <use xlink:href="#SourceCodePro-Regular-2a"/>
+    </g>
+   </g>
+   <g id="text_9">
+    <!-- FROM -->
+    <g style="fill: #990088" transform="translate(76.576457 212.3424) scale(0.32 -0.32)">
+     <use xlink:href="#SourceCodePro-Regular-46"/>
+     <use xlink:href="#SourceCodePro-Regular-52" x="59.999985"/>
+     <use xlink:href="#SourceCodePro-Regular-4f" x="119.999969"/>
+     <use xlink:href="#SourceCodePro-Regular-4d" x="179.999954"/>
+    </g>
+   </g>
+   <g id="text_10">
+    <!-- Part P -->
+    <g transform="translate(172.960457 212.3424) scale(0.32 -0.32)">
+     <defs>
+      <path id="SourceCodePro-Regular-50" d="M 653 0 
+L 1184 0 
+L 1184 1664 
+L 1920 1664 
+C 2842 1664 3475 2080 3475 2963 
+C 3475 3885 2848 4198 1920 4198 
+L 653 4198 
+L 653 0 
+z
+M 1184 2099 
+L 1184 3770 
+L 1856 3770 
+C 2579 3770 2938 3571 2938 2963 
+C 2938 2368 2592 2099 1856 2099 
+L 1184 2099 
+z
+" transform="scale(0.015625)"/>
+     </defs>
+     <use xlink:href="#SourceCodePro-Regular-50"/>
+     <use xlink:href="#SourceCodePro-Regular-61" x="59.999985"/>
+     <use xlink:href="#SourceCodePro-Regular-72" x="119.999969"/>
+     <use xlink:href="#SourceCodePro-Regular-74" x="179.999954"/>
+     <use xlink:href="#SourceCodePro-Regular-20" x="239.999939"/>
+     <use xlink:href="#SourceCodePro-Regular-50" x="299.999924"/>
+    </g>
+   </g>
+   <g id="text_11">
+    <!-- WHERE NOT EXISTS -->
+    <g style="fill: #990088" transform="translate(76.576457 253.656) scale(0.32 -0.32)">
+     <use xlink:href="#SourceCodePro-Regular-57"/>
+     <use xlink:href="#SourceCodePro-Regular-48" x="59.999985"/>
+     <use xlink:href="#SourceCodePro-Regular-45" x="119.999969"/>
+     <use xlink:href="#SourceCodePro-Regular-52" x="179.999954"/>
+     <use xlink:href="#SourceCodePro-Regular-45" x="239.999939"/>
+     <use xlink:href="#SourceCodePro-Regular-20" x="299.999924"/>
+     <use xlink:href="#SourceCodePro-Regular-4e" x="359.999908"/>
+     <use xlink:href="#SourceCodePro-Regular-4f" x="419.999893"/>
+     <use xlink:href="#SourceCodePro-Regular-54" x="479.999878"/>
+     <use xlink:href="#SourceCodePro-Regular-20" x="539.999863"/>
+     <use xlink:href="#SourceCodePro-Regular-45" x="599.999847"/>
+     <use xlink:href="#SourceCodePro-Regular-58" x="659.999832"/>
+     <use xlink:href="#SourceCodePro-Regular-49" x="719.999817"/>
+     <use xlink:href="#SourceCodePro-Regular-53" x="779.999802"/>
+     <use xlink:href="#SourceCodePro-Regular-54" x="839.999786"/>
+     <use xlink:href="#SourceCodePro-Regular-53" x="899.999771"/>
+    </g>
+   </g>
+   <g id="text_12">
+    <!-- ( -->
+    <g transform="translate(385.005257 253.656) scale(0.32 -0.32)">
+     <use xlink:href="#SourceCodePro-Regular-28"/>
+    </g>
+   </g>
+   <g id="text_13">
+    <!-- SELECT -->
+    <g style="fill: #990088" transform="translate(115.130057 294.9696) scale(0.32 -0.32)">
+     <use xlink:href="#SourceCodePro-Regular-53"/>
+     <use xlink:href="#SourceCodePro-Regular-45" x="59.999985"/>
+     <use xlink:href="#SourceCodePro-Regular-4c" x="119.999969"/>
+     <use xlink:href="#SourceCodePro-Regular-45" x="179.999954"/>
+     <use xlink:href="#SourceCodePro-Regular-43" x="239.999939"/>
+     <use xlink:href="#SourceCodePro-Regular-54" x="299.999924"/>
+    </g>
+   </g>
+   <g id="text_14">
+    <!-- * -->
+    <g transform="translate(250.067657 294.9696) scale(0.32 -0.32)">
+     <use xlink:href="#SourceCodePro-Regular-2a"/>
+    </g>
+   </g>
+   <g id="text_15">
+    <!-- FROM -->
+    <g style="fill: #990088" transform="translate(115.130057 336.2832) scale(0.32 -0.32)">
+     <use xlink:href="#SourceCodePro-Regular-46"/>
+     <use xlink:href="#SourceCodePro-Regular-52" x="59.999985"/>
+     <use xlink:href="#SourceCodePro-Regular-4f" x="119.999969"/>
+     <use xlink:href="#SourceCodePro-Regular-4d" x="179.999954"/>
+    </g>
+   </g>
+   <g id="text_16">
+    <!-- Sells SP -->
+    <g transform="translate(211.514057 336.2832) scale(0.32 -0.32)">
+     <defs>
+      <path id="SourceCodePro-Regular-6c" d="M 2605 -77 
+C 2944 -77 3149 -13 3437 109 
+L 3302 499 
+C 3091 403 2899 358 2720 358 
+C 2349 358 2106 550 2106 1005 
+L 2106 4557 
+L 474 4557 
+L 474 4128 
+L 1581 4128 
+L 1581 1043 
+C 1581 307 1946 -77 2605 -77 
+z
+" transform="scale(0.015625)"/>
+      <path id="SourceCodePro-Regular-73" d="M 1984 -77 
+C 2874 -77 3366 346 3366 851 
+C 3366 1325 3117 1587 2080 1811 
+C 1446 1946 1178 2061 1178 2330 
+C 1178 2566 1363 2778 1894 2778 
+C 2291 2778 2650 2650 2938 2451 
+L 3194 2790 
+C 2886 3002 2413 3187 1939 3187 
+C 1088 3187 646 2803 646 2304 
+C 646 1837 1056 1562 1862 1395 
+C 2707 1222 2835 1056 2835 819 
+C 2835 557 2573 333 2048 333 
+C 1472 333 1056 499 698 755 
+L 454 410 
+C 832 147 1376 -77 1984 -77 
+z
+" transform="scale(0.015625)"/>
+     </defs>
+     <use xlink:href="#SourceCodePro-Regular-53"/>
+     <use xlink:href="#SourceCodePro-Regular-65" x="59.999985"/>
+     <use xlink:href="#SourceCodePro-Regular-6c" x="119.999969"/>
+     <use xlink:href="#SourceCodePro-Regular-6c" x="179.999954"/>
+     <use xlink:href="#SourceCodePro-Regular-73" x="239.999939"/>
+     <use xlink:href="#SourceCodePro-Regular-20" x="299.999924"/>
+     <use xlink:href="#SourceCodePro-Regular-53" x="359.999908"/>
+     <use xlink:href="#SourceCodePro-Regular-50" x="419.999893"/>
+    </g>
+   </g>
+   <g id="text_17">
+    <!-- WHERE -->
+    <g style="fill: #990088" transform="translate(115.130057 377.5968) scale(0.32 -0.32)">
+     <use xlink:href="#SourceCodePro-Regular-57"/>
+     <use xlink:href="#SourceCodePro-Regular-48" x="59.999985"/>
+     <use xlink:href="#SourceCodePro-Regular-45" x="119.999969"/>
+     <use xlink:href="#SourceCodePro-Regular-52" x="179.999954"/>
+     <use xlink:href="#SourceCodePro-Regular-45" x="239.999939"/>
+    </g>
+   </g>
+   <g id="text_18">
+    <!-- SP.pid = P.pid -->
+    <g transform="translate(230.790857 377.5968) scale(0.32 -0.32)">
+     <defs>
+      <path id="SourceCodePro-Regular-70" d="M 595 -1312 
+L 1120 -1312 
+L 1120 -262 
+L 1094 326 
+L 1114 326 
+C 1389 70 1754 -77 2042 -77 
+C 2790 -77 3456 544 3456 1600 
+C 3456 2566 3008 3187 2170 3187 
+C 1786 3187 1382 2989 1094 2714 
+L 1075 2714 
+L 1030 3110 
+L 595 3110 
+L 595 -1312 
+z
+M 1952 365 
+C 1741 365 1414 467 1120 730 
+L 1120 2278 
+C 1440 2598 1760 2746 2035 2746 
+C 2656 2746 2912 2285 2912 1600 
+C 2912 832 2509 365 1952 365 
+z
+" transform="scale(0.015625)"/>
+      <path id="SourceCodePro-Regular-69" d="M 2022 0 
+L 2547 0 
+L 2547 3110 
+L 576 3110 
+L 576 2682 
+L 2022 2682 
+L 2022 0 
+z
+M 2227 3763 
+C 2464 3763 2650 3923 2650 4173 
+C 2650 4416 2464 4582 2227 4582 
+C 1990 4582 1805 4416 1805 4173 
+C 1805 3923 1990 3763 2227 3763 
+z
+" transform="scale(0.015625)"/>
+      <path id="SourceCodePro-Regular-64" d="M 1734 -77 
+C 2118 -77 2490 147 2746 410 
+L 2765 410 
+L 2810 0 
+L 3245 0 
+L 3245 4557 
+L 2720 4557 
+L 2720 3360 
+L 2746 2784 
+L 2726 2784 
+C 2458 3040 2170 3187 1798 3187 
+C 1062 3187 384 2560 384 1549 
+C 384 512 922 -77 1734 -77 
+z
+M 1843 365 
+C 1267 365 928 813 928 1555 
+C 928 2266 1363 2746 1901 2746 
+C 2170 2746 2438 2643 2720 2381 
+L 2720 832 
+C 2445 525 2150 365 1843 365 
+z
+" transform="scale(0.015625)"/>
+      <path id="SourceCodePro-Regular-3d" d="M 544 2598 
+L 3296 2598 
+L 3296 2995 
+L 544 2995 
+L 544 2598 
+z
+M 544 1229 
+L 3296 1229 
+L 3296 1626 
+L 544 1626 
+L 544 1229 
+z
+" transform="scale(0.015625)"/>
+     </defs>
+     <use xlink:href="#SourceCodePro-Regular-53"/>
+     <use xlink:href="#SourceCodePro-Regular-50" x="59.999985"/>
+     <use xlink:href="#SourceCodePro-Regular-2e" x="119.999969"/>
+     <use xlink:href="#SourceCodePro-Regular-70" x="179.999954"/>
+     <use xlink:href="#SourceCodePro-Regular-69" x="239.999939"/>
+     <use xlink:href="#SourceCodePro-Regular-64" x="299.999924"/>
+     <use xlink:href="#SourceCodePro-Regular-20" x="359.999908"/>
+     <use xlink:href="#SourceCodePro-Regular-3d" x="419.999893"/>
+     <use xlink:href="#SourceCodePro-Regular-20" x="479.999878"/>
+     <use xlink:href="#SourceCodePro-Regular-50" x="539.999863"/>
+     <use xlink:href="#SourceCodePro-Regular-2e" x="599.999847"/>
+     <use xlink:href="#SourceCodePro-Regular-70" x="659.999832"/>
+     <use xlink:href="#SourceCodePro-Regular-69" x="719.999817"/>
+     <use xlink:href="#SourceCodePro-Regular-64" x="779.999802"/>
+    </g>
+   </g>
+   <g id="text_19">
+    <!-- AND -->
+    <g style="fill: #990088" transform="translate(115.130057 418.9104) scale(0.32 -0.32)">
+     <defs>
+      <path id="SourceCodePro-Regular-41" d="M 1485 2349 
+C 1632 2816 1766 3277 1901 3763 
+L 1926 3763 
+C 2054 3277 2195 2816 2342 2349 
+L 2541 1709 
+L 1286 1709 
+L 1485 2349 
+z
+M 205 0 
+L 749 0 
+L 1152 1280 
+L 2675 1280 
+L 3072 0 
+L 3635 0 
+L 2221 4198 
+L 1619 4198 
+L 205 0 
+z
+" transform="scale(0.015625)"/>
+      <path id="SourceCodePro-Regular-44" d="M 557 0 
+L 1619 0 
+C 2854 0 3539 781 3539 2118 
+C 3539 3450 2854 4198 1594 4198 
+L 557 4198 
+L 557 0 
+z
+M 1088 435 
+L 1088 3763 
+L 1555 3763 
+C 2515 3763 2989 3174 2989 2118 
+C 2989 1056 2515 435 1555 435 
+L 1088 435 
+z
+" transform="scale(0.015625)"/>
+     </defs>
+     <use xlink:href="#SourceCodePro-Regular-41"/>
+     <use xlink:href="#SourceCodePro-Regular-4e" x="59.999985"/>
+     <use xlink:href="#SourceCodePro-Regular-44" x="119.999969"/>
+    </g>
+   </g>
+   <g id="text_20">
+    <!-- SP.mid = M.mid)) -->
+    <g transform="translate(192.237257 418.9104) scale(0.32 -0.32)">
+     <defs>
+      <path id="SourceCodePro-Regular-29" d="M 1069 -1126 
+C 1958 -435 2509 544 2509 1779 
+C 2509 3014 1958 3994 1069 4685 
+L 781 4416 
+C 1638 3693 2035 2854 2035 1779 
+C 2035 704 1638 -134 781 -858 
+L 1069 -1126 
+z
+" transform="scale(0.015625)"/>
+     </defs>
+     <use xlink:href="#SourceCodePro-Regular-53"/>
+     <use xlink:href="#SourceCodePro-Regular-50" x="59.999985"/>
+     <use xlink:href="#SourceCodePro-Regular-2e" x="119.999969"/>
+     <use xlink:href="#SourceCodePro-Regular-6d" x="179.999954"/>
+     <use xlink:href="#SourceCodePro-Regular-69" x="239.999939"/>
+     <use xlink:href="#SourceCodePro-Regular-64" x="299.999924"/>
+     <use xlink:href="#SourceCodePro-Regular-20" x="359.999908"/>
+     <use xlink:href="#SourceCodePro-Regular-3d" x="419.999893"/>
+     <use xlink:href="#SourceCodePro-Regular-20" x="479.999878"/>
+     <use xlink:href="#SourceCodePro-Regular-4d" x="539.999863"/>
+     <use xlink:href="#SourceCodePro-Regular-2e" x="599.999847"/>
+     <use xlink:href="#SourceCodePro-Regular-6d" x="659.999832"/>
+     <use xlink:href="#SourceCodePro-Regular-69" x="719.999817"/>
+     <use xlink:href="#SourceCodePro-Regular-64" x="779.999802"/>
+     <use xlink:href="#SourceCodePro-Regular-29" x="839.999786"/>
+     <use xlink:href="#SourceCodePro-Regular-29" x="899.999771"/>
+    </g>
+   </g>
+  </g>
+ </g>
+</svg>

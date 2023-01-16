@@ -1,6 +1,0 @@
-SELECT	s.LastName
-FROM	students s, studentstudies ss, 
-	studyprograms sp
-WHERE	s.StudentID=ss.StudentID 
-AND	ss.StudyProgramID=sp.StudyProgramID 
-AND	sp.Name='Informatics'

@@ -1,1 +1,0 @@
-Find customers from 'Michigan' that have two invoices billed at two different states where none of them is 'Michigan'.
