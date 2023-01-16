@@ -134,7 +134,7 @@ def create_questions_array():
     return usedQuestionData
 
 def getPatternOrder():
-    sequence_length = NUM_PATTERNS * NUM_MODES
+    sequence_length = NUM_PATTERNS * NUM_MODES * 2
     if (NUM_QUESTIONS % sequence_length) != 0:
         raise Exception(NUM_QUESTIONS + ' is not evenly divisible by  ' + sequence_length)
     num_sequences = math.floor(NUM_QUESTIONS / sequence_length)
@@ -279,7 +279,8 @@ def updateProgressAndGetRedirect(user, current_section, next_section):
     if next_section:
         proper_next_section = SECTION_FOLLOWER[user.current_section]
         if current_section != proper_next_section:
-            app.logger.error('full_path ' + request.full_path + ' asked for section ' + current_section.name + ' but proper next section was ' + proper_next_section.name)
+            if current_section != Sections.TUTORIAL: # For some reason there is a weird issue where 2 requests are made from tutorial
+                app.logger.error('full_path ' + request.full_path + ' asked for section ' + current_section.name + ' but proper next section was ' + proper_next_section.name)
         else:
             user.current_section = current_section
             user.current_page = 1
