@@ -98,6 +98,21 @@ In bash
 ```pip3 install -r requirements.txt```
 
 
+Set environment variables using a `.env` file. The file should contain:
+```
+FLASK_DEBUG=True
+FLASK_APP=rd_study_server.py
+LOCAL=True
+TESTING=True
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+FLASK_SECRET_KEY=
+LOCAL_SQLALCHEMY_DATABASE_URI=postgresql://user:password@localhost:5432/rdstudy
+REMOTE_SQLALCHEMY_DATABASE_URI=
+SQLALCHEMY_TRACK_MODIFICATIONS=False
+```
+
+
 
 On Windows with WSL, install https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.vscode-remote-extensionpack
 

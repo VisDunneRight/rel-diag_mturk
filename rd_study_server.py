@@ -83,6 +83,9 @@ NUM_QUESTIONS = 32
 NUM_PATTERNS = 4
 NUM_MODES = 2
 
+MIN_NUM_CORRECT_QUESTIONS = 16
+MIN_ALLOWED_ACCURACY = 0.5
+MAX_ALLOWED_TIME_SEC = 50*60 # in seconds
 
 def create_questions_array():
     import json
@@ -115,22 +118,6 @@ def create_questions_array():
     #     answer4 = questionDatum['answer4']
     #     questions[questions_key]
 
-        
-        
-
-    # # Loop through all questions
-    # for i in range(1, NUM_QUESTIONS+1):
-    #     question_key = "Q" + str(i)
-    #     questions[question_key] = {}
-
-    #     # Loop through all choices for each question
-    #     for c in choices:
-    #         question_str = ""
-    #         # Read choices files
-    #         # with open('static/questions/' + str(i) + '/' + c + '.txt', 'r') as choice_file:
-    #         #     question_str = choice_file.read().replace('\n', '')
-    #         questions[question_key][c] = question_str
-
     return usedQuestionData
 
 def getPatternOrder():
@@ -142,7 +129,7 @@ def getPatternOrder():
     pattern_order = []
     for sequence in range(1, num_sequences+1):
         temp_order = []
-        for i in [1, 2]:
+        for i in [1, 2]:# To go along with the *2 multiplier above
             for pattern in range(1,NUM_PATTERNS+1):
                 for mode in range(1, NUM_MODES+1):
                     temp_order.append(pattern)
@@ -416,12 +403,24 @@ def test():
 
     # Create dictionary for the questions and answers data
     app.questions = create_questions_array()
+    
+    current_time = datetime.datetime.utcnow() 
+
+    start_time = user.q1_start # should only happen first question
+    if start_time == None:
+        start_time = current_time
+
+    max_end_time = start_time + datetime.timedelta(seconds=MAX_ALLOWED_TIME_SEC)
+
+    time_remaining_delta = max_end_time - current_time
+    time_remaining_ms = int(time_remaining_delta.total_seconds() * 1000)
 
     resp = make_response(render_template("test.html",
         worker_id=user.worker_id,
         assignment_id=user.assignment_id,
         hit_id=user.hit_id,
         current_page=user.current_page,
+        time_remaining_ms=time_remaining_ms,
         questions=app.questions))
     resp.headers['x-frame-options'] = '*'
     return resp
@@ -505,9 +504,6 @@ def record_choice_get_answer():
 
 
 # Modifies the database in order to record a user's question choice and time spent on that question
-
-
-
 @app.route('/get_next_question', methods=['POST'])
 def get_next_question():
     app.logger.info("get_next_question called with " + request.method + " request")
@@ -736,91 +732,93 @@ def results():
 
     # Record the datetime the user finishes
     end_datetime = datetime.datetime.utcnow()
-    app.logger.info('worker_id ' + user.worker_id + ' finished. Ending datetime: ' + str(end_datetime))
+    app.logger.info('worker_id ' + str(user.worker_id) + ' finished. Ending datetime: ' + str(end_datetime))
     user.end_datetime = end_datetime
     db.session.commit()
-
-    # Calculate how many right or wrong, total time, average time
-    # Load the answers in a dictionary
-    answers = json.loads(open("static/questions/answers.json").read())
-
-    min_num_correct_questions = 5
-    min_allowed_accuracy = 0.5
-    max_allowed_time = 50*60
-
-    num_questions = 12
+    
     num_correct = 0
-    total_time = 0
+    
+    total_question_time = 0
+    total_timedelta = user.q32_end - user.q1_start
+    total_time = int(total_timedelta.total_seconds() * 1000)
 
-    for i in range(1, num_questions + 1):
-        q_col = "q" + str(i)
-        q_time_col = "q" + str(i) + "_time"
+    for question_num in range(1, NUM_QUESTIONS + 1):
+        q_col = "q" + str(question_num)
+        q_time_col = "q" + str(question_num) + "_time"
 
-        user_answer = getattr(user, q_col)
         user_time = getattr(user, q_time_col)
-
-        if (user_answer == answers[str(i)]):
+        user_choice = getattr(user, q_col)        
+        pattern_num = user.pattern_order[question_num - 1]# Our questions start at 1, our index starts at 0      
+        
+        if user_choice == pattern_num:
             num_correct += 1
-            print("Correct answer for question " + str(i))
+            app.logger.info('worker_id ' + str(user.worker_id) + ' has correct answer for question ' + str(question_num))
+        else:
+            app.logger.info('worker_id ' + str(user.worker_id) + ' has wrong answer for question ' + str(question_num))
 
-        total_time += user_time
+        total_question_time += user_time
 
-    percentage_correct = num_correct / num_questions
-    print("Number of correct answers is: " + str(num_correct))
-    print("Percentage of correct answers is " + str(percentage_correct))
-    print("Total time taken to complete the test is: " + str(total_time))
+    percentage_correct = num_correct / NUM_QUESTIONS
+    app.logger.info("Number of correct answers is: " + str(num_correct))
+    app.logger.info("Percentage of correct answers is " + str(percentage_correct))
+    app.logger.info('worker_id ' + str(user.worker_id) + "'s total time taken to complete the test is " + str("%.2f" % (total_time / (1000 * 60))) + " minutes , but time on questions was " + str("%.2f" % (total_question_time / (1000 * 60))))
 
     accept = True
     failure_reason = ""
 
     # check if we will accept the hit
-    if (num_correct < min_num_correct_questions):
+    if (num_correct < MIN_NUM_CORRECT_QUESTIONS):
         accept = False
-        failure_reason = "you failed to answer 5 or more questions correctly."
-    if (total_time > max_allowed_time*1000):
+        failure_reason = "You failed to answer " + str(MIN_NUM_CORRECT_QUESTIONS) + " or more questions correctly."
+    if (total_time > MAX_ALLOWED_TIME_SEC * 1000):
         accept = False
-        failure_reason = "you failed to answer all questions within " + \
-            str(max_allowed_time/60) + " minutes."
+        failure_reason = "You failed to answer all questions within " + \
+            str(MAX_ALLOWED_TIME_SEC/60) + " minutes."
 
-    print("The hit acceptance is: " + str(accept))
+    app.logger.info('worker_id ' + str(user.worker_id) + " The hit acceptance is: " + str(accept))
 
     # TODO: Do not hard code variables
     # Calculate the bonus
-    base_pay = 5.20
+    BASE_PAY = 5.00
     bonus_time = 0
     bonus_correctness = 0
     total_bonus = 0
-    correctness_per_question_bonus = 1.04
+    CORRECTNESS_PER_QUESTION_BONUS = 1.04
 
     # Calculate bonuses only if we accept the hit and submit the bonus
     if (accept):
-        bonus_correctness = round(((num_correct - min_num_correct_questions) *
-                                  correctness_per_question_bonus if (num_correct - min_num_correct_questions > 0) else 0), 2)
+        bonus_correctness = round((
+            (num_correct - MIN_NUM_CORRECT_QUESTIONS) *
+            CORRECTNESS_PER_QUESTION_BONUS if (num_correct - MIN_NUM_CORRECT_QUESTIONS > 0) else 0),
+             2)
 
-        if total_time < 14 * 60 * 1000:
-            bonus_time = 0.32 * (base_pay + bonus_correctness)
-        elif total_time < 15 * 60 * 1000:
-            bonus_time = 0.28 * (base_pay + bonus_correctness)
-        elif total_time < 16 * 60 * 1000:
-            bonus_time = 0.24 * (base_pay + bonus_correctness)
-        elif total_time < 17 * 60 * 1000:
-            bonus_time = 0.20 * (base_pay + bonus_correctness)
-        elif total_time < 18 * 60 * 1000:
-            bonus_time = 0.16 * (base_pay + bonus_correctness)
-        elif total_time < 18 * 60 * 1000:
-            bonus_time = 0.12 * (base_pay + bonus_correctness)
+        if total_time < 8 * 60 * 1000:
+            bonus_time = 0.35 * (BASE_PAY + bonus_correctness)
+        elif total_time < 9 * 60 * 1000:
+            bonus_time = 0.30 * (BASE_PAY + bonus_correctness)
+        elif total_time < 10 * 60 * 1000:
+            bonus_time = 0.25 * (BASE_PAY + bonus_correctness)
+        elif total_time < 11 * 60 * 1000:
+            bonus_time = 0.20 * (BASE_PAY + bonus_correctness)
+        elif total_time < 12 * 60 * 1000:
+            bonus_time = 0.15 * (BASE_PAY + bonus_correctness)
+        elif total_time < 13 * 60 * 1000:
+            bonus_time = 0.10 * (BASE_PAY + bonus_correctness)
+        elif total_time < 14 * 60 * 1000:
+            bonus_time = 0.05 * (BASE_PAY + bonus_correctness)
         bonus_time = round(bonus_time, 2)
 
-        print("Bonus from correctness: " + str(bonus_correctness) +
+        app.logger.info("Bonus from correctness: " + str(bonus_correctness) +
               " bonus from time: " + str(bonus_time))
         total_bonus = round(bonus_correctness + bonus_time, 2)
 
-    total_pay = base_pay + total_bonus
+    total_pay = BASE_PAY + total_bonus
 
     resp = make_response(render_template("results.html", 
             AMAZON_HOST=AMAZON_HOST, 
             percentage_correct=percentage_correct,
             num_correct=num_correct,
+            num_questions=NUM_QUESTIONS,
             total_time=int(round(total_time/1000)),
             accept=accept,
             failure_reason=failure_reason,

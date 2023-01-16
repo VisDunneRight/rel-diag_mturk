@@ -6,7 +6,7 @@
   <meta charset="utf-8">
 
   <title>Visualization of SQL Queries</title>
-  <meta name="description" content="Relational Diagrams User Study">
+  <meta name="description" content="Visualization of SQL Queries">
   <meta name="author" content="Cody Dunne">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
@@ -55,7 +55,7 @@
   // Set Progress bar
   apply_progress_changes();
 
-  CountDown.Start(50 * 60 * 1000);
+  CountDown.Start({{ time_remaining_ms | tojson | safe}});
   };
 </script>
 
@@ -140,7 +140,7 @@
       // Check if we are on the last question, and if so redirect the user to the demographics section
       if (question_num >= total_num_questions) {
         console.log("Test completed, user has submitted the last question.");
-        window.location.href = "/demographics";
+        window.location.href = "{{ url_for('results', workerId=worker_id, assignmentId=assignment_id, hitId=hit_id, nextSection=True) | safe }}";
         return;
       }
 
@@ -148,26 +148,10 @@
       question_num++;
       console.log("New question number is", question_num);
 
-      // // Update mode accordingly based on the sequence_num assigned to this worker
-      // update_current_mode();
-      // // apply_mode();
-      // console.log("The new mode is:", current_mode);
-
-      // // Define default sources for html and images
-      // schema_src = "{{url_for('static', filename='questions/1/schema.html')}}";
-      // sql_src = "{{url_for('static', filename='questions/1/query.html')}}";
-
       // Load the next question
       load_next_question();
 
-      //TODO: HOW to read the questions properly and concisely? 
-      // Update the question choices (there must be a better way to get the question_choices but concatenation doesn't work again ... :( )
       var questions_form = $('#questions_form');
-      // var label_ids = ["#Q1_label", "#Q2_label", "#Q3_label", "#Q4_label"];
-      // for (i = 0; i < label_ids.length; i++) {
-      //   text_val = question_choices[(question_num - 1) * num_question_choices + i];
-      //   $(label_ids[i]).html(text_val);
-      // }
 
       // Update progress bar
       apply_progress_changes();
@@ -184,51 +168,6 @@
       checking_answer = true;
     }
   });
-
-  // // Prints out all the question choices in Jinja2 format
-  // function question_choices_arr_creator() {
-  //   {% raw %}
-  //   question_choices = [];
-  //   num_questions = 12;
-  //   choices = ['a', 'b', 'c', 'd'];
-  //   for (i = 1; i <= num_questions; i++) {
-  //     for (j = 0; j < choices.length; j++) {
-  //       var val = "{{questions.Q" + i.toString() + "." + choices[j] + "}}";
-  //       question_choices.push(val);
-  //     }
-  //   }
-  //   {% endraw %}
-  //   return question_choices;
-  // }
-
-  // // Set the initial current_mode according to the user sequence_num
-  // function initialize_current_mode() {
-  //   if (sequence_num == 0 || sequence_num == 1) {
-  //     current_mode = 1;
-  //   }
-  //   else if (sequence_num == 2 || sequence_num == 3) {
-  //     current_mode = 2;
-  //   }
-  //   else if (sequence_num == 4 || sequence_num == 5) {
-  //     current_mode = 3;
-  //   }
-  //   return current_mode;
-  // }
-
-  // // Update the current_mode according to the user sequence_num
-  // function update_current_mode() {
-  //   var seq_1 = [1, 2];
-  //   var seq_2 = [2, 1];
-  //   var seq_list = [seq_1, seq_2];
-
-  //   var idx = seq_list[sequence_num].indexOf(current_mode);
-  //   if (idx == 2) {
-  //     current_mode = seq_list[sequence_num][0];
-  //   }
-  //   else {
-  //     current_mode = seq_list[sequence_num][idx + 1];
-  //   }
-  // }
 
   function apply_progress_changes() {
     let val = (question_num - 1) / total_num_questions;
