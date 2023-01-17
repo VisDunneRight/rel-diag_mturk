@@ -1,1 +1,1 @@
-web: gunicorn rd_study_server:app --log-file - --log-level=debug
+web: gunicorn rd_study_server:app --preload --log-file - --log-level=debug
