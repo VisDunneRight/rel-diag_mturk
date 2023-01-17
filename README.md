@@ -113,7 +113,7 @@ In bash
 
 Set environment variables using a `.env` file. The file should contain:
 ```
-FLASK_DEBUG=True
+FLASK_ENV=Development
 FLASK_APP=rd_study_server.py
 LOCAL=True
 TESTING=True
@@ -145,6 +145,8 @@ in postgres
 flask run
 ```
 
+
+
 http://127.0.0.1:5000/?workerId=a&assignmentId=b&hitId=c
 https://rd-study.herokuapp.com?workerId=a&assignmentId=b&hitId=c
 
@@ -167,6 +169,10 @@ where `rd-study` is the app name on Heroku
 ```cmd
 heroku open -a rd-study
 heroku config:push --file=.env.production -a rd-study
+```
+
+```cmd
+heroku run bash --app rd-study
 ```
 
 

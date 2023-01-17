@@ -12,6 +12,7 @@ from flask import Flask, render_template, url_for, request, make_response, reque
 from flask_sqlalchemy import SQLAlchemy
 # from flask_heroku import Heroku
 from post_hits import get_connection, qualification_id
+import logging
 from logging.config import dictConfig
 
 dictConfig(
@@ -888,6 +889,13 @@ def results():
         ))
     resp.headers['x-frame-options'] = '*'
     return resp
+
+
+# gunicorn logging for heroku
+if __name__ != '__main__':
+    gunicorn_error_logger = logging.getLogger('gunicorn.error')
+    app.logger.handlers.extend(gunicorn_error_logger.handlers)
+    app.logger.setLevel(gunicorn_error_logger.level)
 
 
 if __name__ == "__main__":
