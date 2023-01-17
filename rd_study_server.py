@@ -51,13 +51,13 @@ dictConfig(
 app.secret_key = os.environ.get('FLASK_SECRET_KEY')
 
 # This allows us to specify whether we are pushing to the sandbox or live site.
-if os.environ.get('TESTING'):
+if os.environ.get('TESTING') == 'True':
     AMAZON_HOST = "https://workersandbox.mturk.com/mturk/externalSubmit"
 else:
     AMAZON_HOST = "https://www.mturk.com/mturk/externalSubmit"
 
 # # Set up SQLAlchemy variables and settings
-if (os.environ.get('LOCAL')):
+if os.environ.get('LOCAL') == 'True':
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
         'LOCAL_SQLALCHEMY_DATABASE_URI')
 else:
@@ -219,7 +219,7 @@ def getUser(request, createUser):  # createUser says optionally create if necess
 
     user = None
 
-    # if (os.environ.get('LOCAL')):
+    # if (os.environ.get('LOCAL') == 'True'):
     #     worker_id = "TEST"
     #     assignment_id = "TEST"
     #     hit_id = "TEST"
@@ -247,7 +247,7 @@ def getUser(request, createUser):  # createUser says optionally create if necess
                         assignment_id=assignment_id, hit_id=hit_id)
 
             # Grab the user's qualification score and place it in the database
-            if (not os.environ.get('LOCAL')):
+            if (os.environ.get('LOCAL') == 'False'):
                 conn = get_connection()
                 response = conn.get_qualification_score(
                     QualificationTypeId=qualification_id,
