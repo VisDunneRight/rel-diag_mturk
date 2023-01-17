@@ -204,7 +204,39 @@ heroku config:push --file=.env.live -a rd-study -o
 heroku ps:restart -a rd-study
 ```
 
+papertrail logging (paid)
+```cmd
+heroku addons:create papertrail:fixa
+```
+Access through Heroku site
 
+To see the database with, e.g., PGAdmin, get the value of `DATABASE_URL` on Heroku:
+```cmd
+heroku config:get DATABASE_URL -a rd-study
+```
+It is of the form
+```
+postgres://USERNAME:PASSWORD@HOST:PORT/DATABASE
+```
+
+Set under Connection: 
+
+* Hostname/address: `HOST`
+* Port: `PORT`
+* Maintenance database: `DATABASE`
+* Username: `USERNAME`
+* Password: `PASSWORD`
+
+Set under Advanced:
+
+* DB restriction: `DATABASE`
+
+Click Save
+
+Navigate to the database > Schemas > public > Tables > users.
+Right-click and select View/Edit Data > All Rows.
+
+postgres://bksmptywmdqgrw:736cca0ed9a698081223b023492213fa779e21a3fcf0c86ad2c362c09802d992@ec2-52-21-136-176.compute-1.amazonaws.com:5432/d29vcdcg0m1mv4
 
 ## Basic/useful Postgres psql commands
 To connect in psql as user aristotle: `sudo -u aristotle psql postgres`\

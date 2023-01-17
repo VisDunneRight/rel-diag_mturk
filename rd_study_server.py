@@ -310,6 +310,8 @@ def getUser(request, createUser):  # createUser says optionally create if necess
                 except Exception as e:
                     if os.environ.get('AWS_ALLOW_QUAL_ERROR') == 'True':
                         noRet = getReturnAndLogError(e)
+                        app.logger.warn(
+                            'We are allowing the user to continue as AWS_ALLOW_QUAL_ERROR is True')
                     else:
                         raise
 
