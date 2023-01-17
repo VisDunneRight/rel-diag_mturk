@@ -1,1 +1,1 @@
-web: gunicorn rd_study_server:app --log-file=- onbytes.wsgi:application
+web: gunicorn rd_study_server:app --log-file -
