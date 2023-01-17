@@ -871,8 +871,10 @@ def results():
     app.logger.info("Number of correct answers is: " + str(num_correct))
     app.logger.info("Percentage of correct answers is " +
                     str(percentage_correct))
-    app.logger.info('worker_id ' + str(user.worker_id) + "'s total time taken to complete the test is " + str("%.2f" %
-                                                                                                              (total_time / (1000 * 60))) + " minutes, but time on questions was " + str("%.2f" % (total_question_time / (1000 * 60))))
+    app.logger.info(
+        'worker_id ' + str(user.worker_id) + "'s total time taken to complete the test is " +
+        str("%.2f" % (total_time / (1000 * 60))) + " minutes, but time on questions was " +
+        str("%.2f" % (total_question_time / (1000 * 60))))
 
     accept = True
     failure_reason = ""
