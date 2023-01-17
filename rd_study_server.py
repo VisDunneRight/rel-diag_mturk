@@ -62,7 +62,8 @@ if os.environ.get('LOCAL') == 'True':
         'LOCAL_SQLALCHEMY_DATABASE_URI')
 else:
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
-        'DATABASE_URL')  # 'REMOTE_SQLALCHEMY_DATABASE_URI'
+        'DATABASE_URL').replace('postgres://', 'postgresql://', 1)  # 'REMOTE_SQLALCHEMY_DATABASE_URI'
+    # replace is because https://stackoverflow.com/questions/62688256/sqlalchemy-exc-nosuchmoduleerror-cant-load-plugin-sqlalchemy-dialectspostgre
 
 
 db.init_app(app)
