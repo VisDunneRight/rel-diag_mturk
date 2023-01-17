@@ -6,6 +6,7 @@ import time
 import datetime
 import logging
 import pandas as pd
+import os
 from models import *
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -16,12 +17,10 @@ DATABASE_URL = "replace_with_database_url_on_heroku"
 
 appConfig = config.Config()
 
-DEV_ENVIRONMENT_BOOLEAN = False
-
 
 def get_connection():
     endpoint_url = ''
-    if DEV_ENVIRONMENT_BOOLEAN:
+    if os.environ.get('AWS_SANDBOX') == 'True':
         endpoint_url = 'https://mturk-requester-sandbox.us-east-1.amazonaws.com'
     else:
         endpoint_url = 'https://mturk-requester.us-east-1.amazonaws.com'

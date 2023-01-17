@@ -55,20 +55,7 @@ def handle_exception(e):
     if isinstance(e, HTTPException):
         return e
 
-    code = 400
-    errorType = 'Bad Request'
-    errorText = type(e).__name__ + ': ' + str(e)
-
-    if os.environ.get('TESTING') == 'True':
-        app.logger.warn(errorText, exc_info=True)
-        res = {'code': code,
-               'errorType': errorType,
-               'errorMessage': errorText,
-               'trace': traceback.format_exc()}
-        return jsonify(res), code
-    else:
-        app.logger.warn(errorText, exc_info=False)
-        return errorType, code
+    return getReturnAndLogError(e, loggerToUse=app.logger.warn, code=400, errorType='Bad Request')
 
 
 @app.errorhandler(Exception)
@@ -77,9 +64,12 @@ def handle_exception(e):
     if isinstance(e, HTTPException):
         return e
 
-    code = 500
-    errorType = 'Internal Server Error'
-    errorText = type(e).__name__ + ': ' + str(e)
+    return getReturnAndLogError(e)
+
+
+def getReturnAndLogError(e, errorText=None, loggerToUse=app.logger.error,  code=500, errorType='Internal Server Error'):
+    if errorText == None:
+        errorText = type(e).__name__ + ': ' + str(e)
 
     if os.environ.get('TESTING') == 'True':
         app.logger.error(errorText, exc_info=True)
@@ -89,14 +79,14 @@ def handle_exception(e):
                'trace': traceback.format_exc()}
         return jsonify(res), code
     else:
-        app.logger.error(errorText, exc_info=False)
+        loggerToUse(errorText, exc_info=False)
         return errorType, code
 
 
 app.secret_key = os.environ.get('FLASK_SECRET_KEY')
 
 # This allows us to specify whether we are pushing to the sandbox or live site.
-if os.environ.get('TESTING') == 'True':
+if os.environ.get('AWS_SANDBOX') == 'True':
     AMAZON_HOST = "https://workersandbox.mturk.com/mturk/externalSubmit"
 else:
     AMAZON_HOST = "https://www.mturk.com/mturk/externalSubmit"
@@ -291,14 +281,20 @@ def getUser(request, createUser):  # createUser says optionally create if necess
                         assignment_id=assignment_id, hit_id=hit_id)
 
             # Grab the user's qualification score and place it in the database
-            if (os.environ.get('LOCAL') == 'False'):
-                conn = get_connection()
-                response = conn.get_qualification_score(
-                    QualificationTypeId=qualification_id,
-                    WorkerId=user.worker_id
-                )
-                qualification_score = response['Qualification']['IntegerValue']
-                user.qualification_score = qualification_score
+            if (os.environ.get('AWS_CHECK_QUAL') == 'True'):
+                try:
+                    conn = get_connection()
+                    response = conn.get_qualification_score(
+                        QualificationTypeId=qualification_id,
+                        WorkerId=user.worker_id
+                    )
+                    qualification_score = response['Qualification']['IntegerValue']
+                    user.qualification_score = qualification_score
+                except Exception as e:
+                    if os.environ.get('AWS_ALLOW_QUAL_ERROR') == 'True':
+                        noRet = getReturnAndLogError(e)
+                    else:
+                        raise
 
             user.current_section = Sections.INSTRUCTIONS
             user.current_page = 1

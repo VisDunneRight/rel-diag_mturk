@@ -147,8 +147,10 @@ flask run
 
 
 
-http://127.0.0.1:5000/?workerId=a&assignmentId=b&hitId=c
-https://rd-study.herokuapp.com?workerId=a&assignmentId=b&hitId=c
+http://127.0.0.1:5000/?workerId=AA&assignmentId=BB&hitId=CC
+
+
+
 
 ## Deploying on Heroku
 
@@ -171,10 +173,24 @@ heroku open -a rd-study
 heroku config:push --file=.env.production -a rd-study
 ```
 
+to overwrite existing values, use
+
+```cmd
+heroku config:push --file=.env.production -a rd-study -o
+```
+
 ```cmd
 heroku run bash --app rd-study
 python3 db_create.py
 ```
+
+test gunicorn
+```gunicorn --preload  rd_study_server:app --log-file - --log-level=debug```
+
+http://127.0.0.1:8000/?workerId=AA&assignmentId=BB&hitId=CC
+
+
+https://rd-study.herokuapp.com?workerId=AA&assignmentId=BB&hitId=CC
 
 
 ## Basic/useful Postgres psql commands

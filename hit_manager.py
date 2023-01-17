@@ -1,6 +1,7 @@
 import sys
 import boto3
 import time
+import os
 from datetime import datetime
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
@@ -8,12 +9,10 @@ import config
 
 appConfig = config.Config()
 
-DEV_ENVIRONMENT_BOOLEAN = False
-
 
 def get_connection():
     endpoint_url = ''
-    if DEV_ENVIRONMENT_BOOLEAN:
+    if os.environ.get('AWS_SANDBOX') == 'True':
         endpoint_url = 'https://mturk-requester-sandbox.us-east-1.amazonaws.com'
     else:
         endpoint_url = 'https://mturk-requester.us-east-1.amazonaws.com'
@@ -465,7 +464,10 @@ def notify_workers_with_qualification(qualification_file, taken_hit_file):
 conn = get_connection()
 
 if __name__ == "__main__":
-    print('DEV_ENVIRONMENT_BOOLEAN is set to', DEV_ENVIRONMENT_BOOLEAN, "\n")
+    if os.environ.get('AWS_SANDBOX') == 'True':
+        print('Using AWS Sandbox')
+    else:
+        print('Using AWS production')
 
     arg_arr = sys.argv[1:]
     arg1 = arg_arr[0]

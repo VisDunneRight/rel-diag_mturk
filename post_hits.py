@@ -6,20 +6,19 @@ import config
 # Start Configuration Variables
 appConfig = config.Config()
 
-DEV_ENVIRONMENT_BOOLEAN = True
 # End Configuration Variables
 
 # This allows us to specify whether we are pushing to the sandbox or live site.
-if DEV_ENVIRONMENT_BOOLEAN:
-    AMAZON_HOST = "mechanicalturk.sandbox.amazonaws.com"            # For Sandbox only
-    qualification_id = "qualification_id"                           # For Sandbox only
-    custom_qualification_id = "custom_qualification_id"             # For Sandbox only
-    taken_test_qualification_id = "taken_test_qualification_id"     # For Sandbox only
+if os.environ.get('AWS_SANDBOX') == 'True':
+    AMAZON_HOST = "mechanicalturk.sandbox.amazonaws.com"         # For Sandbox only
+    qualification_id = "AA"                        # For Sandbox only
+    custom_qualification_id = "custom_qualification_id"          # For Sandbox only
+    taken_test_qualification_id = "taken_test_qualification_id"  # For Sandbox only
 else:
-    AMAZON_HOST = "mechanicalturk.amazonaws.com"                    # For Sandbox only
-    qualification_id = "qualification_id"                           # For Sandbox only
-    custom_qualification_id = "custom_qualification_id"             # For Non-Sandbox only
-    taken_test_qualification_id = "taken_test_qualification_id"     # For Non-Sandbox only
+    AMAZON_HOST = "mechanicalturk.amazonaws.com"                 # For Non-Sandbox
+    qualification_id = "AA"                        # For Non-Sandbox
+    custom_qualification_id = "custom_qualification_id"          # For Non-Sandbox
+    taken_test_qualification_id = "taken_test_qualification_id"  # For Non-Sandbox
 
 # HIT specific variables
 base_pay = "5.2"
@@ -42,7 +41,7 @@ usa = [{'Country': "US"}]
 
 def get_connection():
     endpoint_url = ''
-    if DEV_ENVIRONMENT_BOOLEAN:
+    if os.environ.get('AWS_SANDBOX') == 'True':
         endpoint_url = 'https://mturk-requester-sandbox.us-east-1.amazonaws.com'
     else:
         endpoint_url = 'https://mturk-requester.us-east-1.amazonaws.com'
@@ -210,7 +209,8 @@ if __name__ == "__main__":
     yes = {'yes', 'y', 'ye', ''}
     no = {'no', 'n'}
 
-    setting = "on SANDBOX" if DEV_ENVIRONMENT_BOOLEAN else "LIVE"
+    setting = "on SANDBOX" if (os.environ.get(
+        'AWS_SANDBOX') == 'True') else "LIVE"
     print("Are you sure you want to deploy a " +
           arg1 + " HIT " + setting + "? [Y/N]")
     choice = input().lower()
