@@ -1,6 +1,6 @@
 from __future__ import division
-from models import *
 from models import db
+from models import *
 import math
 import os
 # import boto3
@@ -14,6 +14,11 @@ from flask_sqlalchemy import SQLAlchemy
 from post_hits import get_connection, qualification_id
 import logging
 from logging.config import dictConfig
+
+app = Flask(__name__, static_url_path='')
+
+
+print('loading')
 
 dictConfig(
     {
@@ -42,7 +47,6 @@ dictConfig(
     }
 )
 
-app = Flask(__name__, static_url_path='')
 
 app.secret_key = os.environ.get('FLASK_SECRET_KEY')
 
@@ -63,7 +67,6 @@ else:
 
 db.init_app(app)
 db.app = app
-db.create_all()  # creates tables if don't exist
 
 SECTION_FOLLOWER = {
     Sections.INSTRUCTIONS: Sections.TUTORIAL,
@@ -893,12 +896,16 @@ def results():
 
 # gunicorn logging for heroku
 if __name__ != '__main__':
+    import faulthandler
+    print('gunicorn main')
+    faulthandler.enable()
     gunicorn_logger = logging.getLogger('gunicorn.error')
     app.logger.handlers = gunicorn_logger.handlers
     app.logger.setLevel(gunicorn_logger.level)
 
 
 if __name__ == "__main__":
+    print('flask main?')
     # app.debug = DEBUG
     app.init_db()
     app.run(threaded=True, debug=True)
