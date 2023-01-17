@@ -173,6 +173,7 @@ heroku config:push --file=.env.production -a rd-study
 
 ```cmd
 heroku run bash --app rd-study
+python3 db_create.py
 ```
 
 

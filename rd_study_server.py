@@ -20,34 +20,6 @@ app = Flask(__name__, static_url_path='')
 
 print('loading')
 
-dictConfig(
-    {
-        "version": 1,
-        "formatters": {
-            "default": {
-                "format": "[%(asctime)s] %(levelname)s in %(module)s: %(message)s",
-            }
-        },
-        "handlers": {
-            "console": {
-                "class": "logging.StreamHandler",
-                "stream": "ext://sys.stdout",
-                "formatter": "default",
-            },
-            "file": {
-                "class": "logging.handlers.TimedRotatingFileHandler",
-                "filename": "flask.log",
-                "when": "D",
-                "interval": 10,
-                "backupCount": 60,
-                "formatter": "default",
-            },
-        },
-        "root": {"level": "INFO", "handlers": ["console", 'file']},
-    }
-)
-
-
 app.secret_key = os.environ.get('FLASK_SECRET_KEY')
 
 # This allows us to specify whether we are pushing to the sandbox or live site.
@@ -164,7 +136,7 @@ def assign_sequence_num(worker_id):
 
     # check if current worker is a returning worker
     if worker_id in returning_workers:
-        app.logger.info('worker_id ' + worker_id + ' is a returning worker')
+        print('worker_id ' + worker_id + ' is a returning worker')
         lowest_sequence_num_amount = returning_workers_sequence_num_amount.index(
             min(returning_workers_sequence_num_amount))
     else:
@@ -174,20 +146,20 @@ def assign_sequence_num(worker_id):
             amount = db.session.query(User.sequence_num).filter_by(
                 sequence_num=i).count()
             sequence_num_amount.append(amount)
-            app.logger.info('There are ' + str(amount) +
+            print('There are ' + str(amount) +
                             ' users with sequence_num = ' + str(i))
 
         lowest_sequence_num_amount = sequence_num_amount.index(
             min(sequence_num_amount))
 
-    app.logger.info("The sequence_num with the lowest assigned workers is: " +
+    print("The sequence_num with the lowest assigned workers is: " +
                     str(lowest_sequence_num_amount))
 
     # Set sequence_num in the database
     user = db.session.query(User).filter_by(worker_id=worker_id).one()
     user.sequence_num = lowest_sequence_num_amount
     user.pattern_order = getPatternOrder()
-    app.logger.info('User assigned pattern order ' + str(user.pattern_order))
+    print('User assigned pattern order ' + str(user.pattern_order))
     db.session.commit()
 
     return lowest_sequence_num_amount
@@ -199,7 +171,7 @@ def getUser(request, createUser):  # createUser says optionally create if necess
     assignment_id = request.args.get("assignmentId")
     full_path = request.full_path
 
-    app.logger.info(logString([
+    print(logString([
         "Request full path:", full_path,
         "for worker_id:", worker_id,
         "assignment_id:", assignment_id,
@@ -207,7 +179,7 @@ def getUser(request, createUser):  # createUser says optionally create if necess
     ]))
 
     if worker_id == None or assignment_id == None or hit_id == None:
-        app.logger.error(
+        print(
             'Insufficient arguments provided in full path: ' + full_path)
         raise Exception(
             'Insufficient arguments provided in full path: ' + full_path)
@@ -226,7 +198,7 @@ def getUser(request, createUser):  # createUser says optionally create if necess
     #     hit_id = "TEST"
 
     if exists:
-        app.logger.info("Detected EXISTING worker_id " + str(worker_id))
+        print("Detected EXISTING worker_id " + str(worker_id))
         # we don't check createUser as it is optional
 
         # Query user from DB
@@ -234,15 +206,15 @@ def getUser(request, createUser):  # createUser says optionally create if necess
 
         # check arguments match DB
         if user.assignment_id != assignment_id:
-            app.logger.warn('worker_id ' + worker_id + "'s assignment_id in DB (" +
+            print('worker_id ' + worker_id + "'s assignment_id in DB (" +
                             user.assignment_id + ") doesn't match provided id (" + assignment_id + ')')
         if user.hit_id != hit_id:
-            app.logger.warn('worker_id ' + worker_id + "'s hit_id in DB (" +
+            print('worker_id ' + worker_id + "'s hit_id in DB (" +
                             user.hit_id + ") doesn't match provided id (" + hit_id + ')')
     else:
         if createUser:
             # Add the new user into the database
-            app.logger.info(
+            print(
                 'Creating NEW user for worker_id ' + str(worker_id))
             user = User(worker_id=worker_id,
                         assignment_id=assignment_id, hit_id=hit_id)
@@ -263,7 +235,7 @@ def getUser(request, createUser):  # createUser says optionally create if necess
             # Record the datetime a new user is added
             start_datetime = datetime.datetime.utcnow()
             user.start_datetime = start_datetime
-            app.logger.info(logString([
+            print(logString([
                 'worker_id', str(worker_id),
                 'starting datetime in UTC was', str(user.start_datetime)
             ]))
@@ -273,7 +245,7 @@ def getUser(request, createUser):  # createUser says optionally create if necess
         else:
             msg = 'Unable to find user for worker_id ' + \
                 worker_id + ' but we were not told to create user.'
-            app.logger.error(msg)
+            print(msg)
             raise Exception(msg)
 
     return user
@@ -287,7 +259,7 @@ def updateProgressAndGetRedirect(user, current_section, next_section):
         if current_section != proper_next_section:
             # For some reason there is a weird issue where 2 requests are made from tutorial
             if current_section != Sections.TUTORIAL:
-                app.logger.error('full_path ' + request.full_path + ' asked for section ' +
+                print('full_path ' + request.full_path + ' asked for section ' +
                                  current_section.name + ' but proper next section was ' + proper_next_section.name)
         else:
             user.current_section = current_section
@@ -333,7 +305,7 @@ def main():
 
     # Check if the worker clicked on preview. If so, skip creating user
     if request.args.get("assignmentId") == "ASSIGNMENT_ID_NOT_AVAILABLE":
-        app.logger.info(
+        print(
             "Worker has clicked to preview the task with request full_path " + request.full_path)
         preview = True
         resp = make_response(render_template(
@@ -348,7 +320,7 @@ def main():
     if possibleRedirect:
         return possibleRedirect
 
-    app.logger.info(logString([
+    print(logString([
         "worker_id", user.worker_id,
         "had a qualification score of", str(user.qualification_score)
     ]))
@@ -399,7 +371,7 @@ def tutorialClick():
         time_spent = data['time_spent']
         worker_id = data['worker_id']
 
-        app.logger.info("Worker: " + worker_id + " moved away from tutorial page " + str(tutorial_page_num) +
+        print("Worker: " + worker_id + " moved away from tutorial page " + str(tutorial_page_num) +
                         ", elapsed time increased by " + str(time_spent))
 
         # Get the user
@@ -416,11 +388,11 @@ def tutorialClick():
         setattr(user, 'current_page', current_page)
         db.session.commit()
 
-        app.logger.info('worker_id ' + worker_id +
+        print('worker_id ' + worker_id +
                         'Set tutorial_time to ' + str(tutorial_time))
 
     if request.method == 'GET':
-        app.logger.info(
+        print(
             "Wrong request, tutorial_record_time request should be POST not GET")
 
     return "OK"
@@ -466,14 +438,14 @@ def test():
 
 @app.route('/record_choice_get_answer', methods=['POST'])
 def record_choice_get_answer():
-    app.logger.info("record_choice_get_answer called with " +
+    print("record_choice_get_answer called with " +
                     request.method + " request")
     if request.method == 'POST':
         data = request.json
         question_num = data['question_num']
         worker_id = data['worker_id']
 
-        app.logger.info(logString([
+        print(logString([
             "worker_id", worker_id,
             "reporting choice for question", question_num
         ]))
@@ -489,12 +461,12 @@ def record_choice_get_answer():
         # Can't just use exceptions as the user needs something in case in broken state
         invalid = False
         if user[sql_question_column] != None or user[question_end_col] != None or user[question_time_col] != None:
-            app.logger.warning('Unexpected setting question end time and answer again. worker_id ' +
+            printing('Unexpected setting question end time and answer again. worker_id ' +
                                str(worker_id) + ', question ' + str(question_num))
             invalid = True
 
         if user[question_start_col] == None:
-            app.logger.warning(
+            printing(
                 'Tried to set question time for a question that has not been started.')
             invalid = True
 
@@ -526,7 +498,7 @@ def record_choice_get_answer():
             correct_string = '(Incorrect, correct was ' + \
                 str(pattern_num) + ')'
 
-        app.logger.info(logString([
+        print(logString([
             'worker_id', worker_id,
             'for question', question_num,
             'chose answer', user_choice,
@@ -539,7 +511,7 @@ def record_choice_get_answer():
         return ret_data
 
     if request.method == 'GET':
-        app.logger.info(
+        print(
             "Wrong request, record_choice_get_answer request should be POST not GET")
 
     return "OK"
@@ -548,12 +520,12 @@ def record_choice_get_answer():
 # Modifies the database in order to record a user's question choice and time spent on that question
 @app.route('/get_next_question', methods=['POST'])
 def get_next_question():
-    app.logger.info("get_next_question called with " +
+    print("get_next_question called with " +
                     request.method + " request")
     if request.method == 'POST':
         question_num = request.json['question_num']
         worker_id = request.json['worker_id']
-        app.logger.info(logString([
+        print(logString([
             "worker_id", str(worker_id),
             " requesting next question, question_num ", str(question_num)
         ]))
@@ -633,7 +605,7 @@ def get_next_question():
 
         question_start = datetime.datetime.utcnow()
         if user[question_start_col] != None or user[sql_question_column] != None or user[question_end_col] != None or user[question_time_col] != None:
-            app.logger.error(logString([
+            print(logString([
                 'Unexpected setting start question time again. worker_id', worker_id,
                 'question_num ', question_num
             ]))
@@ -643,7 +615,7 @@ def get_next_question():
             setattr(user, 'current_page', question_num)
             db.session.commit()
 
-        app.logger.info(logString([
+        print(logString([
             'worker_id', worker_id,
             'started question num', question_num,
             'at', question_start,
@@ -653,7 +625,7 @@ def get_next_question():
         return ret_data
 
     if request.method == 'GET':
-        app.logger.info("Wrong request, request should be POST not GET")
+        print("Wrong request, request should be POST not GET")
 
     return "OK"
 
@@ -671,7 +643,7 @@ def assign_sequence_num_route():
     # if we want to set the mode based on user performance in the qualification test
 
     worker_id = request.json['worker_id']
-    app.logger.info(
+    print(
         "assign_sequence_num route called for worker_id " + worker_id)
 
     user = db.session.query(User).filter_by(worker_id=worker_id).one()
@@ -681,7 +653,7 @@ def assign_sequence_num_route():
     sequence_num = user.sequence_num
     if (sequence_num == None):
         sequence_num = assign_sequence_num(worker_id)
-        app.logger.info('worker_id ' + worker_id +
+        print('worker_id ' + worker_id +
                         ' does not have a sequence number assigned, assigning them ' + str(sequence_num))
     return str(sequence_num)
 
@@ -781,7 +753,7 @@ def results():
 
     # Record the datetime the user finishes
     end_datetime = datetime.datetime.utcnow()
-    app.logger.info('worker_id ' + str(user.worker_id) +
+    print('worker_id ' + str(user.worker_id) +
                     ' finished. Ending datetime: ' + str(end_datetime))
     user.end_datetime = end_datetime
     db.session.commit()
@@ -803,19 +775,19 @@ def results():
 
         if user_choice == pattern_num:
             num_correct += 1
-            app.logger.info('worker_id ' + str(user.worker_id) +
+            print('worker_id ' + str(user.worker_id) +
                             ' has correct answer for question ' + str(question_num))
         else:
-            app.logger.info('worker_id ' + str(user.worker_id) +
+            print('worker_id ' + str(user.worker_id) +
                             ' has wrong answer for question ' + str(question_num))
 
         total_question_time += user_time
 
     percentage_correct = num_correct / NUM_QUESTIONS
-    app.logger.info("Number of correct answers is: " + str(num_correct))
-    app.logger.info("Percentage of correct answers is " +
+    print("Number of correct answers is: " + str(num_correct))
+    print("Percentage of correct answers is " +
                     str(percentage_correct))
-    app.logger.info('worker_id ' + str(user.worker_id) + "'s total time taken to complete the test is " + str("%.2f" %
+    print('worker_id ' + str(user.worker_id) + "'s total time taken to complete the test is " + str("%.2f" %
                     (total_time / (1000 * 60))) + " minutes, but time on questions was " + str("%.2f" % (total_question_time / (1000 * 60))))
 
     accept = True
@@ -831,7 +803,7 @@ def results():
         failure_reason = "you failed to answer all questions within " + \
             str(MAX_ALLOWED_TIME_SEC/60) + " minutes."
 
-    app.logger.info('worker_id ' + str(user.worker_id) +
+    print('worker_id ' + str(user.worker_id) +
                     " The hit acceptance is: " + str(accept))
 
     # TODO: Do not hard code variables
@@ -865,7 +837,7 @@ def results():
             bonus_time = 0.05 * (BASE_PAY + bonus_correctness)
         bonus_time = round(bonus_time, 2)
 
-        app.logger.info("Bonus from correctness: " + str(bonus_correctness) +
+        print("Bonus from correctness: " + str(bonus_correctness) +
                         " bonus from time: " + str(bonus_time))
         total_bonus = round(bonus_correctness + bonus_time, 2)
 
