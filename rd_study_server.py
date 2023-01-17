@@ -937,12 +937,12 @@ def results():
 
 # gunicorn logging for heroku
 if __name__ != '__main__':
-    # import faulthandler
+    import faulthandler
     print('gunicorn / flask VSCode main')
-    # faulthandler.enable()
-    # gunicorn_logger = logging.getLogger('gunicorn.error')
-    # app.logger.handlers = gunicorn_logger.handlers
-    # app.logger.setLevel(gunicorn_logger.level)
+    faulthandler.enable()
+    gunicorn_logger = logging.getLogger('gunicorn.error')
+    app.logger.handlers = gunicorn_logger.handlers
+    app.logger.setLevel(gunicorn_logger.level)
 
 
 if __name__ == "__main__":
