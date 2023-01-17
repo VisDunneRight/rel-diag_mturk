@@ -18,21 +18,23 @@ appConfig = config.Config()
 
 DEV_ENVIRONMENT_BOOLEAN = False
 
+
 def get_connection():
+    endpoint_url = ''
     if DEV_ENVIRONMENT_BOOLEAN:
-        return  boto3.client('mturk',
-            aws_access_key_id=appConfig.AWS_ACCESS_KEY_ID,
-            aws_secret_access_key=appConfig.AWS_SECRET_ACCESS_KEY,
-            region_name = 'us-east-1',
-            endpoint_url='https://mturk-requester-sandbox.us-east-1.amazonaws.com'
-        )
+        endpoint_url = 'https://mturk-requester-sandbox.us-east-1.amazonaws.com'
     else:
-        return  boto3.client('mturk',
-            aws_access_key_id=appConfig.AWS_ACCESS_KEY_ID,
-            aws_secret_access_key=appConfig.AWS_SECRET_ACCESS_KEY,
-            region_name = 'us-east-1',
-            endpoint_url='https://mturk-requester.us-east-1.amazonaws.com'
-        )
+        endpoint_url = 'https://mturk-requester.us-east-1.amazonaws.com'
+
+    return boto3.client(
+        'mturk',
+        aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID'),
+        aws_secret_access_key=os.environ.get(
+            'AWS_SECRET_ACCESS_KEY'),
+        region_name='us-east-1',
+        endpoint_url=endpoint_url
+    )
+
 
 # Set up the AMT connection
 connection = get_connection()
@@ -66,14 +68,18 @@ console.setFormatter(formatter)
 logging.getLogger('').addHandler(console)
 
 # Returns the list of assignments with certain status for a given HITId
+
+
 def get_assignment_hits(connection, hit_id, status):
     return connection.list_assignments_for_hit(
-        HITId = hit_id,
+        HITId=hit_id,
         MaxResults=100,
         AssignmentStatuses=[status]
     )
 
 # Returns the score and time (in milliseconds) given a worker_id
+
+
 def get_score_and_time(worker_id):
     user = session.query(User).filter_by(worker_id=worker_id).first()
     num_questions = 12
@@ -82,7 +88,7 @@ def get_score_and_time(worker_id):
     for i in range(1, num_questions + 1):
         q_col = "q" + str(i)
         q_time_col = "q" + str(i) + "_time"
-        
+
         user_answer = getattr(user, q_col)
         user_time = getattr(user, q_time_col)
 
@@ -94,12 +100,12 @@ def get_score_and_time(worker_id):
     return num_correct, total_time
 
 
-def approve_hits(connection, assignment_id_list, worker_id_list, check_completion_times = True):
+def approve_hits(connection, assignment_id_list, worker_id_list, check_completion_times=True):
     '''
     If check_completion_times is set to true only print out the times and do not accept or reject any time
     '''
     min_allowed_correct = 5
-    max_allowed_time = 50*60 #In seconds
+    max_allowed_time = 50*60  # In seconds
 
     for i in range(len(assignment_id_list)):
         accept = True
@@ -108,12 +114,13 @@ def approve_hits(connection, assignment_id_list, worker_id_list, check_completio
         assignment_id = assignment_id_list[i]
         worker_id = worker_id_list[i]
 
-        logging.info("Worker " + str(i+1) + "/" + str(len(assignment_id_list))) 
-        logging.info("--------------------- Evaluating " + assignment_id + " of worker " + worker_id + " ---------------------")
+        logging.info("Worker " + str(i+1) + "/" + str(len(assignment_id_list)))
+        logging.info("--------------------- Evaluating " + assignment_id +
+                     " of worker " + worker_id + " ---------------------")
 
         num_correct, total_time = get_score_and_time(worker_id)
         logging.info("Assignment " + assignment_id + " had " + str(num_correct)
-        + " correct and was completed in " + str(total_time/1000) + " seconds")
+                     + " correct and was completed in " + str(total_time/1000) + " seconds")
 
         if check_completion_times == False:
             # Check if the user failed
@@ -121,25 +128,27 @@ def approve_hits(connection, assignment_id_list, worker_id_list, check_completio
             if (num_correct < min_allowed_correct):
                 accept = False
                 failure_reason = "low correctness"
-                logging.info("User failed the assignment with ID: " + assignment_id + " due to " + failure_reason)
+                logging.info("User failed the assignment with ID: " +
+                             assignment_id + " due to " + failure_reason)
             if (total_time > max_allowed_time*1000):
                 accept = False
                 failure_reason = "high completion time"
-                logging.info("User failed the assignment with ID: " + assignment_id + " due to " + failure_reason)
+                logging.info("User failed the assignment with ID: " +
+                             assignment_id + " due to " + failure_reason)
 
             # Approve or reject assignment accordingly
             if (accept):
                 logging.info("Assignment " + assignment_id + " approved")
                 connection.approve_assignment(
-                    AssignmentId = assignment_id,
-                    RequesterFeedback = "Congratulations! Your HIT has been approved. Thank you for your time! :)",
-                    OverrideRejection = True
+                    AssignmentId=assignment_id,
+                    RequesterFeedback="Congratulations! Your HIT has been approved. Thank you for your time! :)",
+                    OverrideRejection=True
                 )
             elif (not accept):
                 logging.info("Assignment " + assignment_id + " rejected")
                 connection.reject_assignment(
-                    AssignmentId = assignment_id,
-                    RequesterFeedback = "We are sorry to inform you that your HIT has been rejected due to" + failure_reason
+                    AssignmentId=assignment_id,
+                    RequesterFeedback="We are sorry to inform you that your HIT has been rejected due to" + failure_reason
                 )
 
             # Send appropriate bonus if the assignment is accepted
@@ -154,8 +163,9 @@ def send_bonus(assignment_id, num_correct, total_time):
     min_allowed_correct = 5
     correctness_per_question_bonus = 1.04
 
-    bonus_correctness = round(((num_correct - min_allowed_correct) * correctness_per_question_bonus if (num_correct - min_allowed_correct > 0) else 0), 2)
-    
+    bonus_correctness = round(((num_correct - min_allowed_correct) *
+                              correctness_per_question_bonus if (num_correct - min_allowed_correct > 0) else 0), 2)
+
     if total_time < 14 * 60 * 1000:
         bonus_time = 0.32 * (base_pay + bonus_correctness)
     elif total_time < 15 * 60 * 1000:
@@ -175,32 +185,40 @@ def send_bonus(assignment_id, num_correct, total_time):
     total_bonus = round(bonus_correctness + bonus_time, 2)
 
     if (total_bonus > 0):
-        reason_str = "You received a total bonus of $" + str(total_bonus) + ". $" + str(bonus_correctness) + " due to your correctness and $" + str(bonus_time) + " due to your completion time."
-        worker_id = session.query(User).filter_by(assignment_id=assignment_id).first().worker_id
-        logging.info("In addition Worker ID: " + worker_id + " received a total bonus of $" + str(total_bonus) + ". $" + str(bonus_correctness) +\
-             " due to your correctness and $" + str(bonus_time) + " due to your completion time.")
+        reason_str = "You received a total bonus of $" + str(total_bonus) + ". $" + str(
+            bonus_correctness) + " due to your correctness and $" + str(bonus_time) + " due to your completion time."
+        worker_id = session.query(User).filter_by(
+            assignment_id=assignment_id).first().worker_id
+        logging.info("In addition Worker ID: " + worker_id + " received a total bonus of $" + str(total_bonus) + ". $" + str(bonus_correctness) +
+                     " due to your correctness and $" + str(bonus_time) + " due to your completion time.")
         connection.send_bonus(
-            WorkerId = worker_id,
-            BonusAmount = str(total_bonus),
-            AssignmentId = assignment_id,
-            Reason = reason_str
-        ) 
+            WorkerId=worker_id,
+            BonusAmount=str(total_bonus),
+            AssignmentId=assignment_id,
+            Reason=reason_str
+        )
     else:
-        worker_id = session.query(User).filter_by(assignment_id=assignment_id).first().worker_id
-        logging.info("In addition Worker ID: " + worker_id + "did not receive any bonus.")
+        worker_id = session.query(User).filter_by(
+            assignment_id=assignment_id).first().worker_id
+        logging.info("In addition Worker ID: " +
+                     worker_id + "did not receive any bonus.")
+
 
 def send_bonus_error(worker_id, assignment_id):
     total_bonus = "4.5"
     reason_str = "Due to our issues with your HIT submission you have been compensated with the base pay. Your HIT is neither accepted nor rejected."
     connection.send_bonus(
-            WorkerId = worker_id,
-            BonusAmount = str(total_bonus),
-            AssignmentId = assignment_id,
-            Reason = reason_str
+        WorkerId=worker_id,
+        BonusAmount=str(total_bonus),
+        AssignmentId=assignment_id,
+        Reason=reason_str
     )
-    logging.info("Worker ID: " + worker_id + " with Assignment ID: " + assignment_id + " is payed as bonus the base pay due to issues with their HIT submission.")
+    logging.info("Worker ID: " + worker_id + " with Assignment ID: " + assignment_id +
+                 " is payed as bonus the base pay due to issues with their HIT submission.")
 
 # Evaluate the workers that failed the HIT initially and accept their hit if they had at least 1 right answer
+
+
 def re_evaluate_workers(connection, filename):
     data = pd.read_csv(filename)
     worker_id_list = data['worker_id'].values
@@ -217,16 +235,18 @@ def re_evaluate_workers(connection, filename):
         worker_id = worker_id_list[i]
 
         # Check if the assignment was submitted less than a month ago
-        submit_date = connection.get_assignment(AssignmentId = assignment_id)['Assignment']['SubmitTime'].date()
+        submit_date = connection.get_assignment(AssignmentId=assignment_id)[
+            'Assignment']['SubmitTime'].date()
         days_diff = (current_date - submit_date).days
         print("Days Difference:", days_diff)
 
         if days_diff < 30:
             time.sleep(2)
-            logging.info("--------------------- Evaluating " + assignment_id + " of worker " + worker_id + " ---------------------")
+            logging.info("--------------------- Evaluating " + assignment_id +
+                         " of worker " + worker_id + " ---------------------")
             num_correct, total_time = get_score_and_time(assignment_id)
             logging.info("Assignment " + assignment_id + " had " + str(num_correct)
-            + " correct and was completed in " + str(total_time/1000) + " seconds")
+                         + " correct and was completed in " + str(total_time/1000) + " seconds")
 
             # Check if the user answered 0 questions correctly
             if (num_correct < min_allowed_correct):
@@ -238,28 +258,31 @@ def re_evaluate_workers(connection, filename):
             # Approve or reject assignment accordingly
             if (accept):
                 connection.approve_assignment(
-                    AssignmentId = assignment_id,
-                    RequesterFeedback = "Congratulations! We have decided to accept your HIT after re-evaluating our acceptance criteria for the HIT. Thank you for your time! :)",
-                    OverrideRejection = True
+                    AssignmentId=assignment_id,
+                    RequesterFeedback="Congratulations! We have decided to accept your HIT after re-evaluating our acceptance criteria for the HIT. Thank you for your time! :)",
+                    OverrideRejection=True
                 )
                 logging.info("worker's " + worker_id + "HIT is ACCEPTED")
 
 
 def approve_specific_assignment(assignment_id):
     connection.approve_assignment(
-        AssignmentId = assignment_id,
-        RequesterFeedback = "Congratulations! Your HIT has been approved. Thank you for your time! :)",
-        OverrideRejection = True
+        AssignmentId=assignment_id,
+        RequesterFeedback="Congratulations! Your HIT has been approved. Thank you for your time! :)",
+        OverrideRejection=True
     )
+
 
 def reject_specific_assignment(assignment_id):
     connection.approve_assignment(
-        AssignmentId = assignment_id,
-        RequesterFeedback = "Rejected! Speeding detecting. The HIT cannot be completed in less than 5 minutes!",
+        AssignmentId=assignment_id,
+        RequesterFeedback="Rejected! Speeding detecting. The HIT cannot be completed in less than 5 minutes!",
     )
 
+
 def grade_specific_assignment(assignment_id, worker_id):
-    approve_hits(connection, [assignment_id], [worker_id], check_completion_times=False)
+    approve_hits(connection, [assignment_id], [
+                 worker_id], check_completion_times=False)
 
 
 if __name__ == "__main__":
@@ -268,7 +291,8 @@ if __name__ == "__main__":
 
     if (arg1 == 'batch_grade'):
         hit_id = arg_arr[1]
-        assignments = get_assignment_hits(connection, hit_id, "Submitted")['Assignments']
+        assignments = get_assignment_hits(
+            connection, hit_id, "Submitted")['Assignments']
         assignment_id_list = []
         worker_id_list = []
         for i in assignments:
@@ -279,13 +303,16 @@ if __name__ == "__main__":
         ---------------------------------------------------------------\n\
         --------------------- Running approve_hits.py -----------------\n\
         ---------------------------------------------------------------\n"
-        )
+                     )
 
         for i in range(len(assignment_id_list)):
-            logging.info("worker_id: " + worker_id_list[i] + " with assignment: " + assignment_id_list[i])
-        logging.info("There are " + str(len(assignment_id_list)) + " assignments submitted waiting approval")
+            logging.info(
+                "worker_id: " + worker_id_list[i] + " with assignment: " + assignment_id_list[i])
+        logging.info("There are " + str(len(assignment_id_list)) +
+                     " assignments submitted waiting approval")
 
-        approve_hits(connection, assignment_id_list, worker_id_list, check_completion_times=True)
+        approve_hits(connection, assignment_id_list,
+                     worker_id_list, check_completion_times=True)
     elif (arg1 == 'reject'):
         assignment_id = arg_arr[1]
         reject_specific_assignment(assignment_id)

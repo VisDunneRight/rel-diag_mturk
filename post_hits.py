@@ -1,11 +1,12 @@
 import sys
+import os
 import boto3
 import config
 
 # Start Configuration Variables
 appConfig = config.Config()
 
-DEV_ENVIRONMENT_BOOLEAN = False
+DEV_ENVIRONMENT_BOOLEAN = True
 # End Configuration Variables
 
 # This allows us to specify whether we are pushing to the sandbox or live site.
@@ -15,9 +16,8 @@ if DEV_ENVIRONMENT_BOOLEAN:
     custom_qualification_id = "custom_qualification_id"             # For Sandbox only
     taken_test_qualification_id = "taken_test_qualification_id"     # For Sandbox only
 else:
-    # For Non-Sandbox only
-    AMAZON_HOST = "mechanicalturk.amazonaws.com"
-    qualification_id = "qualification_id"             # For Non-Sandbox only
+    AMAZON_HOST = "mechanicalturk.amazonaws.com"                    # For Sandbox only
+    qualification_id = "qualification_id"                           # For Sandbox only
     custom_qualification_id = "custom_qualification_id"             # For Non-Sandbox only
     taken_test_qualification_id = "taken_test_qualification_id"     # For Non-Sandbox only
 
@@ -41,20 +41,20 @@ usa = [{'Country': "US"}]
 
 
 def get_connection():
+    endpoint_url = ''
     if DEV_ENVIRONMENT_BOOLEAN:
-        return boto3.client('mturk',
-                            aws_access_key_id=appConfig.AWS_ACCESS_KEY_ID,
-                            aws_secret_access_key=appConfig.AWS_SECRET_ACCESS_KEY,
-                            region_name='us-east-1',
-                            endpoint_url='https://mturk-requester-sandbox.us-east-1.amazonaws.com'
-                            )
+        endpoint_url = 'https://mturk-requester-sandbox.us-east-1.amazonaws.com'
     else:
-        return boto3.client('mturk',
-                            aws_access_key_id=appConfig.AWS_ACCESS_KEY_ID,
-                            aws_secret_access_key=appConfig.AWS_SECRET_ACCESS_KEY,
-                            region_name='us-east-1',
-                            endpoint_url='https://mturk-requester.us-east-1.amazonaws.com'
-                            )
+        endpoint_url = 'https://mturk-requester.us-east-1.amazonaws.com'
+
+    return boto3.client(
+        'mturk',
+        aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID'),
+        aws_secret_access_key=os.environ.get(
+            'AWS_SECRET_ACCESS_KEY'),
+        region_name='us-east-1',
+        endpoint_url=endpoint_url
+    )
 
 
 def post_hit(approval_percentage):
