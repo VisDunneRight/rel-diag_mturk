@@ -192,6 +192,19 @@ http://127.0.0.1:8000/?workerId=AA&assignmentId=BB&hitId=CC
 
 https://rd-study.herokuapp.com?workerId=AA&assignmentId=BB&hitId=CC
 
+For testing AMT
+```
+heroku config:push --file=.env.sandbox -a rd-study -o
+heroku ps:restart -a rd-study
+```
+
+For live AMT
+```
+heroku config:push --file=.env.live -a rd-study -o
+heroku ps:restart -a rd-study
+```
+
+
 
 ## Basic/useful Postgres psql commands
 To connect in psql as user aristotle: `sudo -u aristotle psql postgres`\

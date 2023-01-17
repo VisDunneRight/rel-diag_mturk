@@ -159,6 +159,10 @@ def create_questions_array():
     return usedQuestionData
 
 
+# Create dictionary for the questions and answers data
+app.questions = create_questions_array()
+
+
 def getPatternOrder():
     sequence_length = NUM_PATTERNS * NUM_MODES * 2
     if (NUM_QUESTIONS % sequence_length) != 0:
@@ -476,9 +480,6 @@ def test():
     if possibleRedirect:
         return possibleRedirect
 
-    # Create dictionary for the questions and answers data
-    app.questions = create_questions_array()
-
     current_time = datetime.datetime.utcnow()
 
     start_time = user.q1_start  # should only happen first question
@@ -529,12 +530,12 @@ def record_choice_get_answer():
         # Can't just use exceptions as the user needs something in case in broken state
         invalid = False
         if user[sql_question_column] != None or user[question_end_col] != None or user[question_time_col] != None:
-            printing('Unexpected setting question end time and answer again. worker_id ' +
-                     str(worker_id) + ', question ' + str(question_num))
+            print('Unexpected setting question end time and answer again. worker_id ' +
+                  str(worker_id) + ', question ' + str(question_num))
             invalid = True
 
         if user[question_start_col] == None:
-            printing(
+            print(
                 'Tried to set question time for a question that has not been started.')
             invalid = True
 
