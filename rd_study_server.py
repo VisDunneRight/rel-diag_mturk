@@ -893,12 +893,12 @@ def results():
 
 # gunicorn logging for heroku
 if __name__ != '__main__':
-    gunicorn_error_logger = logging.getLogger('gunicorn.error')
-    app.logger.handlers.extend(gunicorn_error_logger.handlers)
-    app.logger.setLevel(gunicorn_error_logger.level)
+    gunicorn_logger = logging.getLogger('gunicorn.error')
+    app.logger.handlers = gunicorn_logger.handlers
+    app.logger.setLevel(gunicorn_logger.level)
 
 
 if __name__ == "__main__":
     # app.debug = DEBUG
     app.init_db()
-    app.run(threaded=True)
+    app.run(threaded=True, debug=True)
