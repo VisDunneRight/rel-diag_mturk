@@ -18,17 +18,7 @@ import logging
 from logging.config import dictConfig
 
 app = Flask(__name__, static_url_path='')
-
-
-# def get_http_exception_handler(app):
-#     """Overrides the default http exception handler to return JSON."""
-#     handle_http_exception = app.handle_http_exception
-
-#     @wraps(handle_http_exception)
-#     def ret_val(exception):
-#         exc = handle_http_exception(exception)
-#         return jsonify({'code': exc.code, 'message': exc.description}), exc.code
-#     return ret_val
+print('loading...')
 
 stream_handler = logging.StreamHandler()
 stream_handler.setLevel(logging.INFO)
@@ -50,33 +40,58 @@ def handle_exception(e):
     return response
 
 
+class InsufficientParameterError(ValueError):
+    pass
+
+
+class IllegalParameterError(ValueError):
+    pass
+
+
+@app.errorhandler(InsufficientParameterError)
+@app.errorhandler(IllegalParameterError)
+def handle_exception(e):
+    # pass through HTTP errors
+    if isinstance(e, HTTPException):
+        return e
+
+    code = 400
+    errorType = 'Bad Request'
+    errorText = type(e).__name__ + ': ' + str(e)
+
+    if os.environ.get('TESTING') == 'True':
+        app.logger.warn(errorText, exc_info=True)
+        res = {'code': code,
+               'errorType': errorType,
+               'errorMessage': errorText,
+               'trace': traceback.format_exc()}
+        return jsonify(res), code
+    else:
+        app.logger.warn(errorText, exc_info=False)
+        return errorType, code
+
+
 @app.errorhandler(Exception)
 def handle_exception(e):
     # pass through HTTP errors
     if isinstance(e, HTTPException):
         return e
-    # traceback.print_exception(e)
 
-    res = {'code': 500,
-           'errorType': 'Internal Server Error',
-           'errorMessage': "Something went really wrong!"}
-    debug = True
-    if debug:
-        res['errorMessage'] = e.message if hasattr(e, 'message') else f'{e}'
+    code = 500
+    errorType = 'Internal Server Error'
+    errorText = type(e).__name__ + ': ' + str(e)
 
-    # print('hit logger')
-    app.logger.error(e, exc_info=True)
+    if os.environ.get('TESTING') == 'True':
+        app.logger.error(errorText, exc_info=True)
+        res = {'code': code,
+               'errorType': errorType,
+               'errorMessage': errorText,
+               'trace': traceback.format_exc()}
+        return jsonify(res), code
+    else:
+        app.logger.error(errorText, exc_info=False)
+        return errorType, code
 
-    return jsonify(res), 500
-
-    # now you're handling non-HTTP exceptions only
-    return render_template("500_generic.html", e=e), 500
-
-# # Override the HTTP exception handler.
-# app.handle_http_exception = get_http_exception_handler(app)
-
-
-print('loading')
 
 app.secret_key = os.environ.get('FLASK_SECRET_KEY')
 
@@ -237,13 +252,11 @@ def getUser(request, createUser):  # createUser says optionally create if necess
     ]))
 
     if worker_id == None or assignment_id == None or hit_id == None:
-        print(
-            'Print: Insufficient arguments provided in full path: ' + full_path)
-        raise Exception(
-            'Excep: Insufficient arguments provided in full path: ' + full_path)
+        raise InsufficientParameterError(
+            'Insufficient arguments provided in full path: ' + full_path)
 
     if assignment_id == "ASSIGNMENT_ID_NOT_AVAILABLE":
-        raise Exception('Preview assignment but not preview code?!')
+        raise RuntimeError('Preview assignment but not preview code?!')
 
     # Check if user exists with the same worker_id in the database
     exists = db.session.query(User).filter_by(worker_id=worker_id).scalar()
@@ -303,8 +316,8 @@ def getUser(request, createUser):  # createUser says optionally create if necess
         else:
             msg = 'Unable to find user for worker_id ' + \
                 worker_id + ' but we were not told to create user.'
-            print(msg)
-            raise Exception(msg)
+            print('Printing: ' + msg)
+            raise IllegalParameterError(msg)
 
     return user
 
@@ -371,6 +384,7 @@ def main():
         resp.headers['x-frame-options'] = '*'
         return resp
 
+    # Can raise InsufficientParameterError:
     user = getUser(request=request, createUser=True)
 
     possibleRedirect = updateProgressAndGetRedirect(
@@ -928,7 +942,7 @@ def results():
 # gunicorn logging for heroku
 if __name__ != '__main__':
     # import faulthandler
-    print('gunicorn main')
+    print('gunicorn / flask VSCode main')
     # faulthandler.enable()
     # gunicorn_logger = logging.getLogger('gunicorn.error')
     # app.logger.handlers = gunicorn_logger.handlers
@@ -936,7 +950,7 @@ if __name__ != '__main__':
 
 
 if __name__ == "__main__":
-    print('flask main?')
+    print('which main?')
     # app.debug = DEBUG
     app.init_db()
     app.run(threaded=True, debug=True)
