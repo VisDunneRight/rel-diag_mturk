@@ -121,7 +121,6 @@ AWS_ACCESS_KEY_ID=
 AWS_SECRET_ACCESS_KEY=
 FLASK_SECRET_KEY=
 LOCAL_SQLALCHEMY_DATABASE_URI=postgresql://user:password@localhost:5432/rdstudy
-REMOTE_SQLALCHEMY_DATABASE_URI=
 SQLALCHEMY_TRACK_MODIFICATIONS=False
 ```
 
@@ -147,6 +146,28 @@ flask run
 ```
 
 http://127.0.0.1:5000/?workerId=a&assignmentId=b&hitId=c
+
+## Deploying on Heroku
+
+Create a pipeline on Heroku that will create from GitHub.
+
+Locally:
+
+```cmd
+heroku plugins:install heroku-config
+heroku login
+```
+to switch to our app
+```cmd
+heroku domains -a rd-study
+```
+where `rd-study` is the app name on Heroku
+
+```cmd
+heroku open -a rd-study
+heroku config:push --file=.env.production -a rd-study
+```
+
 
 ## Basic/useful Postgres psql commands
 To connect in psql as user aristotle: `sudo -u aristotle psql postgres`\

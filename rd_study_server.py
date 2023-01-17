@@ -57,10 +57,12 @@ if (os.environ.get('LOCAL')):
         'LOCAL_SQLALCHEMY_DATABASE_URI')
 else:
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
-        'REMOTE_SQLALCHEMY_DATABASE_URI')
+        'DATABASE_URL')  # 'REMOTE_SQLALCHEMY_DATABASE_URI'
+
 
 db.init_app(app)
 db.app = app
+db.create_all()  # creates tables if don't exist
 
 SECTION_FOLLOWER = {
     Sections.INSTRUCTIONS: Sections.TUTORIAL,
