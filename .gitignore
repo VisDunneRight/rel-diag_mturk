@@ -114,3 +114,7 @@ venv.bak/
 env-home
 env-work
 /.env.production
+/.env.live
+/.env.live.test
+/.env.sandbox
+/.env.sandbox.test
