@@ -125,10 +125,6 @@
 
       console.log("Submitted an answer for question", question_num);
 
-      // Once user submits an answer display both the SQL and QV graph regardless of the current mode
-      // $('.sql_query_div').show();
-      // display_queryvis_img();
-
       // Check the user's answer and record the time in the database
       check_answer();
       checking_answer = false;
@@ -174,15 +170,6 @@
     $('.progress-bar').attr('aria-valuenow', String(val));
     $('.progress-bar').css('width', String(val * 95 + 5) + "%");// inaccurate, but ensures question 1 labe is shown
     $('.progress-bar').text("Question " + String(question_num) + " / " + String(total_num_questions));
-  }
-
-  function display_queryvis_img() {
-    $("#queryviz_img").remove();
-    queryviz_img_src = "{{url_for('static', filename='img/q1.svg')}}"
-    queryviz_img_src = queryviz_img_src.replace("1", question_num.toString());
-    $('.queryviz_img').prepend('<img src="" id = "queryviz_img" alt = "queryviz_img">');
-    var queryviz_img = $('#queryviz_img');
-    queryviz_img[0].src = queryviz_img_src;
   }
 
   // Countdown timer

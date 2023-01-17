@@ -24,6 +24,19 @@ https://code.visualstudio.com/docs/remote/wsl
 ```code .``` from wsl
 
 ```sudo apt-get update```
+```sudo apt-get upgrade```
+
+### upgrade python
+```sudo apt-get install software-properties-common```
+```sudo add-apt-repository ppa:deadsnakes/ppa```
+```sudo apt update```
+```sudo apt install python3.11-full```
+```sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 2```
+And choose which one to use as Python3 via the command:
+```sudo update-alternatives --config python3```
+
+```sudo apt-get install python3.11-dev```
+
 
 ```sudo apt-get install postgresql postgresql-contrib```
 

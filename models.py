@@ -1,6 +1,8 @@
-from rd_study_server import db
 import enum
 from sqlalchemy import Enum
+from flask_sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy()
 
 
 class Sections(enum.Enum):
@@ -10,6 +12,8 @@ class Sections(enum.Enum):
     RESULTS = 4
 
 # Create our database model
+
+
 class User(db.Model):
     __tablename__ = "users"
     # Amazon variables
@@ -165,7 +169,6 @@ class User(db.Model):
     q32_start = db.Column(db.DateTime())
     q32_end = db.Column(db.DateTime())
     q32_time = db.Column(db.Integer)
-
 
     # # Demographics
     # likert_q1 = db.Column(db.Integer)

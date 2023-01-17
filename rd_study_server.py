@@ -1,14 +1,16 @@
 from __future__ import division
+from models import *
+from models import db
 import math
 import os
-import boto3
+# import boto3
 import json
 import datetime
 import random
 from enum import Enum
-from flask import Flask, render_template, url_for, request, make_response, jsonify, request, session, send_from_directory, redirect
+from flask import Flask, render_template, url_for, request, make_response, request, send_from_directory, redirect  # jsonify, session
 from flask_sqlalchemy import SQLAlchemy
-from flask_heroku import Heroku
+# from flask_heroku import Heroku
 from post_hits import get_connection, qualification_id
 from logging.config import dictConfig
 
@@ -41,10 +43,6 @@ dictConfig(
 
 app = Flask(__name__, static_url_path='')
 
-# app.config.from_object(os.environ['APP_SETTINGS'])
-# app.config.from_object('config.Config')
-#app.config.from_pyfile('config.py')
-
 app.secret_key = os.environ.get('FLASK_SECRET_KEY')
 
 # This allows us to specify whether we are pushing to the sandbox or live site.
@@ -55,23 +53,20 @@ else:
 
 # # Set up SQLAlchemy variables and settings
 if (os.environ.get('LOCAL')):
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('LOCAL_SQLALCHEMY_DATABASE_URI')
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
+        'LOCAL_SQLALCHEMY_DATABASE_URI')
 else:
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('REMOTE_SQLALCHEMY_DATABASE_URI')
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
+        'REMOTE_SQLALCHEMY_DATABASE_URI')
 
-# app.app_context().push()
-
-db = SQLAlchemy(app)
-
-from models import *
-
+db.init_app(app)
+db.app = app
 
 SECTION_FOLLOWER = {
     Sections.INSTRUCTIONS: Sections.TUTORIAL,
     Sections.TUTORIAL: Sections.TEST,
     Sections.TEST: Sections.RESULTS
 }
-
 
 # Configuration for returning workers
 returning_workers_filename = 'data/worker_ids_taken_old_hit.csv'
@@ -85,21 +80,22 @@ NUM_MODES = 2
 
 MIN_NUM_CORRECT_QUESTIONS = 16
 MIN_ALLOWED_ACCURACY = 0.5
-MAX_ALLOWED_TIME_SEC = 50*60 # in seconds
+MAX_ALLOWED_TIME_SEC = 50*60  # in seconds
+
 
 def create_questions_array():
     import json
-   
-    # returns JSON object as 
+
+    # returns JSON object as
     # a dictionary
     allQuestionData = json.load(open('data/questions.json'))
     usedQuestionData = allQuestionData[1:33]
 
     if NUM_QUESTIONS != len(usedQuestionData):
-        pass #XXXXXXXXX XXX
-        #raise Exception('Expected ', NUM_QUESTIONS, ' questions, file had ', len(questionData)) 
-    
-    choices = ["a", "b", "c", "d"]# For each of the NUM_PATTERNS
+        pass  # XXXXXXXXX XXX
+        # raise Exception('Expected ', NUM_QUESTIONS, ' questions, file had ', len(questionData))
+
+    choices = ["a", "b", "c", "d"]  # For each of the NUM_PATTERNS
 
     # Iterating through the json
     # list
@@ -120,17 +116,19 @@ def create_questions_array():
 
     return usedQuestionData
 
+
 def getPatternOrder():
     sequence_length = NUM_PATTERNS * NUM_MODES * 2
     if (NUM_QUESTIONS % sequence_length) != 0:
-        raise Exception(NUM_QUESTIONS + ' is not evenly divisible by  ' + sequence_length)
+        raise Exception(
+            NUM_QUESTIONS + ' is not evenly divisible by  ' + sequence_length)
     num_sequences = math.floor(NUM_QUESTIONS / sequence_length)
-    
+
     pattern_order = []
     for sequence in range(1, num_sequences+1):
         temp_order = []
-        for i in [1, 2]:# To go along with the *2 multiplier above
-            for pattern in range(1,NUM_PATTERNS+1):
+        for i in [1, 2]:  # To go along with the *2 multiplier above
+            for pattern in range(1, NUM_PATTERNS+1):
                 for mode in range(1, NUM_MODES+1):
                     temp_order.append(pattern)
         random.shuffle(temp_order)
@@ -138,6 +136,8 @@ def getPatternOrder():
     return pattern_order
 
 # Creates the answers dictionary that includes the letter answer (a-d) for each of the 12 questions
+
+
 def create_answers_dict():
     answers_json = open('static/questions/answers.json')
     answer_str = answers_json.read()
@@ -147,6 +147,8 @@ def create_answers_dict():
 # Returns a sequence number for a given worker. The sequence number is assigned
 # so that the sizes of the different sequence number groups are balanced
 # It also tries to balance groups when assigning returning workers
+
+
 def assign_sequence_num(worker_id):
     # Read the returning workers
     with open(returning_workers_filename) as f:
@@ -166,13 +168,13 @@ def assign_sequence_num(worker_id):
                 sequence_num=i).count()
             sequence_num_amount.append(amount)
             app.logger.info('There are ' + str(amount) +
-                  ' users with sequence_num = ' + str(i))
+                            ' users with sequence_num = ' + str(i))
 
         lowest_sequence_num_amount = sequence_num_amount.index(
             min(sequence_num_amount))
 
     app.logger.info("The sequence_num with the lowest assigned workers is: " +
-          str(lowest_sequence_num_amount))
+                    str(lowest_sequence_num_amount))
 
     # Set sequence_num in the database
     user = db.session.query(User).filter_by(worker_id=worker_id).one()
@@ -184,21 +186,24 @@ def assign_sequence_num(worker_id):
     return lowest_sequence_num_amount
 
 
-def getUser(request, createUser):# createUser says optionally create if necessary
+def getUser(request, createUser):  # createUser says optionally create if necessary
     worker_id = request.args.get("workerId")
     hit_id = request.args.get("hitId")
     assignment_id = request.args.get("assignmentId")
     full_path = request.full_path
-    
-    app.logger.info(logString(            [
-            "Request full path:", full_path,
-            "for worker_id:", worker_id,
-            "assignment_id:", assignment_id,
-            "hit_id:", hit_id
-        ]))
-    
+
+    app.logger.info(logString([
+        "Request full path:", full_path,
+        "for worker_id:", worker_id,
+        "assignment_id:", assignment_id,
+        "hit_id:", hit_id
+    ]))
+
     if worker_id == None or assignment_id == None or hit_id == None:
-        app.logger.error('Insufficient arguments provided in full path: ' + full_path)
+        app.logger.error(
+            'Insufficient arguments provided in full path: ' + full_path)
+        raise Exception(
+            'Insufficient arguments provided in full path: ' + full_path)
 
     if assignment_id == "ASSIGNMENT_ID_NOT_AVAILABLE":
         raise Exception('Preview assignment but not preview code?!')
@@ -222,16 +227,20 @@ def getUser(request, createUser):# createUser says optionally create if necessar
 
         # check arguments match DB
         if user.assignment_id != assignment_id:
-            app.logger.warn('worker_id ' + worker_id + "'s assignment_id in DB (" + user.assignment_id + ") doesn't match provided id (" + assignment_id + ')')
+            app.logger.warn('worker_id ' + worker_id + "'s assignment_id in DB (" +
+                            user.assignment_id + ") doesn't match provided id (" + assignment_id + ')')
         if user.hit_id != hit_id:
-            app.logger.warn('worker_id ' + worker_id + "'s hit_id in DB (" + user.hit_id + ") doesn't match provided id (" + hit_id + ')')
+            app.logger.warn('worker_id ' + worker_id + "'s hit_id in DB (" +
+                            user.hit_id + ") doesn't match provided id (" + hit_id + ')')
     else:
         if createUser:
             # Add the new user into the database
-            app.logger.info('Creating NEW user for worker_id ' + str(worker_id))
-            user = User(worker_id=worker_id, assignment_id=assignment_id, hit_id=hit_id)
-            
-             # Grab the user's qualification score and place it in the database
+            app.logger.info(
+                'Creating NEW user for worker_id ' + str(worker_id))
+            user = User(worker_id=worker_id,
+                        assignment_id=assignment_id, hit_id=hit_id)
+
+            # Grab the user's qualification score and place it in the database
             if (not os.environ.get('LOCAL')):
                 conn = get_connection()
                 response = conn.get_qualification_score(
@@ -240,58 +249,66 @@ def getUser(request, createUser):# createUser says optionally create if necessar
                 )
                 qualification_score = response['Qualification']['IntegerValue']
                 user.qualification_score = qualification_score
-            
+
             user.current_section = Sections.INSTRUCTIONS
             user.current_page = 1
-            
+
             # Record the datetime a new user is added
             start_datetime = datetime.datetime.utcnow()
             user.start_datetime = start_datetime
             app.logger.info(logString([
-                    'worker_id', str(worker_id),
-                    'starting datetime in UTC was', str(user.start_datetime)
-                ]))
+                'worker_id', str(worker_id),
+                'starting datetime in UTC was', str(user.start_datetime)
+            ]))
 
-           
             db.session.add(user)
             db.session.commit()
         else:
-            app.logger.error('Unable to find user for worker_id ' + worker_id + ' but we were not told to create user.')
+            msg = 'Unable to find user for worker_id ' + \
+                worker_id + ' but we were not told to create user.'
+            app.logger.error(msg)
+            raise Exception(msg)
 
     return user
 
 
 def updateProgressAndGetRedirect(user, current_section, next_section):
     redirect_route = None
-        
+
     if next_section:
         proper_next_section = SECTION_FOLLOWER[user.current_section]
         if current_section != proper_next_section:
-            if current_section != Sections.TUTORIAL: # For some reason there is a weird issue where 2 requests are made from tutorial
-                app.logger.error('full_path ' + request.full_path + ' asked for section ' + current_section.name + ' but proper next section was ' + proper_next_section.name)
+            # For some reason there is a weird issue where 2 requests are made from tutorial
+            if current_section != Sections.TUTORIAL:
+                app.logger.error('full_path ' + request.full_path + ' asked for section ' +
+                                 current_section.name + ' but proper next section was ' + proper_next_section.name)
         else:
             user.current_section = current_section
             user.current_page = 1
-            db.session.commit()            
+            db.session.commit()
 
     if user.current_section == current_section:
         return None
     elif user.current_section == Sections.INSTRUCTIONS:
         redirect_route = 'main'
     elif user.current_section == Sections.TUTORIAL:
-        redirect_route = 'tutorial'        
+        redirect_route = 'tutorial'
     elif user.current_section == Sections.TEST:
         redirect_route = 'test'
     elif user.current_section == Sections.RESULTS:
         redirect_route = 'results'
     else:
-        raise Exception('Undefined section for worker_id ' + user.worker_id + ': ' + user.current_section)
+        raise Exception('Undefined section for worker_id ' +
+                        user.worker_id + ': ' + user.current_section)
 
-    return redirect(url_for(redirect_route,
-        workerId=user.worker_id,
-        assignmentId=user.assignment_id,
-        hitId=user.hit_id,
-        currentPage=user.current_page))
+    return redirect(
+        url_for(
+            redirect_route,
+            workerId=user.worker_id,
+            assignmentId=user.assignment_id,
+            hitId=user.hit_id,
+            currentPage=user.current_page))
+
 
 def logString(input_array):
     return ' '.join(str(s) for s in input_array)
@@ -306,10 +323,11 @@ def favicon():
 @app.route('/', methods=['GET', 'POST'])
 def main():
     preview = False
-    
+
     # Check if the worker clicked on preview. If so, skip creating user
     if request.args.get("assignmentId") == "ASSIGNMENT_ID_NOT_AVAILABLE":
-        app.logger.info("Worker has clicked to preview the task with request full_path " + request.full_path)
+        app.logger.info(
+            "Worker has clicked to preview the task with request full_path " + request.full_path)
         preview = True
         resp = make_response(render_template(
             "instructions.hAtml", preview=preview))
@@ -317,22 +335,25 @@ def main():
         return resp
 
     user = getUser(request=request, createUser=True)
-    
-    possibleRedirect = updateProgressAndGetRedirect(user, Sections.INSTRUCTIONS, request.args.get('nextSection'))
+
+    possibleRedirect = updateProgressAndGetRedirect(
+        user, Sections.INSTRUCTIONS, request.args.get('nextSection'))
     if possibleRedirect:
         return possibleRedirect
 
     app.logger.info(logString([
-            "worker_id", user.worker_id,
-            "had a qualification score of", str(user.qualification_score)
-        ]))
-    
-    resp = make_response(render_template("instructions.html",
-        preview=False,
-        worker_id=user.worker_id,
-        assignment_id=user.assignment_id,
-        hit_id=user.hit_id))
-    
+        "worker_id", user.worker_id,
+        "had a qualification score of", str(user.qualification_score)
+    ]))
+
+    resp = make_response(
+        render_template(
+            "instructions.html",
+            preview=False,
+            worker_id=user.worker_id,
+            assignment_id=user.assignment_id,
+            hit_id=user.hit_id))
+
     # This is particularly nasty gotcha.
     # Without this header, your iFrame will not render in Amazon
     resp.headers['x-frame-options'] = '*'
@@ -343,15 +364,18 @@ def main():
 def tutorial():
     user = getUser(request=request, createUser=False)
 
-    possibleRedirect = updateProgressAndGetRedirect(user, Sections.TUTORIAL, request.args.get('nextSection'))
+    possibleRedirect = updateProgressAndGetRedirect(
+        user, Sections.TUTORIAL, request.args.get('nextSection'))
     if possibleRedirect:
         return possibleRedirect
 
-    resp = make_response(render_template("tutorial.html",
-        worker_id=user.worker_id,
-        assignment_id=user.assignment_id,
-        hit_id=user.hit_id,
-        current_page=user.current_page))
+    resp = make_response(
+        render_template(
+            "tutorial.html",
+            worker_id=user.worker_id,
+            assignment_id=user.assignment_id,
+            hit_id=user.hit_id,
+            current_page=user.current_page))
     resp.headers['x-frame-options'] = '*'
     return resp
 
@@ -364,11 +388,12 @@ def tutorialClick():
         # Get the data
         tutorial_page_num = data['tutorial_page_num']
         current_page = data['current_page']
-        time_spent = data['time_spent']# Insecure, but we don't really care about tutorial time
+        # Insecure, but we don't really care about tutorial time
+        time_spent = data['time_spent']
         worker_id = data['worker_id']
 
         app.logger.info("Worker: " + worker_id + " moved away from tutorial page " + str(tutorial_page_num) +
-              ", elapsed time increased by " + str(time_spent))
+                        ", elapsed time increased by " + str(time_spent))
 
         # Get the user
         user = db.session.query(User).filter_by(worker_id=worker_id).one()
@@ -384,10 +409,12 @@ def tutorialClick():
         setattr(user, 'current_page', current_page)
         db.session.commit()
 
-        app.logger.info('worker_id ' + worker_id + 'Set tutorial_time to ' + str(tutorial_time))
+        app.logger.info('worker_id ' + worker_id +
+                        'Set tutorial_time to ' + str(tutorial_time))
 
     if request.method == 'GET':
-        app.logger.info("Wrong request, tutorial_record_time request should be POST not GET")
+        app.logger.info(
+            "Wrong request, tutorial_record_time request should be POST not GET")
 
     return "OK"
 
@@ -397,47 +424,52 @@ def tutorialClick():
 def test():
     user = getUser(request=request, createUser=False)
 
-    possibleRedirect = updateProgressAndGetRedirect(user, Sections.TEST, request.args.get('nextSection'))
+    possibleRedirect = updateProgressAndGetRedirect(
+        user, Sections.TEST, request.args.get('nextSection'))
     if possibleRedirect:
         return possibleRedirect
 
     # Create dictionary for the questions and answers data
     app.questions = create_questions_array()
-    
-    current_time = datetime.datetime.utcnow() 
 
-    start_time = user.q1_start # should only happen first question
+    current_time = datetime.datetime.utcnow()
+
+    start_time = user.q1_start  # should only happen first question
     if start_time == None:
         start_time = current_time
 
-    max_end_time = start_time + datetime.timedelta(seconds=MAX_ALLOWED_TIME_SEC)
+    max_end_time = start_time + \
+        datetime.timedelta(seconds=MAX_ALLOWED_TIME_SEC)
 
     time_remaining_delta = max_end_time - current_time
     time_remaining_ms = int(time_remaining_delta.total_seconds() * 1000)
 
-    resp = make_response(render_template("test.html",
-        worker_id=user.worker_id,
-        assignment_id=user.assignment_id,
-        hit_id=user.hit_id,
-        current_page=user.current_page,
-        time_remaining_ms=time_remaining_ms,
-        questions=app.questions))
+    resp = make_response(
+        render_template(
+            "test.html",
+            worker_id=user.worker_id,
+            assignment_id=user.assignment_id,
+            hit_id=user.hit_id,
+            current_page=user.current_page,
+            time_remaining_ms=time_remaining_ms,
+            questions=app.questions))
     resp.headers['x-frame-options'] = '*'
     return resp
 
 
 @app.route('/record_choice_get_answer', methods=['POST'])
 def record_choice_get_answer():
-    app.logger.info("record_choice_get_answer called with " + request.method + " request")
+    app.logger.info("record_choice_get_answer called with " +
+                    request.method + " request")
     if request.method == 'POST':
         data = request.json
         question_num = data['question_num']
         worker_id = data['worker_id']
-        
+
         app.logger.info(logString([
-                    "worker_id", worker_id,
-                    "reporting choice for question", question_num
-                ]))
+            "worker_id", worker_id,
+            "reporting choice for question", question_num
+        ]))
 
         user = db.session.query(User).filter_by(worker_id=worker_id).one()
 
@@ -446,30 +478,32 @@ def record_choice_get_answer():
         question_end_col = sql_question_column + "_end"
         question_time_col = sql_question_column + "_time"
         user_choice = data['user_choice']
-       
 
         # Can't just use exceptions as the user needs something in case in broken state
-        invalid = False 
+        invalid = False
         if user[sql_question_column] != None or user[question_end_col] != None or user[question_time_col] != None:
-            app.logger.warning('Unexpected setting question end time and answer again. worker_id ' + str(worker_id) + ', question ' + str(question_num))
+            app.logger.warning('Unexpected setting question end time and answer again. worker_id ' +
+                               str(worker_id) + ', question ' + str(question_num))
             invalid = True
-        
+
         if user[question_start_col] == None:
-            app.logger.warning('Tried to set question time for a question that has not been started.')
+            app.logger.warning(
+                'Tried to set question time for a question that has not been started.')
             invalid = True
 
         question_end = datetime.datetime.utcnow()
-        question_time = question_end - user[question_start_col] 
+        question_time = question_end - user[question_start_col]
         question_time_ms = int(question_time.total_seconds() * 1000)
-        
+
         if not invalid:
             setattr(user, sql_question_column, user_choice)
             setattr(user, question_end_col, question_end)
-            
+
             setattr(user, question_time_col, question_time_ms)
             db.session.commit()
 
-        pattern_num = user.pattern_order[question_num - 1]# Our questions start at 1, our index starts at 0
+        # Our questions start at 1, our index starts at 0
+        pattern_num = user.pattern_order[question_num - 1]
         question = app.questions[question_num - 1]
 
         answer_key = 'answer' + str(pattern_num)
@@ -482,23 +516,24 @@ def record_choice_get_answer():
 
         correct_string = '(Correct)'
         if pattern_num != user_choice:
-            correct_string = '(Incorrect, correct was '+ str(pattern_num) +')'
-
+            correct_string = '(Incorrect, correct was ' + \
+                str(pattern_num) + ')'
 
         app.logger.info(logString([
-                'worker_id', worker_id,
-                'for question', question_num, 
-                'chose answer', user_choice, 
-                correct_string,
-                'at', question_end, 
-                'Took', question_time_ms/1000, 'seconds.',
-                'Answer text', answer_text]
-            ))
+            'worker_id', worker_id,
+            'for question', question_num,
+            'chose answer', user_choice,
+            correct_string,
+            'at', question_end,
+            'Took', question_time_ms/1000, 'seconds.',
+            'Answer text', answer_text]
+        ))
 
         return ret_data
 
     if request.method == 'GET':
-        app.logger.info("Wrong request, record_choice_get_answer request should be POST not GET")
+        app.logger.info(
+            "Wrong request, record_choice_get_answer request should be POST not GET")
 
     return "OK"
 
@@ -506,20 +541,22 @@ def record_choice_get_answer():
 # Modifies the database in order to record a user's question choice and time spent on that question
 @app.route('/get_next_question', methods=['POST'])
 def get_next_question():
-    app.logger.info("get_next_question called with " + request.method + " request")
+    app.logger.info("get_next_question called with " +
+                    request.method + " request")
     if request.method == 'POST':
-        question_num = request.json['question_num']        
+        question_num = request.json['question_num']
         worker_id = request.json['worker_id']
         app.logger.info(logString([
-                "worker_id", str(worker_id),
-                " requesting next question, question_num ", str(question_num)
-            ]))
+            "worker_id", str(worker_id),
+            " requesting next question, question_num ", str(question_num)
+        ]))
 
         user = db.session.query(User).filter_by(worker_id=worker_id).one()
 
         sequence_num = user.sequence_num
-        
-        pattern_num = user.pattern_order[question_num - 1]# Our questions start at 1, our index starts at 0
+
+        # Our questions start at 1, our index starts at 0
+        pattern_num = user.pattern_order[question_num - 1]
         question = app.questions[question_num - 1]
 
         # example of question format is
@@ -548,9 +585,9 @@ def get_next_question():
         #     answer3: 'Find employees who do **not** work on **all** projects.',
         #     answer4: 'Find employees who work on **all** projects.',
         # }
-        
-        #question_num is [1,2,3,4,5...32]
-        #sequence_num is [0, 1]
+
+        # question_num is [1,2,3,4,5...32]
+        # sequence_num is [0, 1]
         # 0 & 1 SQL
         # 0 & 2 RD
         # 0 & 3 SQL
@@ -559,15 +596,17 @@ def get_next_question():
         # 1 & 2 SQL
         # 1 & 3 RD
 
-        image_key_base = '';
+        image_key_base = ''
         if sequence_num > 1:
-            raise Exception('Unhandled image location definition for sequence num ' + sequence_num)
+            raise Exception(
+                'Unhandled image location definition for sequence num ' + sequence_num)
         elif (sequence_num + question_num) % 2 == 1:
             image_key_base = 'sqlpattern'
         elif (sequence_num + question_num) % 2 == 0:
             image_key_base = 'diagrampattern'
         else:
-            raise Exception('Unhandled image location definition for sequence num ' + sequence_num + ' question_num ' + question_num)
+            raise Exception('Unhandled image location definition for sequence num ' +
+                            sequence_num + ' question_num ' + question_num)
         image_key = image_key_base + str(pattern_num)
 
         ret_data = {
@@ -579,30 +618,30 @@ def get_next_question():
                 question['answer4']
             ]
         }
-        
+
         sql_question_column = 'q' + str(question_num)
         question_start_col = sql_question_column + "_start"
         question_end_col = sql_question_column + "_end"
         question_time_col = sql_question_column + "_time"
-        
+
+        question_start = datetime.datetime.utcnow()
         if user[question_start_col] != None or user[sql_question_column] != None or user[question_end_col] != None or user[question_time_col] != None:
             app.logger.error(logString([
                 'Unexpected setting start question time again. worker_id', worker_id,
                 'question_num ', question_num
             ]))
-        
-        question_start = datetime.datetime.utcnow()
-        setattr(user, question_start_col, question_start)
-        setattr(user, 'current_page', question_num)
+        else:
 
-        db.session.commit()
+            setattr(user, question_start_col, question_start)
+            setattr(user, 'current_page', question_num)
+            db.session.commit()
 
         app.logger.info(logString([
-                'worker_id', worker_id,
-                'started question num', question_num,
-                'at', question_start,
-                '. Sending question details:', ret_data
-            ]))
+            'worker_id', worker_id,
+            'started question num', question_num,
+            'at', question_start,
+            '. Sending question details:', ret_data
+        ]))
 
         return ret_data
 
@@ -610,6 +649,7 @@ def get_next_question():
         app.logger.info("Wrong request, request should be POST not GET")
 
     return "OK"
+
 
 @app.route('/assign_sequence_num', methods=['GET', 'POST'])
 def assign_sequence_num_route():
@@ -623,9 +663,9 @@ def assign_sequence_num_route():
     # TODO: use get_qualification_score (https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/mturk.html#MTurk.Client.get_qualification_score)
     # if we want to set the mode based on user performance in the qualification test
 
-    
     worker_id = request.json['worker_id']
-    app.logger.info("assign_sequence_num route called for worker_id " + worker_id)
+    app.logger.info(
+        "assign_sequence_num route called for worker_id " + worker_id)
 
     user = db.session.query(User).filter_by(worker_id=worker_id).one()
     user.current_section = Sections.TUTORIAL
@@ -634,7 +674,8 @@ def assign_sequence_num_route():
     sequence_num = user.sequence_num
     if (sequence_num == None):
         sequence_num = assign_sequence_num(worker_id)
-        app.logger.info('worker_id ' + worker_id + ' does not have a sequence number assigned, assigning them ' + str(sequence_num))
+        app.logger.info('worker_id ' + worker_id +
+                        ' does not have a sequence number assigned, assigning them ' + str(sequence_num))
     return str(sequence_num)
 
 
@@ -726,18 +767,20 @@ def custom_to_int(val):
 def results():
     user = getUser(request=request, createUser=False)
 
-    possibleRedirect = updateProgressAndGetRedirect(user, Sections.RESULTS, request.args.get('nextSection'))
+    possibleRedirect = updateProgressAndGetRedirect(
+        user, Sections.RESULTS, request.args.get('nextSection'))
     if possibleRedirect:
         return possibleRedirect
 
     # Record the datetime the user finishes
     end_datetime = datetime.datetime.utcnow()
-    app.logger.info('worker_id ' + str(user.worker_id) + ' finished. Ending datetime: ' + str(end_datetime))
+    app.logger.info('worker_id ' + str(user.worker_id) +
+                    ' finished. Ending datetime: ' + str(end_datetime))
     user.end_datetime = end_datetime
     db.session.commit()
-    
+
     num_correct = 0
-    
+
     total_question_time = 0
     total_timedelta = user.q32_end - user.q1_start
     total_time = int(total_timedelta.total_seconds() * 1000)
@@ -747,21 +790,26 @@ def results():
         q_time_col = "q" + str(question_num) + "_time"
 
         user_time = getattr(user, q_time_col)
-        user_choice = getattr(user, q_col)        
-        pattern_num = user.pattern_order[question_num - 1]# Our questions start at 1, our index starts at 0      
-        
+        user_choice = getattr(user, q_col)
+        # Our questions start at 1, our index starts at 0
+        pattern_num = user.pattern_order[question_num - 1]
+
         if user_choice == pattern_num:
             num_correct += 1
-            app.logger.info('worker_id ' + str(user.worker_id) + ' has correct answer for question ' + str(question_num))
+            app.logger.info('worker_id ' + str(user.worker_id) +
+                            ' has correct answer for question ' + str(question_num))
         else:
-            app.logger.info('worker_id ' + str(user.worker_id) + ' has wrong answer for question ' + str(question_num))
+            app.logger.info('worker_id ' + str(user.worker_id) +
+                            ' has wrong answer for question ' + str(question_num))
 
         total_question_time += user_time
 
     percentage_correct = num_correct / NUM_QUESTIONS
     app.logger.info("Number of correct answers is: " + str(num_correct))
-    app.logger.info("Percentage of correct answers is " + str(percentage_correct))
-    app.logger.info('worker_id ' + str(user.worker_id) + "'s total time taken to complete the test is " + str("%.2f" % (total_time / (1000 * 60))) + " minutes , but time on questions was " + str("%.2f" % (total_question_time / (1000 * 60))))
+    app.logger.info("Percentage of correct answers is " +
+                    str(percentage_correct))
+    app.logger.info('worker_id ' + str(user.worker_id) + "'s total time taken to complete the test is " + str("%.2f" %
+                    (total_time / (1000 * 60))) + " minutes, but time on questions was " + str("%.2f" % (total_question_time / (1000 * 60))))
 
     accept = True
     failure_reason = ""
@@ -769,13 +817,15 @@ def results():
     # check if we will accept the hit
     if (num_correct < MIN_NUM_CORRECT_QUESTIONS):
         accept = False
-        failure_reason = "You failed to answer " + str(MIN_NUM_CORRECT_QUESTIONS) + " or more questions correctly."
+        failure_reason = "you failed to answer " + \
+            str(MIN_NUM_CORRECT_QUESTIONS) + " or more questions correctly."
     if (total_time > MAX_ALLOWED_TIME_SEC * 1000):
         accept = False
-        failure_reason = "You failed to answer all questions within " + \
+        failure_reason = "you failed to answer all questions within " + \
             str(MAX_ALLOWED_TIME_SEC/60) + " minutes."
 
-    app.logger.info('worker_id ' + str(user.worker_id) + " The hit acceptance is: " + str(accept))
+    app.logger.info('worker_id ' + str(user.worker_id) +
+                    " The hit acceptance is: " + str(accept))
 
     # TODO: Do not hard code variables
     # Calculate the bonus
@@ -790,7 +840,7 @@ def results():
         bonus_correctness = round((
             (num_correct - MIN_NUM_CORRECT_QUESTIONS) *
             CORRECTNESS_PER_QUESTION_BONUS if (num_correct - MIN_NUM_CORRECT_QUESTIONS > 0) else 0),
-             2)
+            2)
 
         if total_time < 8 * 60 * 1000:
             bonus_time = 0.35 * (BASE_PAY + bonus_correctness)
@@ -809,23 +859,30 @@ def results():
         bonus_time = round(bonus_time, 2)
 
         app.logger.info("Bonus from correctness: " + str(bonus_correctness) +
-              " bonus from time: " + str(bonus_time))
+                        " bonus from time: " + str(bonus_time))
         total_bonus = round(bonus_correctness + bonus_time, 2)
 
     total_pay = BASE_PAY + total_bonus
 
-    resp = make_response(render_template("results.html", 
-            AMAZON_HOST=AMAZON_HOST, 
+    resp = make_response(
+        render_template(
+            "results.html",
+            AMAZON_HOST=AMAZON_HOST,
             percentage_correct=percentage_correct,
             num_correct=num_correct,
             num_questions=NUM_QUESTIONS,
-            total_time=int(round(total_time/1000)),
+            total_time=int(
+                round(total_time/1000)),
             accept=accept,
             failure_reason=failure_reason,
-            bonus_time=str("{:.2f}".format(bonus_time)),
-            bonus_correctness=str("{:.2f}".format(bonus_correctness)),
-            total_bonus=str("{:.2f}".format(total_bonus)),
-            total_pay=str("{:.2f}".format(total_pay))
+            bonus_time=str(
+                "{:.2f}".format(bonus_time)),
+            bonus_correctness=str(
+                "{:.2f}".format(bonus_correctness)),
+            total_bonus=str(
+                "{:.2f}".format(total_bonus)),
+            total_pay=str(
+                "{:.2f}".format(total_pay))
         ))
     resp.headers['x-frame-options'] = '*'
     return resp
@@ -833,4 +890,5 @@ def results():
 
 if __name__ == "__main__":
     # app.debug = DEBUG
+    app.init_db()
     app.run(threaded=True)

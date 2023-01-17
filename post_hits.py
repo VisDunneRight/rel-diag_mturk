@@ -1,22 +1,22 @@
-import os
 import sys
 import boto3
 import config
 
-#Start Configuration Variables
+# Start Configuration Variables
 appConfig = config.Config()
 
 DEV_ENVIRONMENT_BOOLEAN = False
-#End Configuration Variables
+# End Configuration Variables
 
-#This allows us to specify whether we are pushing to the sandbox or live site.
+# This allows us to specify whether we are pushing to the sandbox or live site.
 if DEV_ENVIRONMENT_BOOLEAN:
     AMAZON_HOST = "mechanicalturk.sandbox.amazonaws.com"            # For Sandbox only
     qualification_id = "qualification_id"                           # For Sandbox only
     custom_qualification_id = "custom_qualification_id"             # For Sandbox only
     taken_test_qualification_id = "taken_test_qualification_id"     # For Sandbox only
 else:
-    AMAZON_HOST = "mechanicalturk.amazonaws.com"                    # For Non-Sandbox only
+    # For Non-Sandbox only
+    AMAZON_HOST = "mechanicalturk.amazonaws.com"
     qualification_id = "qualification_id"             # For Non-Sandbox only
     custom_qualification_id = "custom_qualification_id"             # For Non-Sandbox only
     taken_test_qualification_id = "taken_test_qualification_id"     # For Non-Sandbox only
@@ -39,21 +39,23 @@ was not successful' error message."
 
 usa = [{'Country': "US"}]
 
+
 def get_connection():
     if DEV_ENVIRONMENT_BOOLEAN:
-        return  boto3.client('mturk',
-            aws_access_key_id=appConfig.AWS_ACCESS_KEY_ID,
-            aws_secret_access_key=appConfig.AWS_SECRET_ACCESS_KEY,
-            region_name = 'us-east-1',
-            endpoint_url='https://mturk-requester-sandbox.us-east-1.amazonaws.com'
-        )
+        return boto3.client('mturk',
+                            aws_access_key_id=appConfig.AWS_ACCESS_KEY_ID,
+                            aws_secret_access_key=appConfig.AWS_SECRET_ACCESS_KEY,
+                            region_name='us-east-1',
+                            endpoint_url='https://mturk-requester-sandbox.us-east-1.amazonaws.com'
+                            )
     else:
-        return  boto3.client('mturk',
-            aws_access_key_id=appConfig.AWS_ACCESS_KEY_ID,
-            aws_secret_access_key=appConfig.AWS_SECRET_ACCESS_KEY,
-            region_name = 'us-east-1',
-            endpoint_url='https://mturk-requester.us-east-1.amazonaws.com'
-        )
+        return boto3.client('mturk',
+                            aws_access_key_id=appConfig.AWS_ACCESS_KEY_ID,
+                            aws_secret_access_key=appConfig.AWS_SECRET_ACCESS_KEY,
+                            region_name='us-east-1',
+                            endpoint_url='https://mturk-requester.us-east-1.amazonaws.com'
+                            )
+
 
 def post_hit(approval_percentage):
     connection = get_connection()
@@ -62,31 +64,32 @@ def post_hit(approval_percentage):
 
     # Boto3 version
     create_hit_result = connection.create_hit(
-        Question = questionform,
-        MaxAssignments = 30,
-        LifetimeInSeconds = 60*60*24*10,
-        AssignmentDurationInSeconds = 60*60*2,
-        Reward = base_pay,
-        Title = title_str,
-        Description = description_str,
-        QualificationRequirements = [{'QualificationTypeId': qualification_id,
+        Question=questionform,
+        MaxAssignments=30,
+        LifetimeInSeconds=60*60*24*10,
+        AssignmentDurationInSeconds=60*60*2,
+        Reward=base_pay,
+        Title=title_str,
+        Description=description_str,
+        QualificationRequirements=[{'QualificationTypeId': qualification_id,
                                     'Comparator': 'GreaterThanOrEqualTo',
-                                    'IntegerValues':[minimum_qualification_score],
+                                    'IntegerValues': [minimum_qualification_score],
                                     },
-                                    {'QualificationTypeId': "00000000000000000071",
+                                   {'QualificationTypeId': "00000000000000000071",
                                     'Comparator': 'EqualTo',
                                     'LocaleValues': usa
                                     },
-                                    {'QualificationTypeId': "000000000000000000L0",
+                                   {'QualificationTypeId': "000000000000000000L0",
                                     'Comparator': 'GreaterThanOrEqualTo',
-                                    'IntegerValues':[approval_percentage]
+                                    'IntegerValues': [approval_percentage]
                                     },
-                                    {'QualificationTypeId': taken_test_qualification_id,
+                                   {'QualificationTypeId': taken_test_qualification_id,
                                     'Comparator': 'DoesNotExist',
                                     }]
     )
 
     print("Created a new HIT with HITId: " + create_hit_result['HIT']['HITId'])
+
 
 def pilot_post_hit(approval_percentage):
     connection = get_connection()
@@ -95,28 +98,29 @@ def pilot_post_hit(approval_percentage):
 
     # Boto3 version
     create_hit_result = connection.create_hit(
-        Question = questionform,
+        Question=questionform,
         MaxAssignments=12,
         LifetimeInSeconds=60*60*24*7,
         AssignmentDurationInSeconds=60*60*2,
-        Reward = base_pay,
-        Title = title_str,
-        Description = description_str,
+        Reward=base_pay,
+        Title=title_str,
+        Description=description_str,
         QualificationRequirements=[{'QualificationTypeId': qualification_id,
                                     'Comparator': 'GreaterThanOrEqualTo',
-                                    'IntegerValues':[minimum_qualification_score]
+                                    'IntegerValues': [minimum_qualification_score]
                                     },
-                                    {'QualificationTypeId': "00000000000000000071",
+                                   {'QualificationTypeId': "00000000000000000071",
                                     'Comparator': 'EqualTo',
                                     'LocaleValues': usa
                                     },
-                                    {'QualificationTypeId': "000000000000000000L0",
+                                   {'QualificationTypeId': "000000000000000000L0",
                                     'Comparator': 'GreaterThanOrEqualTo',
-                                    'IntegerValues':[approval_percentage]
+                                    'IntegerValues': [approval_percentage]
                                     }]
     )
 
     print("Created a new HIT with HITId: " + create_hit_result['HIT']['HITId'])
+
 
 def test_post_hit():
     connection = get_connection()
@@ -125,31 +129,33 @@ def test_post_hit():
 
     # Boto3 version
     create_hit_result = connection.create_hit(
-        Question = questionform,
+        Question=questionform,
         MaxAssignments=12,
         LifetimeInSeconds=60*60*1,
         AssignmentDurationInSeconds=60*60*2,
-        Reward = base_pay,
-        Title = title_str,
-        Description = description_str,
+        Reward=base_pay,
+        Title=title_str,
+        Description=description_str,
         QualificationRequirements=[{'QualificationTypeId': qualification_id,
-                            'Comparator': 'GreaterThanOrEqualTo',
-                            'IntegerValues':[minimum_qualification_score]
-                            },
-                            {'QualificationTypeId': "00000000000000000071",
-                            'Comparator': 'In',
-                            'LocaleValues': usa
-                            },
-                            {'QualificationTypeId': "000000000000000000L0",
-                            'Comparator': 'GreaterThanOrEqualTo',
-                            'IntegerValues':[approval_percentage]
-                            },
-                            {'QualificationTypeId': taken_test_qualification_id,
-                            'Comparator': 'DoesNotExist',
-                            }]
+                                    'Comparator': 'GreaterThanOrEqualTo',
+                                    'IntegerValues': [minimum_qualification_score]
+                                    },
+                                   {'QualificationTypeId': "00000000000000000071",
+                                    'Comparator': 'In',
+                                    'LocaleValues': usa
+                                    },
+                                   {'QualificationTypeId': "000000000000000000L0",
+                                    'Comparator': 'GreaterThanOrEqualTo',
+                                    'IntegerValues': [approval_percentage]
+                                    },
+                                   {'QualificationTypeId': taken_test_qualification_id,
+                                    'Comparator': 'DoesNotExist',
+                                    }]
     )
 
-    print("Created a test HIT with HITId: " + create_hit_result['HIT']['HITId'])
+    print("Created a test HIT with HITId: " +
+          create_hit_result['HIT']['HITId'])
+
 
 def custom_post_hit(approval_percentage):
     connection = get_connection()
@@ -158,50 +164,55 @@ def custom_post_hit(approval_percentage):
 
     # Boto3 version
     create_hit_result = connection.create_hit(
-        Question = questionform,
+        Question=questionform,
         MaxAssignments=1,
         LifetimeInSeconds=60*60*24*10,
         AssignmentDurationInSeconds=60*60*2,
-        Reward = base_pay,
-        Title = "CUSTOM HIT for A2OATZCX1YXE77, " + title_str,
-        Description = description_str + "THIS HIT IS ONLY FOR THAT SPECIFIC WORKER!",
-        QualificationRequirements = [{'QualificationTypeId': qualification_id,
+        Reward=base_pay,
+        Title="CUSTOM HIT for A2OATZCX1YXE77, " + title_str,
+        Description=description_str + "THIS HIT IS ONLY FOR THAT SPECIFIC WORKER!",
+        QualificationRequirements=[{'QualificationTypeId': qualification_id,
                                     'Comparator': 'GreaterThanOrEqualTo',
-                                    'IntegerValues':[minimum_qualification_score],
+                                    'IntegerValues': [minimum_qualification_score],
                                     },
-                                    {'QualificationTypeId': "00000000000000000071",
+                                   {'QualificationTypeId': "00000000000000000071",
                                     'Comparator': 'EqualTo',
                                     'LocaleValues': usa
                                     },
-                                    {'QualificationTypeId': "000000000000000000L0",
+                                   {'QualificationTypeId': "000000000000000000L0",
                                     'Comparator': 'GreaterThanOrEqualTo',
-                                    'IntegerValues':[approval_percentage]
+                                    'IntegerValues': [approval_percentage]
                                     },
-                                    {'QualificationTypeId': custom_qualification_id,
+                                   {'QualificationTypeId': custom_qualification_id,
                                     'Comparator': 'Exists',
                                     }]
     )
 
-    print("Created a custom new HIT with HITId: " + create_hit_result['HIT']['HITId'])
+    print("Created a custom new HIT with HITId: " +
+          create_hit_result['HIT']['HITId'])
+
 
 def create_multiple_hits():
     for i in range(5):
         title = "SQL Query Visualization " + str(i)
         post_hit(title)
 
+
 if __name__ == "__main__":
     arg_arr = sys.argv[1:]
     arg1 = arg_arr[0]
 
     if arg1 not in ['full', 'pilot', 'custom', 'test']:
-        print("Invalid argument! Argument must be one of 'full', 'pilot', 'custom' or 'test'")
+        print(
+            "Invalid argument! Argument must be one of 'full', 'pilot', 'custom' or 'test'")
         sys.exit()
 
-    yes = {'yes','y', 'ye', ''}
-    no = {'no','n'}
+    yes = {'yes', 'y', 'ye', ''}
+    no = {'no', 'n'}
 
     setting = "on SANDBOX" if DEV_ENVIRONMENT_BOOLEAN else "LIVE"
-    print("Are you sure you want to deploy a " + arg1 + " HIT " + setting + "? [Y/N]")
+    print("Are you sure you want to deploy a " +
+          arg1 + " HIT " + setting + "? [Y/N]")
     choice = input().lower()
     if choice in yes:
         if arg1 == 'full':
