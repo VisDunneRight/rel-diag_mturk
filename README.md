@@ -146,6 +146,7 @@ flask run
 ```
 
 http://127.0.0.1:5000/?workerId=a&assignmentId=b&hitId=c
+https://rd-study.herokuapp.com?workerId=a&assignmentId=b&hitId=c
 
 ## Deploying on Heroku
 
