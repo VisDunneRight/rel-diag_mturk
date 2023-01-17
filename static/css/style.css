@@ -62,20 +62,13 @@ img {
     max-height: 100%;
 }
 
+.stimuli_img {
+    max-width: 700px;
+    max-height: 250px;
+}
+
 .question_div_mid {
     display:flex;
-}
-
-.sql_query_div {
-    max-width: 100%;
-    width: 45%;
-    margin-left: 2%;
-}
-
-.queryviz_img {
-    flex: 1;
-    margin-left: 2%;
-    margin-right: 2%;
 }
 
 .questions_form_div {
