@@ -3,19 +3,77 @@ from models import db
 from models import *
 import math
 import os
-# import boto3
 import json
 import datetime
 import random
+import traceback
 from enum import Enum
-from flask import Flask, render_template, url_for, request, make_response, request, send_from_directory, redirect  # jsonify, session
+from flask import Flask, render_template, url_for, request, make_response, request, send_from_directory, redirect, jsonify  # , session
 from flask_sqlalchemy import SQLAlchemy
-# from flask_heroku import Heroku
+from werkzeug.exceptions import HTTPException
+from werkzeug.routing import RequestRedirect
+from functools import wraps
 from post_hits import get_connection, qualification_id
 import logging
 from logging.config import dictConfig
 
 app = Flask(__name__, static_url_path='')
+
+
+# def get_http_exception_handler(app):
+#     """Overrides the default http exception handler to return JSON."""
+#     handle_http_exception = app.handle_http_exception
+
+#     @wraps(handle_http_exception)
+#     def ret_val(exception):
+#         exc = handle_http_exception(exception)
+#         return jsonify({'code': exc.code, 'message': exc.description}), exc.code
+#     return ret_val
+
+stream_handler = logging.StreamHandler()
+stream_handler.setLevel(logging.INFO)
+app.logger.addHandler(stream_handler)
+
+
+@app.errorhandler(HTTPException)
+def handle_exception(e):
+    """Return JSON instead of HTML for HTTP errors."""
+    # start with the correct headers and status code from the error
+    response = e.get_response()
+    # replace the body with JSON
+    response.data = json.dumps({
+        "code": e.code,
+        "name": e.name,
+        "description": e.description,
+    })
+    response.content_type = "application/json"
+    return response
+
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    # pass through HTTP errors
+    if isinstance(e, HTTPException):
+        return e
+    # traceback.print_exception(e)
+
+    res = {'code': 500,
+           'errorType': 'Internal Server Error',
+           'errorMessage': "Something went really wrong!"}
+    debug = True
+    if debug:
+        res['errorMessage'] = e.message if hasattr(e, 'message') else f'{e}'
+
+    # print('hit logger')
+    app.logger.error(e, exc_info=True)
+
+    return jsonify(res), 500
+
+    # now you're handling non-HTTP exceptions only
+    return render_template("500_generic.html", e=e), 500
+
+# # Override the HTTP exception handler.
+# app.handle_http_exception = get_http_exception_handler(app)
 
 
 print('loading')
@@ -147,13 +205,13 @@ def assign_sequence_num(worker_id):
                 sequence_num=i).count()
             sequence_num_amount.append(amount)
             print('There are ' + str(amount) +
-                            ' users with sequence_num = ' + str(i))
+                  ' users with sequence_num = ' + str(i))
 
         lowest_sequence_num_amount = sequence_num_amount.index(
             min(sequence_num_amount))
 
     print("The sequence_num with the lowest assigned workers is: " +
-                    str(lowest_sequence_num_amount))
+          str(lowest_sequence_num_amount))
 
     # Set sequence_num in the database
     user = db.session.query(User).filter_by(worker_id=worker_id).one()
@@ -180,9 +238,9 @@ def getUser(request, createUser):  # createUser says optionally create if necess
 
     if worker_id == None or assignment_id == None or hit_id == None:
         print(
-            'Insufficient arguments provided in full path: ' + full_path)
+            'Print: Insufficient arguments provided in full path: ' + full_path)
         raise Exception(
-            'Insufficient arguments provided in full path: ' + full_path)
+            'Excep: Insufficient arguments provided in full path: ' + full_path)
 
     if assignment_id == "ASSIGNMENT_ID_NOT_AVAILABLE":
         raise Exception('Preview assignment but not preview code?!')
@@ -207,10 +265,10 @@ def getUser(request, createUser):  # createUser says optionally create if necess
         # check arguments match DB
         if user.assignment_id != assignment_id:
             print('worker_id ' + worker_id + "'s assignment_id in DB (" +
-                            user.assignment_id + ") doesn't match provided id (" + assignment_id + ')')
+                  user.assignment_id + ") doesn't match provided id (" + assignment_id + ')')
         if user.hit_id != hit_id:
             print('worker_id ' + worker_id + "'s hit_id in DB (" +
-                            user.hit_id + ") doesn't match provided id (" + hit_id + ')')
+                  user.hit_id + ") doesn't match provided id (" + hit_id + ')')
     else:
         if createUser:
             # Add the new user into the database
@@ -260,7 +318,7 @@ def updateProgressAndGetRedirect(user, current_section, next_section):
             # For some reason there is a weird issue where 2 requests are made from tutorial
             if current_section != Sections.TUTORIAL:
                 print('full_path ' + request.full_path + ' asked for section ' +
-                                 current_section.name + ' but proper next section was ' + proper_next_section.name)
+                      current_section.name + ' but proper next section was ' + proper_next_section.name)
         else:
             user.current_section = current_section
             user.current_page = 1
@@ -372,7 +430,7 @@ def tutorialClick():
         worker_id = data['worker_id']
 
         print("Worker: " + worker_id + " moved away from tutorial page " + str(tutorial_page_num) +
-                        ", elapsed time increased by " + str(time_spent))
+              ", elapsed time increased by " + str(time_spent))
 
         # Get the user
         user = db.session.query(User).filter_by(worker_id=worker_id).one()
@@ -389,7 +447,7 @@ def tutorialClick():
         db.session.commit()
 
         print('worker_id ' + worker_id +
-                        'Set tutorial_time to ' + str(tutorial_time))
+              'Set tutorial_time to ' + str(tutorial_time))
 
     if request.method == 'GET':
         print(
@@ -439,7 +497,7 @@ def test():
 @app.route('/record_choice_get_answer', methods=['POST'])
 def record_choice_get_answer():
     print("record_choice_get_answer called with " +
-                    request.method + " request")
+          request.method + " request")
     if request.method == 'POST':
         data = request.json
         question_num = data['question_num']
@@ -462,7 +520,7 @@ def record_choice_get_answer():
         invalid = False
         if user[sql_question_column] != None or user[question_end_col] != None or user[question_time_col] != None:
             printing('Unexpected setting question end time and answer again. worker_id ' +
-                               str(worker_id) + ', question ' + str(question_num))
+                     str(worker_id) + ', question ' + str(question_num))
             invalid = True
 
         if user[question_start_col] == None:
@@ -521,7 +579,7 @@ def record_choice_get_answer():
 @app.route('/get_next_question', methods=['POST'])
 def get_next_question():
     print("get_next_question called with " +
-                    request.method + " request")
+          request.method + " request")
     if request.method == 'POST':
         question_num = request.json['question_num']
         worker_id = request.json['worker_id']
@@ -654,7 +712,7 @@ def assign_sequence_num_route():
     if (sequence_num == None):
         sequence_num = assign_sequence_num(worker_id)
         print('worker_id ' + worker_id +
-                        ' does not have a sequence number assigned, assigning them ' + str(sequence_num))
+              ' does not have a sequence number assigned, assigning them ' + str(sequence_num))
     return str(sequence_num)
 
 
@@ -754,7 +812,7 @@ def results():
     # Record the datetime the user finishes
     end_datetime = datetime.datetime.utcnow()
     print('worker_id ' + str(user.worker_id) +
-                    ' finished. Ending datetime: ' + str(end_datetime))
+          ' finished. Ending datetime: ' + str(end_datetime))
     user.end_datetime = end_datetime
     db.session.commit()
 
@@ -776,19 +834,19 @@ def results():
         if user_choice == pattern_num:
             num_correct += 1
             print('worker_id ' + str(user.worker_id) +
-                            ' has correct answer for question ' + str(question_num))
+                  ' has correct answer for question ' + str(question_num))
         else:
             print('worker_id ' + str(user.worker_id) +
-                            ' has wrong answer for question ' + str(question_num))
+                  ' has wrong answer for question ' + str(question_num))
 
         total_question_time += user_time
 
     percentage_correct = num_correct / NUM_QUESTIONS
     print("Number of correct answers is: " + str(num_correct))
     print("Percentage of correct answers is " +
-                    str(percentage_correct))
+          str(percentage_correct))
     print('worker_id ' + str(user.worker_id) + "'s total time taken to complete the test is " + str("%.2f" %
-                    (total_time / (1000 * 60))) + " minutes, but time on questions was " + str("%.2f" % (total_question_time / (1000 * 60))))
+                                                                                                    (total_time / (1000 * 60))) + " minutes, but time on questions was " + str("%.2f" % (total_question_time / (1000 * 60))))
 
     accept = True
     failure_reason = ""
@@ -804,7 +862,7 @@ def results():
             str(MAX_ALLOWED_TIME_SEC/60) + " minutes."
 
     print('worker_id ' + str(user.worker_id) +
-                    " The hit acceptance is: " + str(accept))
+          " The hit acceptance is: " + str(accept))
 
     # TODO: Do not hard code variables
     # Calculate the bonus
@@ -838,7 +896,7 @@ def results():
         bonus_time = round(bonus_time, 2)
 
         print("Bonus from correctness: " + str(bonus_correctness) +
-                        " bonus from time: " + str(bonus_time))
+              " bonus from time: " + str(bonus_time))
         total_bonus = round(bonus_correctness + bonus_time, 2)
 
     total_pay = BASE_PAY + total_bonus
@@ -869,12 +927,12 @@ def results():
 
 # gunicorn logging for heroku
 if __name__ != '__main__':
-    import faulthandler
+    # import faulthandler
     print('gunicorn main')
-    faulthandler.enable()
-    gunicorn_logger = logging.getLogger('gunicorn.error')
-    app.logger.handlers = gunicorn_logger.handlers
-    app.logger.setLevel(gunicorn_logger.level)
+    # faulthandler.enable()
+    # gunicorn_logger = logging.getLogger('gunicorn.error')
+    # app.logger.handlers = gunicorn_logger.handlers
+    # app.logger.setLevel(gunicorn_logger.level)
 
 
 if __name__ == "__main__":
