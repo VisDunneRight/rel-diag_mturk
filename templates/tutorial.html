@@ -41,7 +41,7 @@
 <body>
     <div id="tutorial_div">
         <div id="tutorial_img_div">
-            <img src="{{url_for('static', filename='documents/tutorial/tutorial-1.png')}}" id="tutorial_img" alt="tutorial_img">
+            <img src="{{url_for('static', filename='documents/tutorial/tutorial-1.svg')}}" id="tutorial_img" alt="tutorial_img">
         </div>
         <div id="tutorial_btn_div">
             <input type="button" value="Previous page" id=previous_tutorial></input>
@@ -125,7 +125,7 @@
     }
 
     function update_tutorial_image(tutorial_page_num) {
-        tutorial_img_src = "{{url_for('static', filename='documents/tutorial/tutorial-1.png')}}";
+        tutorial_img_src = "{{url_for('static', filename='documents/tutorial/tutorial-1.svg')}}";
         var tutorial_img = $('#tutorial_img');
         tutorial_img_src = tutorial_img_src.replace("1", tutorial_page_num.toString());
         tutorial_img[0].src = tutorial_img_src;
