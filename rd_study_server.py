@@ -898,13 +898,13 @@ def results():
     bonus_time = 0
     bonus_correctness = 0
     total_bonus = 0
-    CORRECTNESS_PER_QUESTION_BONUS = 1.04
+    CORRECTNESS_PER_QUESTION_BONUS = .2
 
     # Calculate bonuses only if we accept the hit and submit the bonus
     if (accept):
         bonus_correctness = round((
             (num_correct - MIN_NUM_CORRECT_QUESTIONS) *
-            CORRECTNESS_PER_QUESTION_BONUS if (num_correct - MIN_NUM_CORRECT_QUESTIONS > 0) else 0),
+            CORRECTNESS_PER_QUESTION_BONUS if (num_correct > MIN_NUM_CORRECT_QUESTIONS) else 0),
             2)
 
         if total_time < 8 * 60 * 1000:
