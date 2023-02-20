@@ -173,18 +173,24 @@ def getPatternOrder():
 
     pattern_order = []
     for sequence in range(1, num_sequences+1):
-        temp_order = []
-        for i in [1, 2]:  # To go along with the *2 multiplier above
-            for pattern in range(1, NUM_PATTERNS+1):
-                for mode in range(1, NUM_MODES+1):
-                    temp_order.append(pattern)
-        random.shuffle(temp_order)
-        pattern_order.extend(temp_order)
+        # We need to interleave the lists so that each mode has the same number of each pattern.
+        # So create one list per mode
+        perModeLists = []        
+        for i in range(0, NUM_MODES): # E.g., [1,2] in the RD study
+            modeList = []
+            for i in [1, 2]:  # To go along with the *2 multiplier above
+                for pattern in range(1, NUM_PATTERNS+1): # E.g., [1,2,3,4] in the RD study
+                    modeList.append(pattern)
+            random.shuffle(modeList)
+            perModeLists.append(modeList)
+
+        interleaved_list = [val for tup in zip(*perModeLists) for val in tup]
+
+        pattern_order.extend(interleaved_list)
     return pattern_order
 
+
 # Creates the answers dictionary that includes the letter answer (a-d) for each of the 12 questions
-
-
 def create_answers_dict():
     answers_json = open('static/questions/answers.json')
     answer_str = answers_json.read()

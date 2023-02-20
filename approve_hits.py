@@ -81,7 +81,7 @@ def get_assignment_hits(connection, hit_id, status):
 
 def get_score_and_time(worker_id):
     user = session.query(User).filter_by(worker_id=worker_id).first()
-    num_questions = 12
+    num_questions = 32
     num_correct = 0
     total_time = 0
     for i in range(1, num_questions + 1):

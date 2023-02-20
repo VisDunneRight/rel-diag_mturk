@@ -231,6 +231,8 @@ in postgres
 flask run
 ```
 
+You can also select `Run > Start Debugging` in VSCode to get an interactive debugger.
+
 <http://127.0.0.1:5000/?workerId=AA&assignmentId=BB&hitId=CC>
 
 ## Deploying on Heroku
