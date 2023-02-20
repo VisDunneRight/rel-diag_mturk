@@ -108,7 +108,8 @@ db.app = app
 SECTION_FOLLOWER = {
     Sections.INSTRUCTIONS: Sections.TUTORIAL,
     Sections.TUTORIAL: Sections.QUESTIONS,
-    Sections.QUESTIONS: Sections.RESULTS
+    Sections.QUESTIONS: Sections.RESULTS,
+    Sections.RESULTS: Sections.RESULTS # need last self-redirect to keep from redirecting to nothing
 }
 
 # Configuration for returning workers
@@ -475,7 +476,7 @@ def tutorialClick():
         else:
             tutorial_time += time_spent
 
-        setattr(user, "tutorial_time", tutorial_time)
+        setattr(user, 'tutorial_time', tutorial_time)
         setattr(user, 'current_page', current_page)
         db.session.commit()
 
@@ -504,6 +505,8 @@ def questions():
     start_time = user.q1_start  # should only happen first question
     if start_time == None:
         start_time = current_time
+        setattr(user, 'current_page', 1)
+        db.session.commit()
 
     max_end_time = start_time + \
         datetime.timedelta(seconds=MAX_ALLOWED_TIME_SEC)
@@ -530,17 +533,17 @@ def record_choice_get_answer():
                     request.method + " request")
     if request.method == 'POST':
         data = request.json
-        question_num = data['question_num']
         worker_id = data['worker_id']
+
+        user = db.session.query(User).filter_by(worker_id=worker_id).one()
+        current_page = user.current_page
 
         app.logger.info(logString([
             "worker_id", worker_id,
-            "reporting choice for question", question_num
+            "reporting choice for question", current_page
         ]))
 
-        user = db.session.query(User).filter_by(worker_id=worker_id).one()
-
-        sql_question_column = 'q' + str(question_num)
+        sql_question_column = 'q' + str(current_page)
         question_start_col = sql_question_column + "_start"
         question_end_col = sql_question_column + "_end"
         question_time_col = sql_question_column + "_time"
@@ -551,13 +554,13 @@ def record_choice_get_answer():
         if user[sql_question_column] != None or user[question_end_col] != None or user[question_time_col] != None:
             app.logger.warn(
                 'Unexpected setting question end time and answer again. worker_id ' +
-                str(worker_id) + ', question ' + str(question_num))
+                str(worker_id) + ', question ' + str(current_page))
             invalid = True
 
         if user[question_start_col] == None:
             app.logger.warn(
                 'Tried to set question time for a question that has not been started. worker_id ' +
-                str(worker_id) + ', question ' + str(question_num))
+                str(worker_id) + ', question ' + str(current_page))
             invalid = True
 
         question_end = datetime.datetime.utcnow()
@@ -572,8 +575,8 @@ def record_choice_get_answer():
             db.session.commit()
 
         # Our questions start at 1, our index starts at 0
-        pattern_num = user.pattern_order[question_num - 1]
-        question = app.questions[question_num - 1]
+        pattern_num = user.pattern_order[current_page - 1]
+        question = app.questions[current_page - 1]
 
         answer_key = 'answer' + str(pattern_num)
         answer_text = question[answer_key]
@@ -590,13 +593,16 @@ def record_choice_get_answer():
 
         app.logger.info(logString([
             'worker_id', worker_id,
-            'for question', question_num,
+            'for question', current_page,
             'chose answer', user_choice,
             correct_string,
             'at', question_end,
             'Took', question_time_ms/1000, 'seconds.',
             'Answer text', answer_text]
         ))
+
+        setattr(user, 'current_page', current_page + 1)# Update the current question number (current page of this section)
+        db.session.commit()
 
         return ret_data
 
@@ -613,11 +619,14 @@ def get_next_question():
     app.logger.info("get_next_question called with " +
                     request.method + " request")
     if request.method == 'POST':
-        question_num = request.json['question_num']
         worker_id = request.json['worker_id']
+
+        user = db.session.query(User).filter_by(worker_id=worker_id).one()
+        current_page = user.current_page
+
         app.logger.info(logString([
             "worker_id", str(worker_id),
-            " requesting next question, question_num ", str(question_num)
+            " requesting next question, question_num ", str(current_page)
         ]))
 
         user = db.session.query(User).filter_by(worker_id=worker_id).one()
@@ -625,8 +634,8 @@ def get_next_question():
         sequence_num = user.sequence_num
 
         # Our questions start at 1, our index starts at 0
-        pattern_num = user.pattern_order[question_num - 1]
-        question = app.questions[question_num - 1]
+        pattern_num = user.pattern_order[current_page - 1]
+        question = app.questions[current_page - 1]
 
         # example of question format is
         # {
@@ -655,7 +664,7 @@ def get_next_question():
         #     answer4: 'Find employees who work on **all** projects.',
         # }
 
-        # question_num is [1,2,3,4,5...32]
+        # current_page is [1,2,3,4,5...32]
         # sequence_num is [0, 1]
         # 0 & 1 SQL
         # 0 & 2 RD
@@ -669,13 +678,13 @@ def get_next_question():
         if sequence_num > 1:
             raise Exception(
                 'Unhandled image location definition for sequence num ' + sequence_num)
-        elif (sequence_num + question_num) % 2 == 1:
+        elif (sequence_num + current_page) % 2 == 1:
             image_key_base = 'sqlpattern'
-        elif (sequence_num + question_num) % 2 == 0:
+        elif (sequence_num + current_page) % 2 == 0:
             image_key_base = 'diagrampattern'
         else:
             raise Exception('Unhandled image location definition for sequence num ' +
-                            sequence_num + ' question_num ' + question_num)
+                            sequence_num + ' question_num ' + current_page)
         image_key = image_key_base + str(pattern_num)
 
         ret_data = {
@@ -688,7 +697,7 @@ def get_next_question():
             ]
         }
 
-        sql_question_column = 'q' + str(question_num)
+        sql_question_column = 'q' + str(current_page)
         question_start_col = sql_question_column + "_start"
         question_end_col = sql_question_column + "_end"
         question_time_col = sql_question_column + "_time"
@@ -697,17 +706,17 @@ def get_next_question():
         if user[question_start_col] != None or user[sql_question_column] != None or user[question_end_col] != None or user[question_time_col] != None:
             app.logger.warn(logString([
                 'Unexpected setting start question time again. worker_id', worker_id,
-                'question_num ', question_num
+                'question_num ', current_page
             ]))
         else:
 
             setattr(user, question_start_col, question_start)
-            setattr(user, 'current_page', question_num)
+            # setattr(user, 'current_page', question_num)
             db.session.commit()
 
         app.logger.info(logString([
             'worker_id', worker_id,
-            'started question num', question_num,
+            'started question num', current_page,
             'at', question_start,
             '. Sending question details:', ret_data
         ]))
@@ -863,15 +872,21 @@ def results():
         # Our questions start at 1, our index starts at 0
         pattern_num = user.pattern_order[question_num - 1]
 
-        if user_choice == pattern_num:
+        if user_choice == None:
+            app.logger.error('worker_id ' + str(user.worker_id) +
+                            ' has no choice for question ' + str(question_num))
+        elif user_choice == pattern_num:
             num_correct += 1
             app.logger.info('worker_id ' + str(user.worker_id) +
                             ' has correct answer for question ' + str(question_num))
         else:
             app.logger.info('worker_id ' + str(user.worker_id) +
                             ' has wrong answer for question ' + str(question_num))
-
-        total_question_time += user_time
+        if user_time == None:
+            app.logger.error('worker_id ' + str(user.worker_id) +
+                            ' has no time for question ' + str(question_num))
+        else:
+            total_question_time += user_time
 
     percentage_correct = num_correct / NUM_QUESTIONS
     app.logger.info("Number of correct answers is: " + str(num_correct))

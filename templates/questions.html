@@ -80,7 +80,7 @@
       </div>
 
       <div class="questions_form_div">
-        <form method="POST" id="questions_form">
+        <form method="POST" id="questions_form" autocomplete="off">
           <label for="Q1">
             <input type="radio" id="Q1" value="1" name=choice />
             <span class="wrappable" id="Q_label_1"></span>
@@ -128,9 +128,10 @@
       // Check the user's answer and record the time in the database
       check_answer();
       checking_answer = false;
+      // // Increment the question number (have to do it here so page refresh will go to next question
+      // // but after check_answer because it relies on it)
+      // question_num++;
 
-      // Pause the timer
-      CountDown.Pause();
     }
     else {
       // Check if we are on the last question, and if so redirect the user to the demographics section
@@ -156,9 +157,6 @@
 
       // Start recording the time when the user starts the new question
       new_question_start_time();
-
-      // Unpause the timer
-      CountDown.Resume();
 
       // Change the status of check answer
       checking_answer = true;
@@ -210,11 +208,11 @@
         + (Seconds < 10 ? '0' : '') + Seconds);
     };
 
-    var Pause = function () {
+    var Pause = function () {// Not used. Does not affect DB!!!
       Running = false;
     };
 
-    var Resume = function () {
+    var Resume = function () {// Not used. Does not affect DB!!!
       Running = true;
     };
 

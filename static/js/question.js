@@ -27,7 +27,7 @@ function check_answer() {
     // Perform an AJAX request to check the answer for the current question number
     // The answers for other questions is not shown until the user submits their selection on that question
     var url = "/record_choice_get_answer";
-    data = { worker_id: worker_id, question_num: question_num, user_choice: user_choice };
+    data = { worker_id: worker_id, user_choice: user_choice };
     $.ajax({
         url: url,
         type: 'POST',
@@ -79,15 +79,8 @@ function check_answer() {
 
 // Loads the next question in the list and updates the image, schema and SQL 
 function load_next_question() {
-    // Update the schema
-    // var schema_iframe = $('.sql_schema_iframe');
-    // schema_src = schema_src.replace("1", question_num.toString());
-    // schema_iframe[0].src = schema_src;
-    // $('.sql_schema_iframe').load(document.URL +  ' .sql_schema_iframe');
-
-
     worker_id = localStorage.getItem('worker_id');
-    data = { worker_id: worker_id, question_num: question_num };
+    data = { worker_id: worker_id };
     let url = "/get_next_question";
     $.ajax({
         url: url,
