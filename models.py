@@ -9,7 +9,8 @@ class Sections(enum.Enum):
     INSTRUCTIONS = 1
     TUTORIAL = 2
     QUESTIONS = 3
-    RESULTS = 4
+    SURVEY = 4
+    RESULTS = 5
 
 # Create our database model
 
@@ -170,23 +171,8 @@ class User(db.Model):
     q32_end = db.Column(db.DateTime())
     q32_time = db.Column(db.Integer)
 
-    # # Demographics
-    # likert_q1 = db.Column(db.Integer)
-    # likert_q2 = db.Column(db.Integer)
-    # likert_q3 = db.Column(db.Integer)
-    # likert_q4 = db.Column(db.Integer)
-    # likert_q5 = db.Column(db.Integer)
-    # likert_q6 = db.Column(db.Integer)
-
-    # feedback = db.Column(db.String())
-    # country = db.Column(db.String())
-    # gender= db.Column(db.String())
-    # age = db.Column(db.Integer)
-    # occupation = db.Column(db.String())
-    # income = db.Column(db.Integer)
-    # sql_exp = db.Column(db.String())
-    # frequency = db.Column(db.Integer)
-    # usage = db.Column(db.String())
+    # Survey
+    feedback = db.Column(db.String())
 
     def __init__(self, worker_id=None, assignment_id=None, hit_id=None):
         self.worker_id = worker_id

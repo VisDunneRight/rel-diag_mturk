@@ -1,0 +1,191 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+    <title>Visualization of SQL Queries</title>
+    <meta name="description" content="Visualization of SQL Queries">
+    <meta name="author" content="Cody Dunne">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+	<link rel="stylesheet" href="https://s3.amazonaws.com/mturk-public/bs30/css/bootstrap.min.css">
+</head>
+
+<style>
+	.likert_question {
+		text-align: center;
+		font-size: 15px;
+	}
+
+	.custom-horizontal-radio-button-div {
+		display: flex;
+		flex-flow: column nowrap;
+	}
+
+	.custom-horizontal-radio-button-labels,
+	.custom-horizontal-radio-buttons {
+		margin: 0px auto;
+		width: 40vw;
+		min-width: 500px;
+		display: flex;
+		flex-flow: row nowrap;
+	}
+
+	.custom-horizontal-radio-button-labels {
+		column-count: 3;
+		column-gap: 0px;
+		font-size: 1em;
+		font-weight: bold;
+		color: #4a1575;
+	}
+
+	.custom-horizontal-radio-button-labels label {
+		width: 100%;
+	}
+
+	.custom-horizontal-radio-button-labels .left-label {
+		text-align: left;
+	}
+
+	.custom-horizontal-radio-button-labels .middle-label {
+		text-align: center;
+	}
+
+	.custom-horizontal-radio-button-labels .right-label {
+		text-align: right;
+	}
+
+	.custom-horizontal-radio-buttons {
+		justify-content: space-between;
+	}
+
+	.custom-radio-container {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		position: relative;
+		padding-bottom: 25px;
+		cursor: pointer;
+		font-size: 14px;
+		width: 16px;
+		-webkit-user-select: none;
+		-moz-user-select: none;
+		-ms-user-select: none;
+		user-select: none;
+	}
+
+	.custom-radio-container input {
+		position: absolute;
+		opacity: 0;
+		cursor: pointer;
+	}
+
+	.custom-radio-button {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		height: 16px;
+		width: 16px;
+		border: 1px solid #a575cd;
+		border-radius: 50%;
+	}
+
+	.custom-radio-container:hover input~.custom-radio-button {
+		background-color: #e1c4f9;
+	}
+
+	.custom-radio-container input:checked~.custom-radio-button {
+		background-color: #632695;
+		border-color: #632695;
+		box-shadow: 0 0 5px 0.1rem rgba(165, 117, 205, 1);
+	}
+
+	.custom-radio-container input:checked~.custom-radio-button:after {
+		display: block;
+	}
+
+	.custom-radio-container .custom-radio-button:after {
+		top: 5px;
+		left: 5px;
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		background: white;
+	}
+</style>
+
+<body>
+	<div id="survey_div">
+		<h2> Feedback Survey </h2>
+		<p style="width: 60%">
+			Please provide us with any feedback you have.
+			When done, click the <strong>Submit</strong> button to see your performance summary.
+			Although answering this section isn't mandatory to successfully complete this HIT, it is highly appreciated if you would do so!
+			Note that all of this data is only used anonymously and as aggregate information.
+		</p>
+	</div>
+
+	<div id="survey_div">
+		<p style="width: 60%"><b>
+				What feedback do you have for us? Here are some guiding questions:<br>
+				<ul>
+					<li>Did you find our Diagrams of SQL queries helpful for understanding the queries?</li>
+					<li>What aspects did you like and what would you improve?</li>
+					<li>For what query patterns or aspects of queries were they most useful or least useful?</li>
+					<li>Were you able to see the logical patterns?</li>
+					<li>What aspects of the tutorials helped you?</li>
+					<li>Assume that these Diagrams can be automatically generated from SQL; do you see any applications of them to your own database usage?</li>
+				</ul>
+
+			</b></p>
+		<textarea name="feedback" id="feedback_id" rows="10" cols="80" maxlength="10000"></textarea>
+		<br></br>
+		<p id="btnContainer">
+			<input type="submit" value="Submit" id="survey_submitButton">
+		</p>
+	</div>
+
+</body>
+
+<script>
+
+	// Function used by age text field to ensure we get numbers only
+	function isNumberKey(evt) {
+		var charCode = (evt.which) ? evt.which : event.keyCode
+		if (charCode > 31 && (charCode < 48 || charCode > 57))
+			return false;
+		return true;
+	}
+
+	$('#survey_submitButton').click(function () {
+		feedback = $("#feedback_id").val();
+
+		console.log("Survey submitted with the following data:",
+			feedback);
+
+		// Perform an AJAX request to store the survey data in the database
+		let url = "/survey_submit";
+		worker_id = "{{worker_id}}";
+
+		data = { worker_id: worker_id, feedback: feedback };
+		$.ajax({
+			url: url,
+			type: 'POST',
+			contentType: 'application/json;charset=UTF-8',
+			data: JSON.stringify(data, null, '\t'),
+			success: function () {
+				console.log("Survey completed, moving to results page.");
+				window.location.href = "{{ url_for('results', workerId=worker_id, assignmentId=assignment_id, hitId=hit_id, nextSection=True) | safe }}";
+			},
+			error: function (xhr, testStatus, errorThrown) {
+				console.log("AJAX to get_question_answer() route failed!");
+			}
+		});
+
+	});
+
+</script>
+
+</html>

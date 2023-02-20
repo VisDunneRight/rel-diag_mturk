@@ -108,7 +108,8 @@ db.app = app
 SECTION_FOLLOWER = {
     Sections.INSTRUCTIONS: Sections.TUTORIAL,
     Sections.TUTORIAL: Sections.QUESTIONS,
-    Sections.QUESTIONS: Sections.RESULTS,
+    Sections.QUESTIONS: Sections.SURVEY,
+    Sections.SURVEY: Sections.RESULTS,
     Sections.RESULTS: Sections.RESULTS # need last self-redirect to keep from redirecting to nothing
 }
 
@@ -365,6 +366,8 @@ def updateProgressAndGetRedirect(user, current_section, next_section):
         redirect_route = 'tutorial'
     elif user.current_section == Sections.QUESTIONS:
         redirect_route = 'questions'
+    elif user.current_section == Sections.SURVEY:
+        redirect_route = 'survey'
     elif user.current_section == Sections.RESULTS:
         redirect_route = 'results'
     else:
@@ -757,83 +760,64 @@ def assign_sequence_num_route():
     return str(sequence_num)
 
 
-# @app.route('/demographics', methods=['GET', 'POST'])
-# def demographics():
-#     print("Demographics route called")
+@app.route('/survey', methods=['GET', 'POST'])
+def survey():
+    user = getUser(request=request, createUser=False)
 
-#     resp = make_response(render_template("demographics.html"))
-#     resp.headers['x-frame-options'] = '*'
-#     return resp
+    possibleRedirect = updateProgressAndGetRedirect(
+        user, Sections.SURVEY, request.args.get('nextSection'))
+    if possibleRedirect:
+        return possibleRedirect
 
+    resp = make_response(
+        render_template(
+            "survey.html",
+            worker_id=user.worker_id,
+            assignment_id=user.assignment_id,
+            hit_id=user.hit_id,
+            current_page=user.current_page))
+    resp.headers['x-frame-options'] = '*'
+    return resp
 
-# @app.route('/demographics_submit', methods=['POST'])
-# def demographics_submit():
-#     print("Demographics submit route called")
-#     if request.method == 'POST':
-#         data = json.loads(request.form['data'])
-#         print(data)
+ 
+@app.route('/survey_submit', methods=['POST'])
+def survey_submit():
+    app.logger.info("survey_submit called with " +
+                    request.method + " request")
+    if request.method == 'POST':
+        data = request.json
+        worker_id = data['worker_id']
 
-#         # Get the data
-#         likert_q1 = data['likert_q1']
-#         likert_q2 = data['likert_q2']
-#         likert_q3 = data['likert_q3']
-#         likert_q4 = data['likert_q4']
-#         likert_q5 = data['likert_q5']
-#         likert_q6 = data['likert_q6']
+        user = db.session.query(User).filter_by(worker_id=worker_id).one()
+        current_page = user.current_page
 
-#         feedback = data['feedback']
-#         country = data['country']
-#         gender = data['gender']
-#         age = custom_to_int(data['age'])
-#         occupation = data['occupation']
-#         income = custom_to_int(data['income'])
-#         sql_exp = data['sql_exp']
-#         frequency = custom_to_int(data['frequency'])
-#         usage = data['usage']
+        app.logger.info(logString([
+            "worker_id", worker_id,
+            "submitting survey with data " + str(data)
+        ]))
 
-#         # Get the user
-#         worker_id = data['worker_id']
-#         user = db.session.query(User).filter_by(worker_id=worker_id).one()
+        # data = json.loads(request.form['data'])
 
-#         # Apply the changes to the database
-#         user.feedback = feedback
-#         user.country = country
-#         user.gender = gender
-#         user.occupation = occupation
-#         user.sql_exp = sql_exp
-#         user.usage = usage
+        # Get the data
+        # if data == None:
+        #     app.logger.warn(logString([
+        #         "worker_id", worker_id,
+        #         "had null data"
+        #     ]))
+        # elif
+            
+        feedback = data['feedback']
+        
+        # Apply the changes to the database
+        user.feedback = feedback
+        db.session.commit()
 
-#         # Make sure we don't insert empty strings for integer columns
-#         if (likert_q1 != ''):
-#             user.likert_q1 = likert_q1
-#         if (likert_q2 != ''):
-#             user.likert_q2 = likert_q2
-#         if (likert_q3 != ''):
-#             user.likert_q3 = likert_q3
-#         if (likert_q4 != ''):
-#             user.likert_q4 = likert_q4
-#         if (likert_q5 != ''):
-#             user.likert_q5 = likert_q5
-#         if (likert_q6 != ''):
-#             user.likert_q6 = likert_q6
+    if request.method == 'GET':
+        print("Wrong request, request should be POST not GET")
 
-#         if (age != ''):
-#             user.age = age
-#         if (income != ''):
-#             user.income = income
-#         if (frequency != ''):
-#             user.frequency = frequency
-
-#         db.session.commit()
-
-#     if request.method == 'GET':
-#         print("Wrong request, request should be POST not GET")
-
-#     return "OK"
+    return "OK"
 
 # val is either an empty string or an integer string, custom_to_int converts the string to an integer if it wasn't empty
-
-
 def custom_to_int(val):
     if (val == ''):
         return val
