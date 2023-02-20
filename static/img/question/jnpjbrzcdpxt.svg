@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="669.726pt" height="442.08pt" viewBox="0 0 669.726 442.08" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="730.08pt" height="442.08pt" viewBox="0 0 730.08 442.08" xmlns="http://www.w3.org/2000/svg" version="1.1">
  <metadata>
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2023-01-09T13:17:53.965743</dc:date>
+    <dc:date>2023-02-20T12:25:33.718225</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
-      <dc:title>Matplotlib v3.6.2, https://matplotlib.org/</dc:title>
+      <dc:title>Matplotlib v3.6.3, https://matplotlib.org/</dc:title>
      </cc:Agent>
     </dc:creator>
    </cc:Work>
@@ -22,8 +22,8 @@
  <g id="figure_1">
   <g id="patch_1">
    <path d="M 0 442.08 
-L 669.726 442.08 
-L 669.726 0 
+L 730.08 442.08 
+L 730.08 0 
 L 0 0 
 z
 " style="fill: #ffffff"/>
@@ -31,7 +31,7 @@ z
   <g id="axes_1">
    <g id="text_1">
     <!-- SELECT -->
-    <g style="fill: #990088" transform="translate(35.148857 47.088) scale(0.32 -0.32)">
+    <g style="fill: #990088" transform="translate(38.022857 47.088) scale(0.32 -0.32)">
      <defs>
       <path id="SourceCodePro-Regular-53" d="M 1952 -77 
 C 2874 -77 3437 454 3437 1120 
@@ -111,7 +111,7 @@ z
    </g>
    <g id="text_2">
     <!-- S.name -->
-    <g transform="translate(158.820377 47.088) scale(0.32 -0.32)">
+    <g transform="translate(172.960457 47.088) scale(0.32 -0.32)">
      <defs>
       <path id="SourceCodePro-Regular-2e" d="M 1920 -77 
 C 2208 -77 2438 141 2438 461 
@@ -208,7 +208,7 @@ z
    </g>
    <g id="text_3">
     <!-- FROM -->
-    <g style="fill: #990088" transform="translate(35.148857 88.4016) scale(0.32 -0.32)">
+    <g style="fill: #990088" transform="translate(38.022857 88.4016) scale(0.32 -0.32)">
      <defs>
       <path id="SourceCodePro-Regular-46" d="M 851 0 
 L 1389 0 
@@ -290,7 +290,7 @@ z
    </g>
    <g id="text_4">
     <!-- Student S -->
-    <g transform="translate(123.485657 88.4016) scale(0.32 -0.32)">
+    <g transform="translate(134.406857 88.4016) scale(0.32 -0.32)">
      <defs>
       <path id="SourceCodePro-Regular-74" d="M 2522 -77 
 C 2912 -77 3213 6 3494 109 
@@ -364,7 +364,7 @@ z
    </g>
    <g id="text_5">
     <!-- WHERE NOT EXISTS -->
-    <g style="fill: #990088" transform="translate(35.148857 129.7152) scale(0.32 -0.32)">
+    <g style="fill: #990088" transform="translate(38.022857 129.7152) scale(0.32 -0.32)">
      <defs>
       <path id="SourceCodePro-Regular-57" d="M 704 0 
 L 1357 0 
@@ -482,7 +482,7 @@ z
    </g>
    <g id="text_6">
     <!-- ( -->
-    <g transform="translate(317.826617 129.7152) scale(0.32 -0.32)">
+    <g transform="translate(346.451657 129.7152) scale(0.32 -0.32)">
      <defs>
       <path id="SourceCodePro-Regular-28" d="M 2771 -1126 
 L 3059 -858 
@@ -499,7 +499,7 @@ z
    </g>
    <g id="text_7">
     <!-- SELECT -->
-    <g style="fill: #990088" transform="translate(70.483577 171.0288) scale(0.32 -0.32)">
+    <g style="fill: #990088" transform="translate(76.576457 171.0288) scale(0.32 -0.32)">
      <use xlink:href="#SourceCodePro-Regular-53"/>
      <use xlink:href="#SourceCodePro-Regular-45" x="59.999985"/>
      <use xlink:href="#SourceCodePro-Regular-4c" x="119.999969"/>
@@ -510,7 +510,7 @@ z
    </g>
    <g id="text_8">
     <!-- * -->
-    <g transform="translate(194.155097 171.0288) scale(0.32 -0.32)">
+    <g transform="translate(211.514057 171.0288) scale(0.32 -0.32)">
      <defs>
       <path id="SourceCodePro-Regular-2a" d="M 1152 710 
 L 1920 1728 
@@ -536,7 +536,7 @@ z
    </g>
    <g id="text_9">
     <!-- FROM -->
-    <g style="fill: #990088" transform="translate(70.483577 212.3424) scale(0.32 -0.32)">
+    <g style="fill: #990088" transform="translate(76.576457 212.3424) scale(0.32 -0.32)">
      <use xlink:href="#SourceCodePro-Regular-46"/>
      <use xlink:href="#SourceCodePro-Regular-52" x="59.999985"/>
      <use xlink:href="#SourceCodePro-Regular-4f" x="119.999969"/>
@@ -545,7 +545,7 @@ z
    </g>
    <g id="text_10">
     <!-- Passes P -->
-    <g transform="translate(158.820377 212.3424) scale(0.32 -0.32)">
+    <g transform="translate(172.960457 212.3424) scale(0.32 -0.32)">
      <defs>
       <path id="SourceCodePro-Regular-50" d="M 653 0 
 L 1184 0 
@@ -594,7 +594,7 @@ z
    </g>
    <g id="text_11">
     <!-- WHERE -->
-    <g style="fill: #990088" transform="translate(70.483577 253.656) scale(0.32 -0.32)">
+    <g style="fill: #990088" transform="translate(76.576457 253.656) scale(0.32 -0.32)">
      <use xlink:href="#SourceCodePro-Regular-57"/>
      <use xlink:href="#SourceCodePro-Regular-48" x="59.999985"/>
      <use xlink:href="#SourceCodePro-Regular-45" x="119.999969"/>
@@ -604,7 +604,7 @@ z
    </g>
    <g id="text_12">
     <!-- P.ID = S.ID -->
-    <g transform="translate(176.487737 253.656) scale(0.32 -0.32)">
+    <g transform="translate(192.237257 253.656) scale(0.32 -0.32)">
      <defs>
       <path id="SourceCodePro-Regular-44" d="M 557 0 
 L 1619 0 
@@ -650,7 +650,7 @@ z
    </g>
    <g id="text_13">
     <!-- AND EXISTS -->
-    <g style="fill: #990088" transform="translate(70.483577 294.9696) scale(0.32 -0.32)">
+    <g style="fill: #990088" transform="translate(76.576457 294.9696) scale(0.32 -0.32)">
      <defs>
       <path id="SourceCodePro-Regular-41" d="M 1485 2349 
 C 1632 2816 1766 3277 1901 3763 
@@ -686,13 +686,13 @@ z
    </g>
    <g id="text_14">
     <!-- ( -->
-    <g transform="translate(247.157177 294.9696) scale(0.32 -0.32)">
+    <g transform="translate(269.344457 294.9696) scale(0.32 -0.32)">
      <use xlink:href="#SourceCodePro-Regular-28"/>
     </g>
    </g>
    <g id="text_15">
     <!-- SELECT -->
-    <g style="fill: #990088" transform="translate(105.818297 336.2832) scale(0.32 -0.32)">
+    <g style="fill: #990088" transform="translate(115.130057 336.2832) scale(0.32 -0.32)">
      <use xlink:href="#SourceCodePro-Regular-53"/>
      <use xlink:href="#SourceCodePro-Regular-45" x="59.999985"/>
      <use xlink:href="#SourceCodePro-Regular-4c" x="119.999969"/>
@@ -703,13 +703,13 @@ z
    </g>
    <g id="text_16">
     <!-- * -->
-    <g transform="translate(229.489817 336.2832) scale(0.32 -0.32)">
+    <g transform="translate(250.067657 336.2832) scale(0.32 -0.32)">
      <use xlink:href="#SourceCodePro-Regular-2a"/>
     </g>
    </g>
    <g id="text_17">
     <!-- FROM -->
-    <g style="fill: #990088" transform="translate(105.818297 377.5968) scale(0.32 -0.32)">
+    <g style="fill: #990088" transform="translate(115.130057 377.5968) scale(0.32 -0.32)">
      <use xlink:href="#SourceCodePro-Regular-46"/>
      <use xlink:href="#SourceCodePro-Regular-52" x="59.999985"/>
      <use xlink:href="#SourceCodePro-Regular-4f" x="119.999969"/>
@@ -718,7 +718,7 @@ z
    </g>
    <g id="text_18">
     <!-- Exam E -->
-    <g transform="translate(194.155097 377.5968) scale(0.32 -0.32)">
+    <g transform="translate(211.514057 377.5968) scale(0.32 -0.32)">
      <defs>
       <path id="SourceCodePro-Regular-78" d="M 410 0 
 L 973 0 
@@ -752,7 +752,7 @@ z
    </g>
    <g id="text_19">
     <!-- WHERE -->
-    <g style="fill: #990088" transform="translate(105.818297 418.9104) scale(0.32 -0.32)">
+    <g style="fill: #990088" transform="translate(115.130057 418.9104) scale(0.32 -0.32)">
      <use xlink:href="#SourceCodePro-Regular-57"/>
      <use xlink:href="#SourceCodePro-Regular-48" x="59.999985"/>
      <use xlink:href="#SourceCodePro-Regular-45" x="119.999969"/>
@@ -761,16 +761,9 @@ z
     </g>
    </g>
    <g id="text_20">
-    <!-- E.exam_id = P.exam_id)) -->
-    <g transform="translate(211.822457 418.9104) scale(0.32 -0.32)">
+    <!-- E.eid = P.eid)) -->
+    <g transform="translate(230.790857 418.9104) scale(0.32 -0.32)">
      <defs>
-      <path id="SourceCodePro-Regular-5f" d="M 384 -896 
-L 3456 -896 
-L 3456 -442 
-L 384 -442 
-L 384 -896 
-z
-" transform="scale(0.015625)"/>
       <path id="SourceCodePro-Regular-69" d="M 2022 0 
 L 2547 0 
 L 2547 3110 
@@ -799,26 +792,18 @@ z
      <use xlink:href="#SourceCodePro-Regular-45"/>
      <use xlink:href="#SourceCodePro-Regular-2e" x="59.999985"/>
      <use xlink:href="#SourceCodePro-Regular-65" x="119.999969"/>
-     <use xlink:href="#SourceCodePro-Regular-78" x="179.999954"/>
-     <use xlink:href="#SourceCodePro-Regular-61" x="239.999939"/>
-     <use xlink:href="#SourceCodePro-Regular-6d" x="299.999924"/>
-     <use xlink:href="#SourceCodePro-Regular-5f" x="359.999908"/>
-     <use xlink:href="#SourceCodePro-Regular-69" x="419.999893"/>
-     <use xlink:href="#SourceCodePro-Regular-64" x="479.999878"/>
-     <use xlink:href="#SourceCodePro-Regular-20" x="539.999863"/>
-     <use xlink:href="#SourceCodePro-Regular-3d" x="599.999847"/>
-     <use xlink:href="#SourceCodePro-Regular-20" x="659.999832"/>
-     <use xlink:href="#SourceCodePro-Regular-50" x="719.999817"/>
-     <use xlink:href="#SourceCodePro-Regular-2e" x="779.999802"/>
-     <use xlink:href="#SourceCodePro-Regular-65" x="839.999786"/>
-     <use xlink:href="#SourceCodePro-Regular-78" x="899.999771"/>
-     <use xlink:href="#SourceCodePro-Regular-61" x="959.999756"/>
-     <use xlink:href="#SourceCodePro-Regular-6d" x="1019.999741"/>
-     <use xlink:href="#SourceCodePro-Regular-5f" x="1079.999725"/>
-     <use xlink:href="#SourceCodePro-Regular-69" x="1139.99971"/>
-     <use xlink:href="#SourceCodePro-Regular-64" x="1199.999695"/>
-     <use xlink:href="#SourceCodePro-Regular-29" x="1259.99968"/>
-     <use xlink:href="#SourceCodePro-Regular-29" x="1319.999664"/>
+     <use xlink:href="#SourceCodePro-Regular-69" x="179.999954"/>
+     <use xlink:href="#SourceCodePro-Regular-64" x="239.999939"/>
+     <use xlink:href="#SourceCodePro-Regular-20" x="299.999924"/>
+     <use xlink:href="#SourceCodePro-Regular-3d" x="359.999908"/>
+     <use xlink:href="#SourceCodePro-Regular-20" x="419.999893"/>
+     <use xlink:href="#SourceCodePro-Regular-50" x="479.999878"/>
+     <use xlink:href="#SourceCodePro-Regular-2e" x="539.999863"/>
+     <use xlink:href="#SourceCodePro-Regular-65" x="599.999847"/>
+     <use xlink:href="#SourceCodePro-Regular-69" x="659.999832"/>
+     <use xlink:href="#SourceCodePro-Regular-64" x="719.999817"/>
+     <use xlink:href="#SourceCodePro-Regular-29" x="779.999802"/>
+     <use xlink:href="#SourceCodePro-Regular-29" x="839.999786"/>
     </g>
    </g>
   </g>

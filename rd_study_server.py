@@ -673,7 +673,7 @@ def get_next_question():
         image_key = image_key_base + str(pattern_num)
 
         ret_data = {
-            'image': question[image_key] + '.svg',
+            'image': question[image_key] + '.png',
             'answerStrings': [
                 question['answer1'],
                 question['answer2'],

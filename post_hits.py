@@ -21,7 +21,7 @@ else:
     taken_test_qualification_id = "taken_test_qualification_id"  # For Non-Sandbox
 
 # HIT specific variables
-base_pay = "5.2"
+base_pay = "5"
 approval_percentage = 95
 minimum_qualification_score = 66    # This is equivalent to 4/6 correct for Amazon
 

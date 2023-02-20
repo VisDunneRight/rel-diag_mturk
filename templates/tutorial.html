@@ -125,7 +125,7 @@
     }
 
     function update_tutorial_image(tutorial_page_num) {
-        tutorial_img_src = "{{url_for('static', filename='documents/tutorial/tutorial-1.svg')}}";
+        tutorial_img_src = "{{url_for('static', filename='documents/tutorial/tutorial-1.png')}}";
         var tutorial_img = $('#tutorial_img');
         tutorial_img_src = tutorial_img_src.replace("1", tutorial_page_num.toString());
         tutorial_img[0].src = tutorial_img_src;
