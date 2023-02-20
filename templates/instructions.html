@@ -150,7 +150,7 @@
 </body>
 
 <script>
-    // Redirect the user to the test route
+    // Redirect the user to the tutorial route
     $('#instructions_submitButton').click(function () {
         console.log("User acknowledged that s/he read the instructions and clicked to proceed");
         window.location.href = "{{ url_for('tutorial', workerId=worker_id, assignmentId=assignment_id, hitId=hit_id, nextSection=True) | safe }}";

@@ -135,7 +135,7 @@
     else {
       // Check if we are on the last question, and if so redirect the user to the demographics section
       if (question_num >= total_num_questions) {
-        console.log("Test completed, user has submitted the last question.");
+        console.log("Questions completed, user has submitted the last question.");
         window.location.href = "{{ url_for('results', workerId=worker_id, assignmentId=assignment_id, hitId=hit_id, nextSection=True) | safe }}";
         return;
       }

@@ -8,7 +8,7 @@ db = SQLAlchemy()
 class Sections(enum.Enum):
     INSTRUCTIONS = 1
     TUTORIAL = 2
-    TEST = 3
+    QUESTIONS = 3
     RESULTS = 4
 
 # Create our database model

@@ -218,8 +218,8 @@ Notice that some fields such as: `DATABASE_URL`, `AWS_ACCESS_KEY_ID`, and `AWS_S
         ```
 
 
-`python db_create.py`
-Actually, this only currently works with debugpy from VSCode... Why?
+
+Run `db_create.py` to populate the database. This currently only works with running debugging from VSCode..., i.e., `debugpy`. It is unclear why...
 
 `sudo -u postgres psql -d rdstudy`
 
@@ -231,7 +231,7 @@ in postgres
 flask run
 ```
 
-You can also select `Run > Start Debugging` in VSCode to get an interactive debugger.
+You can also select `Run > Start Debugging` or `F5` in VSCode to get an interactive debugger.
 
 <http://127.0.0.1:5000/?workerId=AA&assignmentId=BB&hitId=CC>
 

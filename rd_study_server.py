@@ -107,8 +107,8 @@ db.app = app
 
 SECTION_FOLLOWER = {
     Sections.INSTRUCTIONS: Sections.TUTORIAL,
-    Sections.TUTORIAL: Sections.TEST,
-    Sections.TEST: Sections.RESULTS
+    Sections.TUTORIAL: Sections.QUESTIONS,
+    Sections.QUESTIONS: Sections.RESULTS
 }
 
 # Configuration for returning workers
@@ -362,8 +362,8 @@ def updateProgressAndGetRedirect(user, current_section, next_section):
         redirect_route = 'main'
     elif user.current_section == Sections.TUTORIAL:
         redirect_route = 'tutorial'
-    elif user.current_section == Sections.TEST:
-        redirect_route = 'test'
+    elif user.current_section == Sections.QUESTIONS:
+        redirect_route = 'questions'
     elif user.current_section == Sections.RESULTS:
         redirect_route = 'results'
     else:
@@ -490,12 +490,12 @@ def tutorialClick():
 
 
 # actual route used for questions
-@app.route('/test', methods=['GET', 'POST'])
-def test():
+@app.route('/questions', methods=['GET', 'POST'])
+def questions():
     user = getUser(request=request, createUser=False)
 
     possibleRedirect = updateProgressAndGetRedirect(
-        user, Sections.TEST, request.args.get('nextSection'))
+        user, Sections.QUESTIONS, request.args.get('nextSection'))
     if possibleRedirect:
         return possibleRedirect
 
@@ -513,7 +513,7 @@ def test():
 
     resp = make_response(
         render_template(
-            "test.html",
+            "questions.html",
             worker_id=user.worker_id,
             assignment_id=user.assignment_id,
             hit_id=user.hit_id,

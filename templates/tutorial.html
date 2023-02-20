@@ -70,7 +70,7 @@
                     var sequence_num = parseInt(data);
                     localStorage.setItem('sequence_num', sequence_num);
                     console.log("Sequence number set to:", localStorage.getItem('sequence_num'));
-                    window.location.href = "{{ url_for('test', workerId=worker_id, assignmentId=assignment_id, hitId=hit_id, nextSection=True) | safe }}";
+                    window.location.href = "{{ url_for('questions', workerId=worker_id, assignmentId=assignment_id, hitId=hit_id, nextSection=True) | safe }}";
 
                 },
                 error: function (xhr, testStatus, errorThrown) {
