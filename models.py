@@ -12,6 +12,7 @@ class Sections(enum.Enum):
     SURVEY = 4
     RESULTS = 5
 
+
 # Create our database model
 
 
