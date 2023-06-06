@@ -17,7 +17,6 @@ DATABASE_URL = "replace_with_database_url_on_heroku"
 
 appConfig = config.Config()
 
-
 def get_connection():
     endpoint_url = ''
     if os.environ.get('AWS_SANDBOX') == 'True':

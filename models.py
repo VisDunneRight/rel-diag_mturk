@@ -40,6 +40,10 @@ class User(db.Model):
     # Time spent on the tutorial
     tutorial_time = db.Column(db.Integer)
 
+    total_time_on_questions_and_answers = db.Column(db.Integer)
+    total_question_time = db.Column(db.Integer)
+    number_correct = db.Column(db.Integer)
+
     # Main test # there is probably a way to set static variables programmatically...
     # This is gross.
     q1 = db.Column(db.Integer)

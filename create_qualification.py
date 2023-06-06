@@ -3,7 +3,6 @@ import sys
 from post_hits import get_connection
 
 # Make sure to check the value of AWS_SANDBOX environment variable before running to make sure it is in Sandbox or Live mode
-
 questions = open(name='qualification_questions.xml', mode='r').read()
 answers = open(name='qualification_answers.xml', mode='r').read()
 
@@ -25,8 +24,6 @@ def create_qualification():
           qual_response['QualificationType']['QualificationTypeId'])
 
 # Custom qualification designed to grant qualifications for people that were faced with errors when taking the test
-
-
 def create_custom_qualification():
     qual_response = connection.create_qualification_type(
         Name='Custom qualification test (for invited workers only)',
@@ -42,8 +39,6 @@ def create_custom_qualification():
           qual_response['QualificationType']['QualificationTypeId'])
 
 # Qualification assigned to everyone that has taken the test previously
-
-
 def create_taken_test_qualification():
     qual_response = connection.create_qualification_type(
         Name='Worker attempted/completed Understanding SQL Queries -- $5.20 to $16.47 with bonuses HIT previously',

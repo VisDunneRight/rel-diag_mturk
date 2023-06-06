@@ -25,7 +25,7 @@ base_pay = "5"
 approval_percentage = 95
 minimum_qualification_score = 66    # This is equivalent to 4/6 correct for Amazon
 
-title_str = "Understanding SQL Queries -- $5.20 to $16.47 with bonuses"
+title_str = "Visualizing Database Queries -- $5.20 to $16.47 with bonuses"
 
 description_str = "You will receive $5.20-$16.47 (estimated time 30 minutes) for participating in this research. \
 Workers must be experienced with SQL as measured by the qualification test (included in the 30 minutes estimate). \
@@ -56,139 +56,94 @@ def get_connection():
     )
 
 
-def post_hit(approval_percentage):
+def post_hit_helper(approval_percentage, max_assignments, lifetime_in_seconds, assignment_duration_in_seconds, base_reward, title, description, locales, qual_id, min_qual_score, test_taken_qual_id, custom_qual_id):
     connection = get_connection()
 
     questionform = open("external_question.xml", 'r').read()
 
     # Boto3 version
+    QualificationRequirements=[{'QualificationTypeId': qual_id,
+                                'Comparator': 'GreaterThanOrEqualTo',
+                                'IntegerValues': [min_qual_score],
+                                },
+                                {'QualificationTypeId': "00000000000000000071",# locale
+                                'Comparator': 'EqualTo',
+                                'LocaleValues': locales
+                                },
+                                {'QualificationTypeId': "000000000000000000L0",# The percentage of assignments the Worker has submitted that were subsequently approved by the Requester, over all assignments the Worker has submitted. The value is an integer between 0 and 100.
+                                'Comparator': 'GreaterThanOrEqualTo',
+                                'IntegerValues': [approval_percentage]
+                                },
+                                {'QualificationTypeId': test_taken_qual_id,
+                                'Comparator': 'DoesNotExist',
+                                }]
+    if custom_qual_id != None:
+        QualificationRequirements.append(
+            {'QualificationTypeId': custom_qual_id,
+             'Comparator': 'Exists'}
+        )
+
     create_hit_result = connection.create_hit(
         Question=questionform,
-        MaxAssignments=30,
-        LifetimeInSeconds=60*60*24*10,
-        AssignmentDurationInSeconds=60*60*2,
-        Reward=base_pay,
-        Title=title_str,
-        Description=description_str,
-        QualificationRequirements=[{'QualificationTypeId': qualification_id,
-                                    'Comparator': 'GreaterThanOrEqualTo',
-                                    'IntegerValues': [minimum_qualification_score],
-                                    },
-                                   {'QualificationTypeId': "00000000000000000071",
-                                    'Comparator': 'EqualTo',
-                                    'LocaleValues': usa
-                                    },
-                                   {'QualificationTypeId': "000000000000000000L0",
-                                    'Comparator': 'GreaterThanOrEqualTo',
-                                    'IntegerValues': [approval_percentage]
-                                    },
-                                   {'QualificationTypeId': taken_test_qualification_id,
-                                    'Comparator': 'DoesNotExist',
-                                    }]
+        MaxAssignments=max_assignments,
+        LifetimeInSeconds=lifetime_in_seconds,
+        AssignmentDurationInSeconds=assignment_duration_in_seconds,
+        Reward=base_reward,
+        Title=title,
+        Description=description,
     )
 
     print("Created a new HIT with HITId: " + create_hit_result['HIT']['HITId'])
 
 
-def pilot_post_hit(approval_percentage):
-    connection = get_connection()
-
-    questionform = open("external_question.xml", 'r').read()
-
-    # Boto3 version
-    create_hit_result = connection.create_hit(
-        Question=questionform,
-        MaxAssignments=12,
-        LifetimeInSeconds=60*60*24*7,
-        AssignmentDurationInSeconds=60*60*2,
-        Reward=base_pay,
-        Title=title_str,
-        Description=description_str,
-        QualificationRequirements=[{'QualificationTypeId': qualification_id,
-                                    'Comparator': 'GreaterThanOrEqualTo',
-                                    'IntegerValues': [minimum_qualification_score]
-                                    },
-                                   {'QualificationTypeId': "00000000000000000071",
-                                    'Comparator': 'EqualTo',
-                                    'LocaleValues': usa
-                                    },
-                                   {'QualificationTypeId': "000000000000000000L0",
-                                    'Comparator': 'GreaterThanOrEqualTo',
-                                    'IntegerValues': [approval_percentage]
-                                    }]
+def post_hit():
+    print('Creating normal HIT')
+    post_hit_helper(
+        approval_percentage=approval_percentage,
+        max_assignments=120,
+        lifetime_in_seconds= 60 * 60 * 24 * 40, # 40 days
+        assignment_duration_in_seconds= 60 * 60 * 2, #2 hours
+        base_reward=base_pay,
+        title = title_str,
+        description=description_str,
+        locales=usa,
+        qual_id=qualification_id,
+        min_qual_score=minimum_qualification_score,
+        test_taken_qual_id=taken_test_qualification_id
     )
 
-    print("Created a new HIT with HITId: " + create_hit_result['HIT']['HITId'])
-
-
-def test_post_hit():
-    connection = get_connection()
-
-    questionform = open("external_question.xml", 'r').read()
-
-    # Boto3 version
-    create_hit_result = connection.create_hit(
-        Question=questionform,
-        MaxAssignments=12,
-        LifetimeInSeconds=60*60*1,
-        AssignmentDurationInSeconds=60*60*2,
-        Reward=base_pay,
-        Title=title_str,
-        Description=description_str,
-        QualificationRequirements=[{'QualificationTypeId': qualification_id,
-                                    'Comparator': 'GreaterThanOrEqualTo',
-                                    'IntegerValues': [minimum_qualification_score]
-                                    },
-                                   {'QualificationTypeId': "00000000000000000071",
-                                    'Comparator': 'In',
-                                    'LocaleValues': usa
-                                    },
-                                   {'QualificationTypeId': "000000000000000000L0",
-                                    'Comparator': 'GreaterThanOrEqualTo',
-                                    'IntegerValues': [approval_percentage]
-                                    },
-                                   {'QualificationTypeId': taken_test_qualification_id,
-                                    'Comparator': 'DoesNotExist',
-                                    }]
+def pilot_post_hit():
+    print('Creating pilot HIT')
+    post_hit_helper(
+        approval_percentage=approval_percentage,
+        max_assignments=12,
+        lifetime_in_seconds= 60 * 60 * 24 * 1, # 1 day
+        assignment_duration_in_seconds= 60 * 60 * 2, #2 hours
+        base_reward=base_pay,
+        title = title_str,
+        description=description_str,
+        locales=usa,
+        qual_id=qualification_id,
+        min_qual_score=minimum_qualification_score,
+        test_taken_qual_id=taken_test_qualification_id
     )
 
-    print("Created a test HIT with HITId: " +
-          create_hit_result['HIT']['HITId'])
-
-
-def custom_post_hit(approval_percentage):
-    connection = get_connection()
-
-    questionform = open("external_question.xml", 'r').read()
-
-    # Boto3 version
-    create_hit_result = connection.create_hit(
-        Question=questionform,
-        MaxAssignments=1,
-        LifetimeInSeconds=60*60*24*10,
-        AssignmentDurationInSeconds=60*60*2,
-        Reward=base_pay,
-        Title="CUSTOM HIT for A2OATZCX1YXE77, " + title_str,
-        Description=description_str + "THIS HIT IS ONLY FOR THAT SPECIFIC WORKER!",
-        QualificationRequirements=[{'QualificationTypeId': qualification_id,
-                                    'Comparator': 'GreaterThanOrEqualTo',
-                                    'IntegerValues': [minimum_qualification_score],
-                                    },
-                                   {'QualificationTypeId': "00000000000000000071",
-                                    'Comparator': 'EqualTo',
-                                    'LocaleValues': usa
-                                    },
-                                   {'QualificationTypeId': "000000000000000000L0",
-                                    'Comparator': 'GreaterThanOrEqualTo',
-                                    'IntegerValues': [approval_percentage]
-                                    },
-                                   {'QualificationTypeId': custom_qualification_id,
-                                    'Comparator': 'Exists',
-                                    }]
+def custom_post_hit(worker_id, custom_qual_id):
+    print('Creating custom HIT for worker ' + worker_id + ' with qualification ' + custom_qual_id)
+    post_hit_helper(
+        approval_percentage=approval_percentage,
+        max_assignments=1,
+        lifetime_in_seconds= 60 * 60 * 24 * 10, # 10 days
+        assignment_duration_in_seconds= 60 * 60 * 2, # 2 hours
+        base_reward=base_pay,
+        title = 'CUSTOM HIT FOR WORKER ' + worker_id + ', ' + title_str,
+        description=description_str,
+        locales=usa,
+        qual_id=qualification_id,
+        min_qual_score=minimum_qualification_score,
+        test_taken_qual_id=taken_test_qualification_id,
+        custom_qual_id=custom_qual_id
     )
-
-    print("Created a custom new HIT with HITId: " +
-          create_hit_result['HIT']['HITId'])
 
 
 def create_multiple_hits():
@@ -216,13 +171,11 @@ if __name__ == "__main__":
     choice = input().lower()
     if choice in yes:
         if arg1 == 'full':
-            post_hit(approval_percentage)
+            post_hit()
         elif arg1 == 'pilot':
-            pilot_post_hit(approval_percentage)
+            pilot_post_hit()
         elif arg1 == 'custom':
-            custom_post_hit(approval_percentage)
-        elif arg1 == 'test':
-            test_post_hit()
+            custom_post_hit(arg_arr[1], arg_arr[2])
     elif choice in no:
         print("Execution cancelled")
     else:

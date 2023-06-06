@@ -54,8 +54,6 @@ def reject_all_assignments(hit_id):
             AssignmentId=assignment["AssignmentId"], RequesterFeedback="HIT rejected")
 
 # Provides a summary of the last 100 hits
-
-
 def summary():
     hit_list_dict = conn.list_hits(MaxResults=100)
     print("There are in total " + str(hit_list_dict['NumResults']) + " hits")
@@ -65,8 +63,6 @@ def summary():
         hit_detail(hit_id, show_graph=False)
 
 # Deletes all HITs except the ones in the except list
-
-
 def clear():
     except_list = []
     hit_list_dict = conn.list_hits(MaxResults=100)
@@ -386,7 +382,7 @@ def get_qualification_score(qual_id, worker_id):
 # Deactivates/hit_id an ongoing HIT
 
 
-def update_expiration(qual_id):
+def update_expiration(hit_id):
     response = conn.update_expiration_for_hit(
         HITId=hit_id,
         ExpireAt=datetime(2019, 5, 15, 18, 0, 0)
@@ -497,11 +493,12 @@ if __name__ == "__main__":
     elif (arg1 == 'get_worker_id_list'):
         hit_id = arg_arr[1]
         get_worker_id_list(hit_id)
-    elif (arg1 == 'approve_qualifications'):
+    elif (arg1 == 'approve_qualifications'):# !!!WARNING!!! hard-coded `accept_list` in `approve_qualifications` definition.
         qual_id = arg_arr[1]
         approve_qualifications(qual_id)
-    elif (arg1 == 'update_expiration'):
+    elif (arg1 == 'update_expiration'):# !!!WARNING!!! hard-coded `ExpireAt` in `update_expiration` definition.
         hit_id = arg_arr[1]
+        update_expiration()
     elif (arg1 == 'give_worker_qualification'):
         qual_id = arg_arr[1]
         worker_id = arg_arr[2]
@@ -524,7 +521,7 @@ if __name__ == "__main__":
     elif (arg1 == 'notify_workers'):
         workers_file = arg_arr[1]
         notify_workers(workers_file)
-    elif (arg1 == 'notify_workers_with_qualification'):
+    elif (arg1 == 'notify_workers_with_qualification'):# **!!!WARNING!!!** Hard-coded advertisement message.
         qualification_file = arg_arr[1]
         taken_hit_file = arg_arr[2]
         notify_workers_with_qualification(qualification_file, taken_hit_file)

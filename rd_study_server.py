@@ -845,7 +845,7 @@ def results():
 
     total_question_time = 0
     total_timedelta = user.q32_end - user.q1_start
-    total_time = int(total_timedelta.total_seconds() * 1000)
+    total_time = int(total_timedelta.total_seconds())
 
     for question_num in range(1, NUM_QUESTIONS + 1):
         q_col = "q" + str(question_num)
@@ -872,14 +872,19 @@ def results():
         else:
             total_question_time += user_time
 
+    user.total_question_time = total_question_time
+    user.total_time_on_questions_and_answers = total_time
+    user.number_correct = num_correct
+    db.session.commit()
+
     percentage_correct = num_correct / NUM_QUESTIONS
     app.logger.info("Number of correct answers is: " + str(num_correct))
     app.logger.info("Percentage of correct answers is " +
                     str(percentage_correct))
     app.logger.info(
         'worker_id ' + str(user.worker_id) + "'s total time taken to complete the test is " +
-        str("%.2f" % (total_time / (1000 * 60))) + " minutes, but time on questions was " +
-        str("%.2f" % (total_question_time / (1000 * 60))))
+        str("%.2f" % (total_time / 60)) + " minutes, but time on questions was " +
+        str("%.2f" % (total_question_time / 60)))
 
     accept = True
     failure_reason = ""
@@ -889,7 +894,7 @@ def results():
         accept = False
         failure_reason = "you failed to answer " + \
             str(MIN_NUM_CORRECT_QUESTIONS) + " or more questions correctly."
-    if (total_time > MAX_ALLOWED_TIME_SEC * 1000):
+    if (total_time > MAX_ALLOWED_TIME_SEC):
         accept = False
         failure_reason = "you failed to answer all questions within " + \
             str(MAX_ALLOWED_TIME_SEC/60) + " minutes."
@@ -912,19 +917,19 @@ def results():
             CORRECTNESS_PER_QUESTION_BONUS if (num_correct > MIN_NUM_CORRECT_QUESTIONS) else 0),
             2)
 
-        if total_time < 8 * 60 * 1000:
+        if total_time < 8 * 60:
             bonus_time = 0.35 * (BASE_PAY + bonus_correctness)
-        elif total_time < 9 * 60 * 1000:
+        elif total_time < 9 * 60:
             bonus_time = 0.30 * (BASE_PAY + bonus_correctness)
-        elif total_time < 10 * 60 * 1000:
+        elif total_time < 10 * 60:
             bonus_time = 0.25 * (BASE_PAY + bonus_correctness)
-        elif total_time < 11 * 60 * 1000:
+        elif total_time < 11 * 60:
             bonus_time = 0.20 * (BASE_PAY + bonus_correctness)
-        elif total_time < 12 * 60 * 1000:
+        elif total_time < 12 * 60:
             bonus_time = 0.15 * (BASE_PAY + bonus_correctness)
-        elif total_time < 13 * 60 * 1000:
+        elif total_time < 13 * 60:
             bonus_time = 0.10 * (BASE_PAY + bonus_correctness)
-        elif total_time < 14 * 60 * 1000:
+        elif total_time < 14 * 60:
             bonus_time = 0.05 * (BASE_PAY + bonus_correctness)
         bonus_time = round(bonus_time, 2)
 
@@ -942,7 +947,7 @@ def results():
             num_correct=num_correct,
             num_questions=NUM_QUESTIONS,
             total_time=int(
-                round(total_time/1000)),
+                round(total_time)),
             accept=accept,
             failure_reason=failure_reason,
             bonus_time=str(

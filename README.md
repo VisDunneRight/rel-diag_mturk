@@ -51,7 +51,7 @@ Notice that some fields such as: `DATABASE_URL`, `AWS_ACCESS_KEY_ID`, and `AWS_S
     sudo apt install software-properties-common
     sudo add-apt-repository ppa:deadsnakes/ppa
     sudo apt update
-    sudo apt install python3.11-full python3.11-dev python3.11-venv
+    sudo apt install python3.11-full python3.11-dev python3.11-venv gcc
     python3.11 -m ensurepip
    ```
 
@@ -197,10 +197,11 @@ Notice that some fields such as: `DATABASE_URL`, `AWS_ACCESS_KEY_ID`, and `AWS_S
 
 5. Install Python requirements in a virtual environment.
 
-    1. Install wheel for building packages:
+    1. Install wheel for building packages and ensure `libpq-fe.h` is available from libpq-dev:
 
         ```bash
         python3.11 -m pip install wheel
+        sudo apt-get install --reinstall libpq-dev
         ```
 
     2. Create the virtual environment:
@@ -213,7 +214,6 @@ Notice that some fields such as: `DATABASE_URL`, `AWS_ACCESS_KEY_ID`, and `AWS_S
     3. Install wheel and then the requirements:
 
         ```bash
-        
         python3.11 -m pip install -r requirements.txt
         ```
 
@@ -230,8 +230,6 @@ in postgres
 ```bash
 flask run
 ```
-
-You can also select `Run > Start Debugging` or `F5` in VSCode to get an interactive debugger.
 
 <http://127.0.0.1:5000/?workerId=AA&assignmentId=BB&hitId=CC>
 
@@ -394,3 +392,81 @@ SQL to HTML: <http://hilite.me/> \
 SQL to HTML: <https://htmlcodeeditor.com/> \
 Removes non-ascii characters: <https://pteo.paranoiaworks.mobi/diacriticsremover/> \
 PDF to PNG: <https://pdf2png.com/>
+
+# Instructions for dealing with AMT interactions
+
+## Setup
+
+1. Ensure your environment variables are set.
+
+
+## `create_qualification.py`
+Creates a qualification using questions from `qualification_questions.xml` and answers from `qualification_answers.xml`. 
+Uses the `AWS_SANDBOX` environment variable.
+**!!!WARNING!!!** hard-coded text!
+Run in the terminal. Pass in one of these arguments followed by parameters:
+
+* `test`: Creates the basic qualification.
+* `custom`: Creates a custom qualification for invited workers only, e.g,. those who had errors taking the test.
+* `test_taken`: Creates a test taken qualification to eliminate workers who have taken the test previously.
+
+## `post_hits.py`
+Creates a HIT. **!!!WARNING!!!*** 
+
+## Setup
+
+1. Update the `<ExternalURL>` tag in [`external_question.xml`](./external_question.xml) to be the URL of your Heroku app.
+2. Update all these **hard-coded elements** in [`post_hits.py`](./post_hits.py) (some docs on [AMT docs](https://docs.aws.amazon.com/AWSMechTurk/latest/AWSMturkAPI/ApiReference_CreateHITOperation.html)), and read the file! 
+
+   1. `qualification_id`: The basic qualification.
+   2. `custom_qualification_id`: A custom qualification for invited workers.
+   3. `taken_test_qualification_id`: A test taken qualification to eliminate workers who took the test previously.
+   4. `base_pay`: The lowest level of reward.
+   5. `approval_percentage`
+   6. `minimum_qualification_score`
+   7. `title_str`
+   8. `description-str`
+   9. `MaxAssignments`
+   10. `LifetimeInSeconds`
+   11. `AssignmentDurationInSeconds`
+
+Run in the terminal. Pass in one of these arguments followed by parameters:
+* `full`: Regular full-duration HIT.
+* `pilot`: Shorter pilot HIT.
+* `custom WID QID`: Post a custom hit for worker with ID `WID` who has been given a custom qualification with ID `QID`.
+
+
+## `hit_manager.py`
+Has lots of code for various things. Make sure to read the code before running it! Run in the terminal. Pass in one of these arguments followed by parameters:
+
+* `summary`: Provides a summary of the last 100 hits
+* `clear`: Deletes all HITs except the ones in a **!!!WARNING!!!** hard-coded `except_list`. Will auto-reject all assignments pending in the HIT!
+* `extend NUM`: Add `NUM` more assignments. **!!!WARNING!!!** hard-coded `hit_id`.
+* `hit_detail HID`: Get details inc. showing a graph for HIT with ID `HID`.
+* `hits_detail HID1 HID2`: Get details for two HIT IDs.
+* `get_assignments HID STATUS`: Get assignments for HIT ID `HID` with status `STATUS` one of `['Approved', 'Rejected', 'Submitted']`.
+* `get_worker_id_list HID`: Get worker IDs for HIT with ID `HID`
+* `approve_qualifications QID`: Approve qualifications for qualification ID `QID`. **!!!WARNING!!!** hard-coded `accept_list` in `approve_qualifications` definition.
+* `update_expiration HID`: Update the expiration for HIT ID `HID`. **!!!WARNING!!!** hard-coded `ExpireAt` in `update_expiration` definition.
+* `give_worker_qualification QID WID`: Give qualification with ID `QID` to worker with ID `WID`.
+* `set_taken_test_qualification QID WFILE`: Read worker IDs from `WFILE` which has one ID per line and **ADD** to each worker the qualification with ID `QID`.
+* `remove_qualification QID WFILE`: Read worker IDs from `WFILE` which has one ID per line and **REMOVE** from each worker the qualification with ID `QID`.
+* `get_workers_with_qualification QID`: List the workers with qualification ID `QID`.
+* `get_qualification_score QID WID`: Get the qualification score on qualification with ID `QID` for worker with ID `WID`.
+* `notify_workers_with_qualification QFILE TFILE`: Notify all workers listed in the qualified workers file `QFILE` (one ID per line) that are in the file of workers that haven't taken the HIT `TFILE` (one ID per line). **!!!WARNING!!!** Hard-coded advertisement message.
+
+## `approve_hits.py`
+
+1. Update `DATABASE_URL` in [`approve_hits.py`](./approve_hits.py) with the Heroku Postges Database. Note: This will change regularly! There are two ways to do this:
+   1. Access through Heroku site, e.g., https://dashboard.heroku.com/apps/rd-study/settings
+   2. Use the Heroku CLI:
+
+        ```cmd
+        heroku config:get DATABASE_URL -a rd-study
+        ```
+
+    It is of the form
+
+    ```
+    postgres://USERNAME:PASSWORD@HOST:PORT/DATABASE
+    ```
