@@ -476,7 +476,7 @@ def main():
             + request.full_path
         )
         preview = True
-        resp = make_response(render_template("instructions.hAtml", preview=preview))
+        resp = make_response(render_template("instructions.html", preview=preview))
         resp.headers["x-frame-options"] = "*"
         return resp
 

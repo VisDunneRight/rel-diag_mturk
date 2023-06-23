@@ -2,6 +2,16 @@ import sys
 import os
 import boto3
 import config
+import json
+from datetime import date, datetime
+
+def json_serial(obj):
+    """JSON serializer for objects not serializable by default json code"""
+
+    if isinstance(obj, (datetime, date)):
+        return obj.isoformat()
+    raise TypeError ("Type %s not serializable" % type(obj))
+
 
 # Start Configuration Variables
 appConfig = config.Config()
@@ -11,7 +21,7 @@ appConfig = config.Config()
 # This allows us to specify whether we are pushing to the sandbox or live site.
 if os.environ.get("AWS_SANDBOX") == "True":
     AMAZON_HOST = "mechanicalturk.sandbox.amazonaws.com"
-    qualification_id = "AA"
+    qualification_id = "3C8RUX4LEU5J46Z02IK6A6TRNV3M9S"
     custom_qualification_id = "custom_qualification_id"
     taken_test_qualification_id = "taken_test_qualification_id"
 else:
@@ -25,16 +35,9 @@ base_pay = "5"
 approval_percentage = 95
 minimum_qualification_score = 66  # This is equivalent to 4/6 correct for Amazon
 
-title_str = "Visualizing Database Queries -- $5.20 to $16.47 with bonuses"
+title_str = "Visualizing Database Queries -- $5.00 to $11.07 with bonuses"
 
-description_str = "You will receive $5.20-$16.47 (estimated time 30 minutes) for participating in this research. \
-Workers must be experienced with SQL as measured by the qualification test (included in the 30 minutes estimate). \
-The HIT is composed of 12 multiple choices questions that ask the user to find the correct description \
-of a SQL query based on a text and/or visual representation. To successfully complete the HIT you need \
-to answer at least 5 questions correctly within 50 minutes. You receive bonuses for more correct answers \
-and in a shorter time. For more details click on Preview to view the full instructions of the HIT. \
-Please contact us with any questions or issues, especially if you get a 'Your HIT submission \
-was not successful' error message."
+description_str = "You will receive $5.00-$11.07 (estimated time 25 minutes) for participating in this research. Workers must be experienced with SQL as measured by the qualification test (included in 25 minutes). The HIT is composed of 32 multiple choices questions that ask the user to find the correct description of an SQL query based on a text or visual representation. To successfully complete the HIT, you need to answer at least 16 questions correctly within 50 minutes. You receive bonuses for more correct answers and in a shorter time. For more details click on Preview to view the full instructions of the HIT. Please contact us with any questions or issues, especially if you get a 'Your HIT submission was not successful' error message."
 
 usa = [{"Country": "US"}]
 
@@ -45,6 +48,8 @@ def get_connection():
         endpoint_url = "https://mturk-requester-sandbox.us-east-1.amazonaws.com"
     else:
         endpoint_url = "https://mturk-requester.us-east-1.amazonaws.com"
+
+    print("using endpoint", endpoint_url)
 
     return boto3.client(
         "mturk",
@@ -110,6 +115,8 @@ def post_hit_helper(
         Description=description,
     )
 
+    print(json.dumps(create_hit_result, default=json_serial, sort_keys=True, indent=4))
+
     print("Created a new HIT with HITId: " + create_hit_result["HIT"]["HITId"])
 
 
@@ -117,9 +124,9 @@ def post_hit():
     print("Creating normal HIT")
     post_hit_helper(
         approval_percentage=approval_percentage,
-        max_assignments=120,
-        lifetime_in_seconds=60 * 60 * 24 * 40,  # 40 days
-        assignment_duration_in_seconds=60 * 60 * 2,  # 2 hours
+        max_assignments=50,
+        lifetime_in_seconds=60 * 60 * 24 * 20,  # 20 days
+        assignment_duration_in_seconds=60 * 50,  # 50 minutes
         base_reward=base_pay,
         title=title_str,
         description=description_str,
@@ -127,6 +134,7 @@ def post_hit():
         qual_id=qualification_id,
         min_qual_score=minimum_qualification_score,
         test_taken_qual_id=taken_test_qualification_id,
+        custom_qual_id=None,
     )
 
 
@@ -136,7 +144,7 @@ def pilot_post_hit():
         approval_percentage=approval_percentage,
         max_assignments=12,
         lifetime_in_seconds=60 * 60 * 24 * 1,  # 1 day
-        assignment_duration_in_seconds=60 * 60 * 2,  # 2 hours
+        assignment_duration_in_seconds=60 * 50,  # 50 minutes
         base_reward=base_pay,
         title=title_str,
         description=description_str,
@@ -144,6 +152,7 @@ def pilot_post_hit():
         qual_id=qualification_id,
         min_qual_score=minimum_qualification_score,
         test_taken_qual_id=taken_test_qualification_id,
+        custom_qual_id=None,
     )
 
 
@@ -158,7 +167,7 @@ def custom_post_hit(worker_id, custom_qual_id):
         approval_percentage=approval_percentage,
         max_assignments=1,
         lifetime_in_seconds=60 * 60 * 24 * 10,  # 10 days
-        assignment_duration_in_seconds=60 * 60 * 2,  # 2 hours
+        assignment_duration_in_seconds=60 * 50,  # 50 minutes
         base_reward=base_pay,
         title="CUSTOM HIT FOR WORKER " + worker_id + ", " + title_str,
         description=description_str,

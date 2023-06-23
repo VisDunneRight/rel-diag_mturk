@@ -2,16 +2,17 @@ import boto3
 import sys
 from post_hits import get_connection
 
-# Make sure to check the value of AWS_SANDBOX environment variable before running to make sure it is in Sandbox or Live mode
-questions = open(name="qualification_questions.xml", mode="r").read()
-answers = open(name="qualification_answers.xml", mode="r").read()
+# Make sure to check the value of AWS_SANDBOX environment variable 
+# before running to make sure it is in Sandbox or Live mode
+questions = open("qualification_questions.xml", mode="r").read()
+answers = open("qualification_answers.xml", mode="r").read()
 
 connection = get_connection()
 
 
 def create_qualification():
     qual_response = connection.create_qualification_type(
-        Name="SQL qualification test",
+        Name="RD SQL qualification test",
         Keywords="test, qualification, SQL",
         Description="A basic SQL qualification test required in order to qualify for the HIT",
         QualificationTypeStatus="Active",
