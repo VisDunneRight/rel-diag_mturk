@@ -80,7 +80,7 @@ def get_assignment_hits(connection, hit_id, status):
 
 
 def approve_hits(connection, assignment_id_list, worker_id_list):
-    with rd_study_server.app.app_context():
+    with rd_study_server.app.app_context():  # needed to write to the database
         for i in range(len(assignment_id_list)):
             time.sleep(2)
 
@@ -112,7 +112,7 @@ def approve_hits(connection, assignment_id_list, worker_id_list):
                 + "{:.2f}".format(
                     round(user.total_time_on_questions_and_answers / 60, 2)
                 )
-                + " minutes."
+                + " minutes. "
                 + (
                     "Accept"
                     if user.accept
@@ -120,10 +120,10 @@ def approve_hits(connection, assignment_id_list, worker_id_list):
                 )
                 + ". Total pay: $"
                 + "{:.2f}".format(round(user.total_pay_cents / 100, 2))
-                + " (bonuses for time: $"
-                + "{:.2f}".format(round(user.bonus_time_cents / 100, 2))
-                + ", correctness: $"
+                + " (bonuses for correctness: $"
                 + "{:.2f}".format(round(user.bonus_correctness_cents / 100, 2))
+                + ", time: $"
+                + "{:.2f}".format(round(user.bonus_time_cents / 100, 2))
                 + ")"
             )
 
@@ -150,20 +150,20 @@ def approve_hits(connection, assignment_id_list, worker_id_list):
 
 def send_bonus(user, assignment_id):
     bonus_correctness_dollars = round(user.bonus_correctness_cents / 100, 2)
-    bonus_time_dollars = round(user.bonus_time_dollars / 100, 2)
+    bonus_time_dollars = round(user.bonus_time_cents / 100, 2)
     total_bonus_dollars = round(user.total_bonus_cents / 100, 2)
     total_pay_dollars = round(user.total_pay_cents / 100, 2)
 
     if total_bonus_dollars > 0:
         reason_str = (
             "You received a total bonus of $"
-            + str(total_bonus_dollars)
+            + "{:.2f}".format(total_bonus_dollars)
             + ". $"
-            + str(bonus_correctness_dollars)
+            + "{:.2f}".format(bonus_correctness_dollars)
             + " due to your correctness and $"
-            + str(bonus_time_dollars)
-            + " due to your completion time, bringing your total pay to "
-            + str(total_pay_dollars)
+            + "{:.2f}".format(bonus_time_dollars)
+            + " due to your completion time, bringing your total pay to $"
+            + "{:.2f}".format(total_pay_dollars)
             + "."
         )
         worker_id = (

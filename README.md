@@ -348,7 +348,8 @@ Right-click and select View/Edit Data > All Rows.
 
 Here are some options you can create:
 
-* [.env](.env) for local development.
+* [.env.local.sandbox](.env.local.sandbox) for local development and sandbox grading
+* [.env.local.live](.env.local.live) for local development and AMT live grading
 * [.env.sandbox.test](.env.sandbox.test) to use for testing the AMT Sandbox site.
 * [.env.sandbox](.env.sandbox) for more production-ready testing on the AMT Sandbox site. Turns off error display to users and requires qualifications.
 * [.env.live.test](.env.live.test) to use for the live AMT website.
