@@ -1058,9 +1058,9 @@ def results():
         "worker_id "
         + str(user.worker_id)
         + "'s total time taken to complete the test is "
-        + str("%.2f" % (total_time / 60))
+        + str("%.2f" % (user.total_time_on_questions_and_answers / 60))
         + " minutes, but time on questions was "
-        + str("%.2f" % (total_question_time / 60))
+        + str("%.2f" % (user.total_question_time / 60))
     )
 
     accept = True
@@ -1136,7 +1136,7 @@ def results():
     user.total_pay_cents = round(total_pay * 100, 2)
 
     app.logger.info(
-        "Bonus from correctness: "
+        "Bonus from correctness: $"
         + "{:.2f}".format(bonus_correctness)
         + ", bonus from time: $"
         + "{:.2f}".format(bonus_time)
