@@ -445,7 +445,7 @@ Has lots of code for various things. Make sure to read the code before running i
 
 ## `approve_hits.py`
 
-1. Depends on the `REMOTE_DATABSE_URI` environment variable being set to point to the Heroku Postges Database. Note: This will change regularly! There are two ways to get this value:
+1. Depends on the `REMOTE_DATABASE_URI` environment variable being set to point to the Heroku Postges Database. Note: This will change regularly! There are two ways to get this value:
    1. Access through Heroku site, e.g., https://dashboard.heroku.com/apps/rd-study/settings
    2. Use the Heroku CLI:
 
