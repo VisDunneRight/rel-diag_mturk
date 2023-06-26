@@ -52,6 +52,8 @@ class User(db.Model):
     bonus_time_cents = db.Column(db.Integer)
     total_bonus_cents = db.Column(db.Integer)
     total_pay_cents = db.Column(db.Integer)
+    bonus_sent = db.Column(db.String)
+    accept_reject_sent = db.Column(db.String)
 
     # Main test # there is probably a way to set static variables programmatically...
     # This is gross.

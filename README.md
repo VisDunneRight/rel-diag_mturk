@@ -444,8 +444,9 @@ Has lots of code for various things. Make sure to read the code before running i
 * `notify_workers_with_qualification QFILE TFILE`: Notify all workers listed in the qualified workers file `QFILE` (one ID per line) that are in the file of workers that haven't taken the HIT `TFILE` (one ID per line). **!!!WARNING!!!** Hard-coded advertisement message.
 
 ## `approve_hits.py`
+Deals with submissions.
 
-1. Depends on the `REMOTE_DATABASE_URI` environment variable being set to point to the Heroku Postges Database. Note: This will change regularly! There are two ways to get this value:
+Depends on the `REMOTE_DATABASE_URI` environment variable being set to point to the Heroku Postges Database. Note: This will change regularly! There are two ways to get this value:
    1. Access through Heroku site, e.g., https://dashboard.heroku.com/apps/rd-study/settings
    2. Use the Heroku CLI:
 
@@ -458,6 +459,10 @@ Has lots of code for various things. Make sure to read the code before running i
     ```
     postgres://USERNAME:PASSWORD@HOST:PORT/DATABASE
     ```
+
+Pass in one of these arguments:
+* `batch-grade`: Check Submitted assignments and Approve them.
+* 
 
 
 # Old

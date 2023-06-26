@@ -13,7 +13,7 @@ from sqlalchemy.orm import sessionmaker
 import config
 
 # Heroku Database URL
-DATABASE_URL = os.environ.get("REMOTE_DATABSE_URI")
+DATABASE_URL = os.environ.get("REMOTE_DATABASE_URI")
 
 appConfig = config.Config()
 
@@ -77,36 +77,12 @@ def get_assignment_hits(connection, hit_id, status):
     )
 
 
-# Returns the score and time (in milliseconds) given a worker_id
-def get_score_and_time(worker_id):
-    user = session.query(User).filter_by(worker_id=worker_id).first()
-    num_questions = 32
-    num_correct = 0
-    total_time = 0
-    for i in range(1, num_questions + 1):
-        q_col = "q" + str(i)
-        q_time_col = "q" + str(i) + "_time"
-
-        user_answer = getattr(user, q_col)
-        user_time = getattr(user, q_time_col)
-
-        if user_answer == answers[str(i)]:
-            num_correct += 1
-            logging.info("Correct answer for question " + str(i))
-
-        total_time += user_time
-    return num_correct, total_time
-
-
 def approve_hits(
     connection, assignment_id_list, worker_id_list, check_completion_times=True
 ):
     """
     If check_completion_times is set to true only print out the times and do not accept or reject any time
     """
-    min_allowed_correct = 5
-    max_allowed_time = 50 * 60  # In seconds
-
     for i in range(len(assignment_id_list)):
         accept = True
         time.sleep(2)
@@ -123,121 +99,85 @@ def approve_hits(
             + " ---------------------"
         )
 
-        num_correct, total_time = get_score_and_time(worker_id)
+        user = session.query(User).filter_by(worker_id=worker_id).first()
+
         logging.info(
             "Assignment "
             + assignment_id
+            + " by worker "
+            + worker_id
             + " had "
-            + str(num_correct)
-            + " correct and was completed in "
-            + str(total_time / 1000)
-            + " seconds"
+            + str(user.number_correct)
+            + "("
+            + str(user.percentage_correct)
+            + "%)"
+            + " correct. Time on questions and answers was "
+            + str((user.total_time_on_questions_and_answers / 1000) / 60)
+            + " minutes."
+            + user.accept ? "Accept" : "Fail, reason given: " + user.failure_reason
+            + ". Total pay: "
+            + str(round(user.total_pay_cents / 100, 2))
+            + " (bonuses for time: "
+            + str(round(user.bonus_time_cents / 100, 2))
+            + ", correctness: "
+            + str(round(user.bonus_correctness_cents / 100, 2))
+            + ")"
         )
 
-        if check_completion_times == False:
-            # Check if the user failed
-            failure_reason = ""
-            if num_correct < min_allowed_correct:
-                accept = False
-                failure_reason = "low correctness"
-                logging.info(
-                    "User failed the assignment with ID: "
-                    + assignment_id
-                    + " due to "
-                    + failure_reason
-                )
-            if total_time > max_allowed_time * 1000:
-                accept = False
-                failure_reason = "high completion time"
-                logging.info(
-                    "User failed the assignment with ID: "
-                    + assignment_id
-                    + " due to "
-                    + failure_reason
-                )
-
-            # Approve or reject assignment accordingly
-            if accept:
-                logging.info("Assignment " + assignment_id + " approved")
-                connection.approve_assignment(
-                    AssignmentId=assignment_id,
-                    RequesterFeedback="Congratulations! Your HIT has been approved. Thank you for your time! :)",
-                    OverrideRejection=True,
-                )
-            elif not accept:
-                logging.info("Assignment " + assignment_id + " rejected")
-                connection.reject_assignment(
-                    AssignmentId=assignment_id,
-                    RequesterFeedback="We are sorry to inform you that your HIT has been rejected due to"
-                    + failure_reason,
-                )
+        # Approve or reject assignment accordingly
+        if accept:
+            logging.info("Assignment " + assignment_id + " approved")
+            connection.approve_assignment(
+                AssignmentId=assignment_id,
+                RequesterFeedback="Congratulations! Your HIT has been approved. Thank you for your help with our study! :-)",
+                OverrideRejection=True,
+            )
+        else:
+            logging.info("Assignment " + assignment_id + " rejected")
+            connection.reject_assignment(
+                AssignmentId=assignment_id,
+                RequesterFeedback="We are sorry to inform you that your HIT has been rejected due to"
+                + user.failure_reason,
+            )
 
             # Send appropriate bonus if the assignment is accepted
             time.sleep(2)
             if accept:
                 logging.info("Calculating bonus for WorkerId: " + worker_id)
-                send_bonus(assignment_id, num_correct, total_time)
+                send_bonus(user, assignment_id)
+        user.accept_reject_sent =  datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+        db.session.commit()
 
+def send_bonus(user, assignment_id):
+    bonus_correctness_dollars = round(user.bonus_correctness_cents / 100, 2)
+    bonus_time_dollars = round(user.bonus_time_dollars / 100, 2)
+    total_bonus_dollars = round(user.total_bonus_cents / 100, 2)
+    total_pay_dollars = round(user.total_pay_cents / 100, 2)
 
-def send_bonus(assignment_id, num_correct, total_time):
-    base_pay = 5.20
-    min_allowed_correct = 5
-    correctness_per_question_bonus = 1.04
-
-    bonus_correctness = round(
-        (
-            (num_correct - min_allowed_correct) * correctness_per_question_bonus
-            if (num_correct - min_allowed_correct > 0)
-            else 0
-        ),
-        2,
-    )
-
-    if total_time < 14 * 60 * 1000:
-        bonus_time = 0.32 * (base_pay + bonus_correctness)
-    elif total_time < 15 * 60 * 1000:
-        bonus_time = 0.28 * (base_pay + bonus_correctness)
-    elif total_time < 16 * 60 * 1000:
-        bonus_time = 0.24 * (base_pay + bonus_correctness)
-    elif total_time < 17 * 60 * 1000:
-        bonus_time = 0.20 * (base_pay + bonus_correctness)
-    elif total_time < 18 * 60 * 1000:
-        bonus_time = 0.16 * (base_pay + bonus_correctness)
-    elif total_time < 18 * 60 * 1000:
-        bonus_time = 0.12 * (base_pay + bonus_correctness)
-    else:
-        bonus_time = 0
-    bonus_time = round(bonus_time, 2)
-
-    total_bonus = round(bonus_correctness + bonus_time, 2)
-
-    if total_bonus > 0:
+    if total_bonus_dollars > 0:
         reason_str = (
             "You received a total bonus of $"
-            + str(total_bonus)
+            + str(total_bonus_dollars)
             + ". $"
-            + str(bonus_correctness)
+            + str(bonus_correctness_dollars)
             + " due to your correctness and $"
-            + str(bonus_time)
-            + " due to your completion time."
+            + str(bonus_time_dollars)
+            + " due to your completion time, bringing your total pay to "
+            + str(total_pay_dollars)
+            + "."
         )
         worker_id = (
             session.query(User).filter_by(assignment_id=assignment_id).first().worker_id
         )
         logging.info(
-            "In addition Worker ID: "
+            "Sending to Worker ID "
             + worker_id
-            + " received a total bonus of $"
-            + str(total_bonus)
-            + ". $"
-            + str(bonus_correctness)
-            + " due to your correctness and $"
-            + str(bonus_time)
-            + " due to your completion time."
+            + ": "
+            + reason_str
         )
-        connection.send_bonus(
+        response = connection.send_bonus(
             WorkerId=worker_id,
-            BonusAmount=str(total_bonus),
+            BonusAmount=str(total_bonus_dollars),
             AssignmentId=assignment_id,
             Reason=reason_str,
         )
@@ -246,8 +186,10 @@ def send_bonus(assignment_id, num_correct, total_time):
             session.query(User).filter_by(assignment_id=assignment_id).first().worker_id
         )
         logging.info(
-            "In addition Worker ID: " + worker_id + "did not receive any bonus."
+            "Worker ID: " + worker_id + " did not receive any bonus."
         )
+    user.bonus_sent =  datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+    db.session.commit()
 
 
 def send_bonus_error(worker_id, assignment_id):

@@ -1132,8 +1132,9 @@ def results():
             + str(bonus_time)
         )
         total_bonus = round(bonus_correctness + bonus_time, 2)
-
-    total_pay = BASE_PAY + total_bonus
+        total_pay = BASE_PAY + total_bonus
+    else:
+        total_pay = 0
 
     user.bonus_correctness_cents = round(bonus_correctness * 100, 2)
     user.bonus_time_cents = round(bonus_time * 100, 2)
