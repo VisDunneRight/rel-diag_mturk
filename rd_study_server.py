@@ -1136,8 +1136,9 @@ def results():
     user.total_pay_cents = round(total_pay * 100, 2)
 
     app.logger.info(
-        "Bonus from correctness: " + "{:.2f}".format(bonus_correctness),
-        +", bonus from time: $"
+        "Bonus from correctness: "
+        + "{:.2f}".format(bonus_correctness)
+        + ", bonus from time: $"
         + "{:.2f}".format(bonus_time)
         + ", total pay: $"
         + "{:.2f}".format(total_pay),
