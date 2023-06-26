@@ -394,6 +394,8 @@ If you get a `RequestError` about having a `QualificationType` with this name al
 Creates a HIT. Uses the `AWS_SANDBOX`, `AWS_ACCESS_KEY_ID`, and `AWS_SECRET_ACCESS_KEY` environment variables.
 **!!!WARNING!!!** hard-coded text!
 
+**!!!WARNING!!!** The HITs you create programmatically here [***Do Not*** show up on the web management interface](https://stackoverflow.com/questions/50382623/hits-created-with-create-hit-with-externalquestion-using-boto3-not-visible-at-r)! Amazon has deprecated that feature—aargh! 
+
 1. Update the `<ExternalURL>` tag in [`external_question.xml`](./external_question.xml) to be the URL of your Heroku app.
 2. Update all these **hard-coded elements** in [`post_hits.py`](./post_hits.py) (some docs on [AMT docs](https://docs.aws.amazon.com/AWSMechTurk/latest/AWSMturkAPI/ApiReference_CreateHITOperation.html)), and read the file! 
 

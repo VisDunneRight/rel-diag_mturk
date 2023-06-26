@@ -1135,10 +1135,10 @@ def results():
 
     total_pay = BASE_PAY + total_bonus
 
-    user.bonus_correctness = bonus_correctness
-    user.bonus_time = bonus_time
-    user.total_bonus = total_bonus
-    user.total_pay = total_pay
+    user.bonus_correctness_cents = round(bonus_correctness * 100, 2)
+    user.bonus_time_cents = round(bonus_time * 100, 2)
+    user.total_bonus_cents = round(total_bonus * 100, 2)
+    user.total_pay_cents = round(total_pay * 100, 2)
 
     db.session.commit()
 

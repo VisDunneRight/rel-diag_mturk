@@ -74,15 +74,20 @@ def clear():
         hit_id = hit["HITId"]
 
         if hit_id not in except_list:
-                # If HIT is active then set it to expire immediately
+            # If HIT is active then set it to expire immediately
             if hit["HITStatus"] == "Assignable":
                 response = conn.update_expiration_for_hit(
-                    HITId=hit_id,
-                    ExpireAt=datetime(2015, 1, 1) # the past
-                )  
+                    HITId=hit_id, ExpireAt=datetime(2015, 1, 1)  # the past
+                )
                 print("Expiring HIT " + hit_id)
             if hit["HITStatus"] != "Reviewable":
-                print("Cannot delete HIT: " + hit_id + " because it is not reviewable. It is in state " + hit["HITStatus"])
+                print(
+                    "Cannot delete HIT: "
+                    + hit_id
+                    + " because it is not reviewable. It is in state "
+                    + hit["HITStatus"]
+                    + ". Try running again!"
+                )
             else:
                 # This will auto-reject all assignments pending in the hit
                 reject_all_assignments(hit_id)
