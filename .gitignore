@@ -118,3 +118,4 @@ env-work
 /.env.live.test
 /.env.sandbox
 /.env.sandbox.test
+keys.txt

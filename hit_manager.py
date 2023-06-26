@@ -74,12 +74,19 @@ def clear():
         hit_id = hit["HITId"]
 
         if hit_id not in except_list:
+                # If HIT is active then set it to expire immediately
+            if hit["HITStatus"] == "Assignable":
+                response = conn.update_expiration_for_hit(
+                    HITId=hit_id,
+                    ExpireAt=datetime(2015, 1, 1) # the past
+                )  
+                print("Expiring HIT " + hit_id)
             if hit["HITStatus"] != "Reviewable":
-                print("Cannot delete HIT: " + hit_id + " because it is not reviewable")
+                print("Cannot delete HIT: " + hit_id + " because it is not reviewable. It is in state " + hit["HITStatus"])
             else:
                 # This will auto-reject all assignments pending in the hit
                 reject_all_assignments(hit_id)
-                conn.delete_hit(HITId=hit_id)
+                response = conn.delete_hit(HITId=hit_id)
                 print(
                     "Deleting HIT: "
                     + hit_id
@@ -130,25 +137,24 @@ def hit_detail(hit_id, show_graph=False):
 
     print(
         hit_id
-        + " created on "
+        + " created "
         + str(hit["CreationTime"])
-        + " with expiration on "
+        + " expiring "
         + str(hit["Expiration"])
         + " has status "
         + hit["HITStatus"]
-        + " and has "
+        + ". Pending: "
         + str(hit["NumberOfAssignmentsPending"])
-        + " pending "
+        + ", Available: "
         + str(hit["NumberOfAssignmentsAvailable"])
-        + " available and "
+        + ", Completed: "
         + str(hit["NumberOfAssignmentsCompleted"])
-        + " completed. Out of those "
+        + ", Submitted: "
         + str(num_submitted)
-        + " are submitted "
+        + ", Approved: "
         + str(num_approved)
-        + " are approved and "
+        + ", Rejected: "
         + str(num_rejected)
-        + " are rejected"
     )
 
     # check for returning workers
@@ -163,8 +169,6 @@ def hit_detail(hit_id, show_graph=False):
 
 
 # Details on a set of HITs
-
-
 def hits_detail(hit_ids):
     num_submitted = 0
     num_approved = 0
@@ -230,8 +234,6 @@ def get_assignments(hit_id, status, ids_only):
 
 
 # List of worker_ids that are Approved and Rejected for a hit
-
-
 def get_worker_id_list(hit_id):
     assignments = conn.list_assignments_for_hit(
         HITId=hit_id, MaxResults=100, AssignmentStatuses=["Approved"]

@@ -47,9 +47,9 @@ def create_custom_qualification():
 # Qualification assigned to everyone that has taken the test previously
 def create_taken_test_qualification():
     qual_response = connection.create_qualification_type(
-        Name="Worker attempted/completed Understanding SQL Queries -- $5.20 to $16.47 with bonuses HIT previously",
+        Name="Worker attempted/completed Visualizing Database Queries -- $5.00 to $11.07 with bonuses HIT previously",
         Keywords="Custom, Attempted HIT, Prevent Repetition, Prevent Retake",
-        Description="Having this qualification signifies that you have attempted/completed the Visualizing Database Queries HIT posted in October/November of 2019.\
+        Description="Having this qualification signifies that you have attempted/completed the Visualizing Database Queries HIT posted in June of 2023.\
         This qualification is given so that the same workers cannot take the same HIT twice. ONLY WORKERS WITHOUT THIS QUALIFICATION CAN ACCEPT THE NEW POSTED HIT.",
         QualificationTypeStatus="Active",
         TestDurationInSeconds=60 * 60,

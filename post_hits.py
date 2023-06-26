@@ -5,12 +5,13 @@ import config
 import json
 from datetime import date, datetime
 
+
 def json_serial(obj):
     """JSON serializer for objects not serializable by default json code"""
 
     if isinstance(obj, (datetime, date)):
         return obj.isoformat()
-    raise TypeError ("Type %s not serializable" % type(obj))
+    raise TypeError("Type %s not serializable" % type(obj))
 
 
 # Start Configuration Variables
@@ -23,12 +24,12 @@ if os.environ.get("AWS_SANDBOX") == "True":
     AMAZON_HOST = "mechanicalturk.sandbox.amazonaws.com"
     qualification_id = "3C8RUX4LEU5J46Z02IK6A6TRNV3M9S"
     custom_qualification_id = "custom_qualification_id"
-    taken_test_qualification_id = "taken_test_qualification_id"
+    taken_test_qualification_id = "3VFIQRXYYM783TDKWYVL8LHMWTBZ2U"
 else:
     AMAZON_HOST = "mechanicalturk.amazonaws.com"
-    qualification_id = "AA"
+    qualification_id = "3C8RUX4LEU5J46Z02IK6A6TRNV3M9S"
     custom_qualification_id = "custom_qualification_id"
-    taken_test_qualification_id = "taken_test_qualification_id"
+    taken_test_qualification_id = "3VFIQRXYYM783TDKWYVL8LHMWTBZ2U"
 
 # HIT specific variables
 base_pay = "5"
@@ -79,7 +80,7 @@ def post_hit_helper(
     questionform = open("external_question.xml", "r").read()
 
     # Boto3 version
-    QualificationRequirements = [
+    qualification_requirements = [
         {
             "QualificationTypeId": qual_id,
             "Comparator": "GreaterThanOrEqualTo",
@@ -101,7 +102,7 @@ def post_hit_helper(
         },
     ]
     if custom_qual_id != None:
-        QualificationRequirements.append(
+        qualification_requirements.append(
             {"QualificationTypeId": custom_qual_id, "Comparator": "Exists"}
         )
 
@@ -113,6 +114,7 @@ def post_hit_helper(
         Reward=base_reward,
         Title=title,
         Description=description,
+        QualificationRequirements=qualification_requirements,
     )
 
     print(json.dumps(create_hit_result, default=json_serial, sort_keys=True, indent=4))
@@ -179,17 +181,11 @@ def custom_post_hit(worker_id, custom_qual_id):
     )
 
 
-def create_multiple_hits():
-    for i in range(5):
-        title = "SQL Query Visualization " + str(i)
-        post_hit(title)
-
-
 if __name__ == "__main__":
     arg_arr = sys.argv[1:]
-    arg1 = arg_arr[0]
+    arg0 = arg_arr[0]
 
-    if arg1 not in ["full", "pilot", "custom", "test"]:
+    if arg0 not in ["full", "pilot", "custom", "test"]:
         print(
             "Invalid argument! Argument must be one of 'full', 'pilot', 'custom' or 'test'"
         )
@@ -199,14 +195,14 @@ if __name__ == "__main__":
     no = {"no", "n"}
 
     setting = "on SANDBOX" if (os.environ.get("AWS_SANDBOX") == "True") else "LIVE"
-    print("Are you sure you want to deploy a " + arg1 + " HIT " + setting + "? [Y/N]")
+    print("Are you sure you want to deploy a " + arg0 + " HIT " + setting + "? [Y/N]")
     choice = input().lower()
     if choice in yes:
-        if arg1 == "full":
+        if arg0 == "full":
             post_hit()
-        elif arg1 == "pilot":
+        elif arg0 == "pilot":
             pilot_post_hit()
-        elif arg1 == "custom":
+        elif arg0 == "custom":
             custom_post_hit(arg_arr[1], arg_arr[2])
     elif choice in no:
         print("Execution cancelled")

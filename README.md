@@ -354,14 +354,7 @@ postgres://bksmptywmdqgrw:736cca0ed9a698081223b023492213fa779e21a3fcf0c86ad2c362
 
 ## AWS / AMT setup
 
-Create your AWS account 
-
-~~maybe the below...~~
-and an IAM account (e.g., `rdstudy`). Give the IAM account console access and a password. Write down the 12-digit ID.
-https://us-east-1.console.aws.amazon.com/iamv2/home?region=us-east-1#/users
-Sign in to 
-https://requester.mturk.com/developer/sandbox
-as an AWS IAM user
+Create your AWS account and an associated AMT account.
 
 ## Setup
 
@@ -378,20 +371,21 @@ You can check variables with `printenv | grep AWS`.
 ## `create_qualification.py`
 Creates a qualification using questions from `qualification_questions.xml` and answers from `qualification_answers.xml`. 
 Uses the `AWS_SANDBOX`, `AWS_ACCESS_KEY_ID`, and `AWS_SECRET_ACCESS_KEY` environment variables.
-**!!!WARNING!!!** hard-coded text!
+**!!!WARNING!!!** hard-coded text for the qualification details! Make sure to at least change the `Name` and hard-coded bits in [`post_hits.py`](./post_hits.py).
 Run in the terminal. Pass in one of these arguments:
 
 * `test`: Creates the basic qualification.
 * `custom`: Creates a custom qualification for invited workers only, e.g,. those who had errors taking the test.
 * `test_taken`: Creates a test taken qualification to eliminate workers who have taken the test previously.
 
-E.g., inside the virtual environment:
+E.g., inside the virtual environment you'll need to run both:
 
 ```
 python ./create_qualification.py test
+python ./create_qualification.py test_taken
 ```
 
-Record the `QualificationId` to use in [`post_hits.py`](./post_hits.py) for the `qualification_id` variable.
+Record the `QualificationId`s to use in [`post_hits.py`](./post_hits.py) for the `qualification_id` and `taken_test_qualification_id` variables.
 
 If you get a `RequestError` about having a `QualificationType` with this name already, you need to change the **hard-coded `Name=`** part of the file or delete the existing qualification at 
 <https://requestersandbox.mturk.com/qualification_types> or <https://requester.mturk.com/qualification_types>.
@@ -437,7 +431,7 @@ Has lots of code for various things. Make sure to read the code before running i
 * `hit_detail HID`: Get details inc. showing a graph for HIT with ID `HID`.
 * `hits_detail HID1 HID2`: Get details for two HIT IDs.
 * `get_assignments HID STATUS`: Get assignments for HIT ID `HID` with status `STATUS` one of `['Approved', 'Rejected', 'Submitted']`.
-* `get_worker_id_list HID`: Get worker IDs for HIT with ID `HID`
+* `get_worker_id_list HID`: Get worker IDs for HIT with ID `HID` that are Approved or Rejected.
 * `approve_qualifications QID`: Approve qualifications for qualification ID `QID`. **!!!WARNING!!!** hard-coded `accept_list` in `approve_qualifications` definition.
 * `update_expiration HID`: Update the expiration for HIT ID `HID`. **!!!WARNING!!!** hard-coded `ExpireAt` in `update_expiration` definition.
 * `give_worker_qualification QID WID`: Give qualification with ID `QID` to worker with ID `WID`.
@@ -449,7 +443,7 @@ Has lots of code for various things. Make sure to read the code before running i
 
 ## `approve_hits.py`
 
-1. Update `DATABASE_URL` in [`approve_hits.py`](./approve_hits.py) with the Heroku Postges Database. Note: This will change regularly! There are two ways to do this:
+1. Depends on the `REMOTE_DATABSE_URI` environment variable being set to point to the Heroku Postges Database. Note: This will change regularly! There are two ways to get this value:
    1. Access through Heroku site, e.g., https://dashboard.heroku.com/apps/rd-study/settings
    2. Use the Heroku CLI:
 

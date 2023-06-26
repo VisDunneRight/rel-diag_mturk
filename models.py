@@ -44,6 +44,14 @@ class User(db.Model):
     total_time_on_questions_and_answers = db.Column(db.Integer)
     total_question_time = db.Column(db.Integer)
     number_correct = db.Column(db.Integer)
+    percentage_correct = db.Column(db.Float)
+
+    accept = db.Column(db.Boolean)
+    failure_reason = db.Column(db.String)
+    bonus_correctness = db.Column(db.Float)
+    bonus_time = db.Column(db.Float)
+    total_bonus = db.Column(db.Float)
+    total_pay = db.Column(db.Float)
 
     # Main test # there is probably a way to set static variables programmatically...
     # This is gross.

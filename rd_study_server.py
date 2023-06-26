@@ -1048,9 +1048,10 @@ def results():
     user.total_question_time = total_question_time
     user.total_time_on_questions_and_answers = total_time
     user.number_correct = num_correct
-    db.session.commit()
 
     percentage_correct = num_correct / NUM_QUESTIONS
+    user.percentage_correct = percentage_correct
+
     app.logger.info("Number of correct answers is: " + str(num_correct))
     app.logger.info("Percentage of correct answers is " + str(percentage_correct))
     app.logger.info(
@@ -1080,6 +1081,9 @@ def results():
             + str(MAX_ALLOWED_TIME_SEC / 60)
             + " minutes."
         )
+
+    user.accept = accept
+    user.failure_reason = failure_reason
 
     app.logger.info(
         "worker_id " + str(user.worker_id) + " The hit acceptance is: " + str(accept)
@@ -1130,6 +1134,13 @@ def results():
         total_bonus = round(bonus_correctness + bonus_time, 2)
 
     total_pay = BASE_PAY + total_bonus
+
+    user.bonus_correctness = bonus_correctness
+    user.bonus_time = bonus_time
+    user.total_bonus = total_bonus
+    user.total_pay = total_pay
+
+    db.session.commit()
 
     resp = make_response(
         render_template(

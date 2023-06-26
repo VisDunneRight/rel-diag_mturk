@@ -13,7 +13,7 @@ from sqlalchemy.orm import sessionmaker
 import config
 
 # Heroku Database URL
-DATABASE_URL = "replace_with_database_url_on_heroku"
+DATABASE_URL = os.environ.get("REMOTE_DATABSE_URI")
 
 appConfig = config.Config()
 
@@ -37,8 +37,8 @@ def get_connection():
 # Set up the AMT connection
 connection = get_connection()
 
-# The answers to the questions
-answers = json.loads(open("static/questions/answers.json").read())
+# # The answers to the questions
+# answers = json.loads(open("static/questions/answers.json").read())
 
 # Database setup
 engine = create_engine(DATABASE_URL)
@@ -47,7 +47,9 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 # Setup logging
-log_filename = "logs/approve_hits_full_study_january_2020.log"
+log_filename = (
+    "logs/approve_hits_" + datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S") + ".log"
+)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -67,9 +69,8 @@ console.setFormatter(formatter)
 # add the handler to the root logger
 logging.getLogger("").addHandler(console)
 
+
 # Returns the list of assignments with certain status for a given HITId
-
-
 def get_assignment_hits(connection, hit_id, status):
     return connection.list_assignments_for_hit(
         HITId=hit_id, MaxResults=100, AssignmentStatuses=[status]
@@ -77,8 +78,6 @@ def get_assignment_hits(connection, hit_id, status):
 
 
 # Returns the score and time (in milliseconds) given a worker_id
-
-
 def get_score_and_time(worker_id):
     user = session.query(User).filter_by(worker_id=worker_id).first()
     num_questions = 32
