@@ -570,7 +570,7 @@ def tutorialClick():
         else:
             tutorial_time += time_spent
 
-        setattr(user, "tutorial_time", tutorial_time)
+        setattr(user, "tutorial_time", int(tutorial_time / 1000))
         setattr(user, "current_page", current_page)
         db.session.commit()
 
@@ -1045,8 +1045,8 @@ def results():
         else:
             total_question_time += user_time
 
-    user.total_question_time = total_question_time
-    user.total_time_on_questions_and_answers = total_time
+    user.total_question_time = int(total_question_time / 1000)  # s
+    user.total_time_on_questions_and_answers = total_time  # s
     user.number_correct = num_correct
 
     percentage_correct = num_correct / NUM_QUESTIONS
@@ -1125,12 +1125,6 @@ def results():
             bonus_time = 0.05 * (BASE_PAY + bonus_correctness)
         bonus_time = round(bonus_time, 2)
 
-        app.logger.info(
-            "Bonus from correctness: "
-            + str(bonus_correctness)
-            + " bonus from time: "
-            + str(bonus_time)
-        )
         total_bonus = round(bonus_correctness + bonus_time, 2)
         total_pay = BASE_PAY + total_bonus
     else:
@@ -1140,6 +1134,14 @@ def results():
     user.bonus_time_cents = round(bonus_time * 100, 2)
     user.total_bonus_cents = round(total_bonus * 100, 2)
     user.total_pay_cents = round(total_pay * 100, 2)
+
+    app.logger.info(
+        "Bonus from correctness: " + "{:.2f}".format(bonus_correctness),
+        +", bonus from time: $"
+        + "{:.2f}".format(bonus_time)
+        + ", total pay: $"
+        + "{:.2f}".format(total_pay),
+    )
 
     db.session.commit()
 

@@ -39,10 +39,10 @@ class User(db.Model):
     end_datetime = db.Column(db.DateTime())
 
     # Time spent on the tutorial
-    tutorial_time = db.Column(db.Integer)
+    tutorial_time = db.Column(db.Integer)  # s
 
-    total_time_on_questions_and_answers = db.Column(db.Integer)
-    total_question_time = db.Column(db.Integer)
+    total_time_on_questions_and_answers = db.Column(db.Integer)  # s
+    total_question_time = db.Column(db.Integer)  # s
     number_correct = db.Column(db.Integer)
     percentage_correct = db.Column(db.Float)
 

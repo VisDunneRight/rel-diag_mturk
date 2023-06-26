@@ -9,6 +9,7 @@ Code and instructions for running the Relational Diagrams MTurk User Study using
     * [Setup for using Ubuntu via WSL](#setup-for-using-ubuntu-via-wsl)
     * [Setup using Ubuntu](#setup-using-ubuntu)
   * [Deploying on Heroku](#deploying-on-heroku)
+  * [Possible `.env` files](#possible-env-files)
 * [Instructions for dealing with AMT interactions](#instructions-for-dealing-with-amt-interactions)
   * [AWS / AMT setup](#aws--amt-setup)
   * [Setup](#setup)
@@ -16,11 +17,6 @@ Code and instructions for running the Relational Diagrams MTurk User Study using
   * [`post_hits.py`](#post_hitspy)
   * [`hit_manager.py`](#hit_managerpy)
   * [`approve_hits.py`](#approve_hitspy)
-* [Old](#old)
-  * [Basic/useful Postgres psql commands](#basicuseful-postgres-psql-commands)
-  * [Performing migration](#performing-migration)
-  * [Heroku useful commands](#heroku-useful-commands)
-  * [Useful online SQL/Text/Image formatters/converters](#useful-online-sqltextimage-formattersconverters)
 
 
 
@@ -348,7 +344,16 @@ Click Save
 Navigate to the database > Schemas > public > Tables > users.
 Right-click and select View/Edit Data > All Rows.
 
-postgres://bksmptywmdqgrw:736cca0ed9a698081223b023492213fa779e21a3fcf0c86ad2c362c09802d992@ec2-52-21-136-176.compute-1.amazonaws.com:5432/d29vcdcg0m1mv4
+## Possible `.env` files
+
+Here are some options you can create:
+
+* [.env](.env) for local development.
+* [.env.sandbox.test](.env.sandbox.test) to use for testing the AMT Sandbox site.
+* [.env.sandbox](.env.sandbox) for more production-ready testing on the AMT Sandbox site. Turns off error display to users and requires qualifications.
+* [.env.live.test](.env.live.test) to use for the live AMT website.
+* [.env.live](.env.live) to use for the live AMT website. Turns off error display to users and requires qualifications.
+
 
 # Instructions for dealing with AMT interactions
 
@@ -461,73 +466,13 @@ Depends on the `REMOTE_DATABASE_URI` environment variable being set to point to 
     ```
 
 Pass in one of these arguments:
-* `batch-grade`: Check Submitted assignments and Approve them.
-* 
+* `batch-grade HID`: Check Submitted assignments for a given HIT ID and Approve them.
+* `reject AID FEEDBACK`: Reject the given assignment ID with a given feedback. E.g., rejecting speeders.
+* `approve`: Approve the given assignment ID like normal.
+* `grade AID WID`: Grade and approve hits as necessary for a given assignment ID and worker ID
 
-
-# Old
-
-## Basic/useful Postgres psql commands
-
-To connect in psql as user cody: `sudo -u cody psql postgres`\
-To check information about current connection from psql: `\conninfo`\
-Drop a database: `dropdb 'database name'`\
-\
-Give user create database rights
+E.g., using your `HID`:
 
 ```
-su postgres
-psql
-alter user cody createdb;
+python ./approve_hits.py batch_grade HID
 ```
-
-Check the database in heroku: `heroku pg:psql`\
-Delete all data from a table: `Truncate Table;`
-
-## Performing migration
-
-To initialize the process: `python manage.py db init`\
-\
-To perform a migration locally
-
-```
-python manage.py db migrate
-python manage.py db upgrade
-```
-
-\
-To perform a migration on heroku on our server:
-
-```
-heroku run python manage.py db migrate --app afternoon-waters-70012
-heroku run python manage.py db upgrade --app afternoon-waters-70012
-```
-
-Then login into heroku and drop the table `users` and run `db_create.py` to re-create it based on the updated schema.\
-\
-Copying a local database to heroku: `heroku pg:push postgresql:///rd heroku_database_name`
-
-## Heroku useful commands
-
-Login to heroku server
-
-```
-heroku login
-heroku run bash
-```
-
-\
-Get config variables: `heroku config --app afternoon-waters-70012`\
-\
-To add the postgres user to the sudo group: `sudo usermod -a -G sudo postgres`\
-\
-Run script on heroku: `heroku run python script.py`\
-\
-Dump database content in a CSV file: `\copy (SELECT * from users) TO dump.csv CSV DELIMITER ',' CSV HEADER`
-
-## Useful online SQL/Text/Image formatters/converters
-
-SQL to HTML: <http://hilite.me/> \
-SQL to HTML: <https://htmlcodeeditor.com/> \
-Removes non-ascii characters: <https://pteo.paranoiaworks.mobi/diacriticsremover/> \
-PDF to PNG: <https://pdf2png.com/>
