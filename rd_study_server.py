@@ -69,7 +69,10 @@ def handle_exception(e):
         return e
 
     return getReturnAndLogError(
-        e, loggerToUse=app.logger.warn, code=400, errorType="Bad Request"
+        e,
+        loggerToUse=app.logger.warn,
+        code=400,
+        errorType="Bad Request",
     )
 
 
@@ -92,8 +95,9 @@ def getReturnAndLogError(
     if errorText == None:
         errorText = type(e).__name__ + ": " + str(e)
 
+    loggerToUse(errorText, exc_info=True)
+
     if os.environ.get("TESTING") == "True":
-        app.logger.error(errorText, exc_info=True)
         res = {
             "code": code,
             "errorType": errorType,
@@ -306,11 +310,6 @@ def getUser(request, createUser):  # createUser says optionally create if necess
     exists = db.session.query(User).filter_by(worker_id=worker_id).scalar()
 
     user = None
-
-    # if (os.environ.get('LOCAL') == 'True'):
-    #     worker_id = "TEST"
-    #     assignment_id = "TEST"
-    #     hit_id = "TEST"
 
     if exists:
         app.logger.info("Detected EXISTING worker_id " + str(worker_id))

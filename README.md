@@ -268,18 +268,25 @@ to switch to our app
 heroku domains -a rd-study
 ```
 
-where `rd-study` is the app name on Heroku
+where `rd-study` is the app name on Heroku. 
+
+This opens the website:
 
 ```cmd
 heroku open -a rd-study
-heroku config:push --file=.env.production -a rd-study
+
 ```
 
-to overwrite existing values, use
+To overwrite existing values, use
 
 ```cmd
-heroku config:push --file=.env.production -a rd-study -o
+heroku config:push --file=.env.live -a rd-study -o
 ```
+
+**Warning:** This fails silently if the file doesn't exist.
+
+**make sure to log in fresh to the latest deployment**, then:
+
 
 ```cmd
 heroku run bash --app rd-study
