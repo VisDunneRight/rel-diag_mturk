@@ -92,12 +92,16 @@ def getReturnAndLogError(
     code=500,
     errorType="Internal Server Error",
 ):
+    errorType = (
+        errorType
+        + " Email us at nudatavisstudies@gmail.com if you received this message in error. Please include the time you received this and your time zone, your AMT worker ID, and what you were doing at the time you received this message."
+    )
+
     if errorText == None:
         errorText = type(e).__name__ + ": " + str(e)
 
-    loggerToUse(errorText, exc_info=True)
-
     if os.environ.get("TESTING") == "True":
+        loggerToUse(errorText, exc_info=True)
         res = {
             "code": code,
             "errorType": errorType,
