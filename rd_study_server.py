@@ -364,15 +364,9 @@ def getUser(request, createUser):  # createUser says optionally create if necess
                     )
                     user.qualification_score = qualification_score
 
-                num_hits_approved = checkAndGetQualification(
-                    "00000000000000000040", user
-                )  # Worker_​NumberHITsApproved
-                user.num_hits_approved = num_hits_approved
-
-                percent_asmt_approved = checkAndGetQualification(
-                    "000000000000000000L0", user
-                )  # PercentAssignmentsApproved
-                user.percent_asmt_approved = percent_asmt_approved
+                # for some reason, we can't check the system qualifications
+                # 00000000000000000040 Worker_​NumberHITsApproved and
+                # 000000000000000000L0 PercentAssignmentsApproved
 
             user.current_section = Sections.INSTRUCTIONS
             user.current_page = 1

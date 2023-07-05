@@ -23,8 +23,6 @@ class User(db.Model):
     assignment_id = db.Column(db.String())
     hit_id = db.Column(db.String())
     qualification_score = db.Column(db.Integer)
-    num_hits_approved = db.Column(db.Integer)
-    percent_asmt_approved = db.Column(db.Integer)
 
     # Current section and page within that section
     current_section = db.Column(Enum(Sections))
