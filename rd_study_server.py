@@ -302,6 +302,7 @@ def getUser(request, createUser):  # createUser says optionally create if necess
         )
     )
 
+    # TODO: can actually check assignments
     if (
         worker_id == None
         or worker_id == ""
@@ -1185,6 +1186,7 @@ def results():
             bonus_correctness=str("{:.2f}".format(bonus_correctness)),
             total_bonus=str("{:.2f}".format(total_bonus)),
             total_pay=str("{:.2f}".format(total_pay)),
+            base_pay=str("{:.2f}".format(BASE_PAY)),
         )
     )
     resp.headers["x-frame-options"] = "*"

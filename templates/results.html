@@ -40,7 +40,7 @@
 
         {% if accept == True %}
         <p>
-            In addition to the base pay of $5.20, you will receive a bonus payment of ${{total_bonus}}: <br>
+            In addition to the base pay of ${{base_pay}}, you will receive a bonus payment of ${{total_bonus}}: <br>
             ${{bonus_correctness}} for answering {{num_correct}} questions correctly and ${{bonus_time}}
             for finishing the questions in {{(total_time / 60)|round(2, 'common')}} minutes ({{total_time}} seconds)
         </p>
