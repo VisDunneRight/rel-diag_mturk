@@ -118,4 +118,7 @@ env-work
 /.env.live.test
 /.env.sandbox
 /.env.sandbox.test
+/.env.local.live
+/.env.local.sandbox
 keys.txt
+logs/

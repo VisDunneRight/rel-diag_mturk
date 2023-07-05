@@ -1091,11 +1091,11 @@ def results():
 
     # TODO: Do not hard code variables
     # Calculate the bonus
-    BASE_PAY = 5.00
+    BASE_PAY = 6.00
     bonus_time = 0
     bonus_correctness = 0
     total_bonus = 0
-    CORRECTNESS_PER_QUESTION_BONUS = 0.2
+    CORRECTNESS_PER_QUESTION_BONUS = 0.20  # 20 cents
 
     # Calculate bonuses only if we accept the hit and submit the bonus
     if accept:
@@ -1109,19 +1109,21 @@ def results():
             2,
         )
 
-        if total_time < 8 * 60:
+        if total_time < 4 * 60:
+            bonus_time = 0.40 * (BASE_PAY + bonus_correctness)
+        elif total_time < 5 * 60:
             bonus_time = 0.35 * (BASE_PAY + bonus_correctness)
-        elif total_time < 9 * 60:
+        elif total_time < 6 * 60:
             bonus_time = 0.30 * (BASE_PAY + bonus_correctness)
-        elif total_time < 10 * 60:
+        elif total_time < 7 * 60:
             bonus_time = 0.25 * (BASE_PAY + bonus_correctness)
-        elif total_time < 11 * 60:
+        elif total_time < 8 * 60:
             bonus_time = 0.20 * (BASE_PAY + bonus_correctness)
-        elif total_time < 12 * 60:
+        elif total_time < 9 * 60:
             bonus_time = 0.15 * (BASE_PAY + bonus_correctness)
-        elif total_time < 13 * 60:
+        elif total_time < 10 * 60:
             bonus_time = 0.10 * (BASE_PAY + bonus_correctness)
-        elif total_time < 14 * 60:
+        elif total_time < 11 * 60:
             bonus_time = 0.05 * (BASE_PAY + bonus_correctness)
         bonus_time = round(bonus_time, 2)
 

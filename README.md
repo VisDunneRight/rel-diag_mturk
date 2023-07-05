@@ -434,6 +434,7 @@ python ./post_hits.py full
 Has lots of code for various things. Make sure to read the code before running it! Run in the terminal. Pass in one of these arguments followed by parameters:
 
 * `summary`: Provides a summary of the last 100 hits
+* `balance`: Gets current prepaid HIT balance.
 * `clear`: Deletes all HITs except the ones in a **!!!WARNING!!!** hard-coded `except_list`. Will auto-reject all assignments pending in the HIT!
 * `extend NUM`: Add `NUM` more assignments. **!!!WARNING!!!** hard-coded `hit_id`.
 * `hit_detail HID`: Get details inc. showing a graph for HIT with ID `HID`.

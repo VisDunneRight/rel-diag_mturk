@@ -528,6 +528,10 @@ def notify_workers_with_qualification(qualification_file, taken_hit_file):
             print(response["NotifyWorkersFailureStatuses"])
 
 
+def get_prepaid_balance():
+    print(conn.get_account_balance()["AvailableBalance"])
+
+
 conn = get_connection()
 
 if __name__ == "__main__":
@@ -602,5 +606,7 @@ if __name__ == "__main__":
         qualification_file = arg_arr[1]
         taken_hit_file = arg_arr[2]
         notify_workers_with_qualification(qualification_file, taken_hit_file)
+    elif arg1 == "balance":
+        get_prepaid_balance()
     else:
         print("Invalid command line argument")

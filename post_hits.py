@@ -22,23 +22,24 @@ appConfig = config.Config()
 # This allows us to specify whether we are pushing to the sandbox or live site.
 if os.environ.get("AWS_SANDBOX") == "True":
     AMAZON_HOST = "mechanicalturk.sandbox.amazonaws.com"
-    qualification_id = "3C8RUX4LEU5J46Z02IK6A6TRNV3M9S"
-    custom_qualification_id = "custom_qualification_id"
+    qualification_id = None
+    custom_qualification_id = None
     taken_test_qualification_id = "3VFIQRXYYM783TDKWYVL8LHMWTBZ2U"
 else:
     AMAZON_HOST = "mechanicalturk.amazonaws.com"
-    qualification_id = "3C8RUX4LEU5J46Z02IK6A6TRNV3M9S"
-    custom_qualification_id = "custom_qualification_id"
+    qualification_id = None
+    custom_qualification_id = None
     taken_test_qualification_id = "3VFIQRXYYM783TDKWYVL8LHMWTBZ2U"
 
 # HIT specific variables
 base_pay = "5"
-approval_percentage = 95
+approval_percentage = 97
+approved_hits = 500
 minimum_qualification_score = 66  # This is equivalent to 4/6 correct for Amazon
 
-title_str = "Visualizing Database Queries -- $5.00 to $11.07 with bonuses"
+title_str = "Visualizing Database Queries -- $6.00 to $12.88 with bonuses"
 
-description_str = "You will receive $5.00-$11.07 (estimated time 25 minutes) for participating in this research. Workers must be experienced with SQL as measured by the qualification test (included in 25 minutes). The HIT is composed of 32 multiple choices questions that ask the user to find the correct description of an SQL query based on a text or visual representation. To successfully complete the HIT, you need to answer at least 16 questions correctly within 50 minutes. You receive bonuses for more correct answers and in a shorter time. For more details click on Preview to view the full instructions of the HIT. Please contact us with any questions or issues, especially if you get a 'Your HIT submission was not successful' error message."
+description_str = "You will receive $6.00-$12.88 (estimated time 21 minutes) for participating in this research. Workers should be familiar with SQL at the level of an advanced undergraduate database class, in particular with nested SQL queries. The HIT is composed of 32 multiple choices questions that ask the user to find the correct description of an SQL query based on a text or visual representation. To successfully complete the HIT, you need to answer at least 16 questions correctly within 40 minutes. You receive bonuses if you get more correct answers and/or finish in shorter time. For more details, click on Preview to view the full instructions of the HIT. Please contact us with any questions or issues, especially if you get a 'Your HIT submission was not successful' error message."
 
 usa = [{"Country": "US"}]
 
@@ -62,6 +63,7 @@ def get_connection():
 
 
 def post_hit_helper(
+    approved_hits,
     approval_percentage,
     max_assignments,
     lifetime_in_seconds,
@@ -79,28 +81,43 @@ def post_hit_helper(
 
     questionform = open("external_question.xml", "r").read()
 
-    # Boto3 version
+    # Boto3 version. Described here:
+    # https://docs.aws.amazon.com/AWSMechTurk/latest/AWSMturkAPI/ApiReference_QualificationRequirementDataStructureArticle.html#ApiReference_QualificationType-IDs
     qualification_requirements = [
         {
-            "QualificationTypeId": qual_id,
-            "Comparator": "GreaterThanOrEqualTo",
-            "IntegerValues": [min_qual_score],
-        },
-        {
-            "QualificationTypeId": "00000000000000000071",  # locale
+            "QualificationTypeId": "00000000000000000071",  # Worker_Locale. The location of the Worker, as specified in the Worker's mailing address.
             "Comparator": "EqualTo",
             "LocaleValues": locales,
         },
         {
-            "QualificationTypeId": "000000000000000000L0",  # The percentage of assignments the Worker has submitted that were subsequently approved by the Requester, over all assignments the Worker has submitted. The value is an integer between 0 and 100.
+            "QualificationTypeId": "00000000000000000040",  # Worker_​NumberHITsApproved. Specifies the total number of HITs submitted by a Worker that have been approved. The value is an integer greater than or equal to 0.
+            "Comparator": "GreaterThanOrEqualTo",
+            "IntegerValues": [approved_hits],
+        },
+        {
+            "QualificationTypeId": "000000000000000000L0",  # PercentAssignmentsApproved. The percentage of assignments the Worker has submitted that were subsequently approved by the Requester, over all assignments the Worker has submitted. The value is an integer between 0 and 100.
             "Comparator": "GreaterThanOrEqualTo",
             "IntegerValues": [approval_percentage],
         },
-        {
-            "QualificationTypeId": test_taken_qual_id,
-            "Comparator": "DoesNotExist",
-        },
     ]
+
+    if test_taken_qual_id != None:
+        qualification_requirements.append(
+            {
+                "QualificationTypeId": test_taken_qual_id,
+                "Comparator": "DoesNotExist",
+            },
+        )
+
+    if qual_id != None:
+        qualification_requirements.append(
+            {
+                "QualificationTypeId": qual_id,
+                "Comparator": "GreaterThanOrEqualTo",
+                "IntegerValues": [min_qual_score],
+            }
+        )
+
     if custom_qual_id != None:
         qualification_requirements.append(
             {"QualificationTypeId": custom_qual_id, "Comparator": "Exists"}
@@ -125,6 +142,7 @@ def post_hit_helper(
 def post_hit():
     print("Creating normal HIT")
     post_hit_helper(
+        approved_hits=approved_hits,
         approval_percentage=approval_percentage,
         max_assignments=50,
         lifetime_in_seconds=60 * 60 * 24 * 20,  # 20 days
@@ -143,6 +161,7 @@ def post_hit():
 def pilot_post_hit():
     print("Creating pilot HIT")
     post_hit_helper(
+        approved_hits=approved_hits,
         approval_percentage=approval_percentage,
         max_assignments=12,
         lifetime_in_seconds=60 * 60 * 24 * 1,  # 1 day
@@ -166,6 +185,7 @@ def custom_post_hit(worker_id, custom_qual_id):
         + custom_qual_id
     )
     post_hit_helper(
+        approved_hits=approved_hits,
         approval_percentage=approval_percentage,
         max_assignments=1,
         lifetime_in_seconds=60 * 60 * 24 * 10,  # 10 days
