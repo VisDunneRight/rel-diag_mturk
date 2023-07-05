@@ -2,7 +2,7 @@ import boto3
 import sys
 from post_hits import get_connection
 
-# Make sure to check the value of AWS_SANDBOX environment variable 
+# Make sure to check the value of AWS_SANDBOX environment variable
 # before running to make sure it is in Sandbox or Live mode
 questions = open("qualification_questions.xml", mode="r").read()
 answers = open("qualification_answers.xml", mode="r").read()
@@ -47,7 +47,7 @@ def create_custom_qualification():
 # Qualification assigned to everyone that has taken the test previously
 def create_taken_test_qualification():
     qual_response = connection.create_qualification_type(
-        Name="Worker attempted/completed Visualizing Database Queries -- $5.00 to $11.07 with bonuses HIT previously",
+        Name="Worker attempted/completed Visualizing Database Queries -- $6.00 to $12.88 with bonuses HIT previously",
         Keywords="Custom, Attempted HIT, Prevent Repetition, Prevent Retake",
         Description="Having this qualification signifies that you have attempted/completed the Visualizing Database Queries HIT posted in June of 2023.\
         This qualification is given so that the same workers cannot take the same HIT twice. ONLY WORKERS WITHOUT THIS QUALIFICATION CAN ACCEPT THE NEW POSTED HIT.",

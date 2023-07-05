@@ -356,23 +356,23 @@ def getUser(request, createUser):  # createUser says optionally create if necess
             app.logger.info("Creating NEW user for worker_id " + str(worker_id))
             user = User(worker_id=worker_id, assignment_id=assignment_id, hit_id=hit_id)
 
-            # Grab the user's qualification score and place it in the database
+            # Grab the user's qualification scores and place it in the database
             if os.environ.get("AWS_CHECK_QUAL") == "True":
-                try:
-                    conn = get_connection()
-                    response = conn.get_qualification_score(
-                        QualificationTypeId=qualification_id, WorkerId=user.worker_id
+                if qualification_id != None:
+                    qualification_score = checkAndGetQualification(
+                        qualification_id, user
                     )
-                    qualification_score = response["Qualification"]["IntegerValue"]
                     user.qualification_score = qualification_score
-                except Exception as e:
-                    if os.environ.get("AWS_ALLOW_QUAL_ERROR") == "True":
-                        noRet = getReturnAndLogError(e)
-                        app.logger.warn(
-                            "We are allowing the user to continue as AWS_ALLOW_QUAL_ERROR is True"
-                        )
-                    else:
-                        raise
+
+                num_hits_approved = checkAndGetQualification(
+                    "00000000000000000040", user
+                )  # Worker_​NumberHITsApproved
+                user.num_hits_approved = num_hits_approved
+
+                percent_asmt_approved = checkAndGetQualification(
+                    "000000000000000000L0", user
+                )  # PercentAssignmentsApproved
+                user.percent_asmt_approved = percent_asmt_approved
 
             user.current_section = Sections.INSTRUCTIONS
             user.current_page = 1
@@ -401,6 +401,25 @@ def getUser(request, createUser):  # createUser says optionally create if necess
             )
 
     return user
+
+
+def checkAndGetQualification(qualification_id, user):
+    try:
+        conn = get_connection()
+
+        response = conn.get_qualification_score(
+            QualificationTypeId=qualification_id, WorkerId=user.worker_id
+        )
+        qualification_score = response["Qualification"]["IntegerValue"]
+        return qualification_score
+    except Exception as e:
+        if os.environ.get("AWS_ALLOW_QUAL_ERROR") == "True":
+            noRet = getReturnAndLogError(e)
+            app.logger.warn(
+                "We are allowing the user to continue as AWS_ALLOW_QUAL_ERROR is True"
+            )
+        else:
+            raise
 
 
 def updateProgressAndGetRedirect(user, current_section, next_section):

@@ -32,7 +32,7 @@ else:
     taken_test_qualification_id = "3VFIQRXYYM783TDKWYVL8LHMWTBZ2U"
 
 # HIT specific variables
-base_pay = "5"
+base_pay = "6"
 approval_percentage = 97
 approved_hits = 500
 minimum_qualification_score = 66  # This is equivalent to 4/6 correct for Amazon
