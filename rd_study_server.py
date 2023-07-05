@@ -94,7 +94,7 @@ def getReturnAndLogError(
 ):
     errorType = (
         errorType
-        + " Email us at nudatavisstudies@gmail.com if you received this message in error. Please include the time you received this and your time zone, your AMT worker ID, and what you were doing at the time you received this message."
+        + ". Email us at nudatavisstudies@gmail.com if you received this message in error. Please include the time you received this and your time zone, your AMT worker ID, and what you were doing at the time you received this message."
     )
 
     if errorText == None:
@@ -302,7 +302,14 @@ def getUser(request, createUser):  # createUser says optionally create if necess
         )
     )
 
-    if worker_id == None or assignment_id == None or hit_id == None:
+    if (
+        worker_id == None
+        or worker_id == ""
+        or assignment_id == None
+        or assignment_id == ""
+        or hit_id == None
+        or hit_id == ""
+    ):
         raise InsufficientParameterError(
             "Insufficient arguments provided in full path: " + full_path
         )
