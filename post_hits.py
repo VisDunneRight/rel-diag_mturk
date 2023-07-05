@@ -24,12 +24,12 @@ if os.environ.get("AWS_SANDBOX") == "True":
     AMAZON_HOST = "mechanicalturk.sandbox.amazonaws.com"
     qualification_id = None
     custom_qualification_id = None
-    taken_test_qualification_id = "3VFIQRXYYM783TDKWYVL8LHMWTBZ2U"
+    taken_test_qualification_id = "3YG2VL3QEQ5WMPMGEFVAYY9VHIVBF2"
 else:
     AMAZON_HOST = "mechanicalturk.amazonaws.com"
     qualification_id = None
     custom_qualification_id = None
-    taken_test_qualification_id = "3VFIQRXYYM783TDKWYVL8LHMWTBZ2U"
+    taken_test_qualification_id = "3YG2VL3QEQ5WMPMGEFVAYY9VHIVBF2"
 
 # HIT specific variables
 base_pay = "6"
