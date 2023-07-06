@@ -110,7 +110,7 @@ def getReturnAndLogError(
         }
         return jsonify(res), code
     else:
-        loggerToUse(errorText, exc_info=False)
+        loggerToUse(errorText, exc_info=True)
         return errorType, code
 
 

@@ -144,8 +144,8 @@ def post_hit():
     post_hit_helper(
         approved_hits=approved_hits,
         approval_percentage=approval_percentage,
-        max_assignments=50,
-        lifetime_in_seconds=60 * 60 * 24 * 20,  # 20 days
+        max_assignments=60,
+        lifetime_in_seconds=60 * 60 * 24 * 20,  # 50 days
         assignment_duration_in_seconds=60 * 50,  # 50 minutes
         base_reward=base_pay,
         title=title_str,
