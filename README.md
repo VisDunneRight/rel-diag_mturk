@@ -486,9 +486,12 @@ Ensure the environment variables are set. E.g., for live payment:
 set -o allexport && source .env.local.live && set +o allexport
 ```
 
+**!!!Warning** currently these claim to update the DB saying who was paid but do not actually. Use the contents of the [/logs](/logs) folder to check status.
+
 Pass in one of these arguments:
 * `batch_grade HID`: Check Submitted assignments for a given HIT ID and Approve them.
 * `batch_grade_test HID`: Check Submitted assignments for a given HIT ID and Approve them.
+* `send_manual_bonus WID AID`: Send a bonus to a given worker ID for given assignment ID (because we accepted but didn't send a bonus the first time.)
 * `reject AID FEEDBACK`: Reject the given assignment ID with a given feedback. E.g., rejecting speeders.
 * `approve AID`: Approve the given assignment ID like normal.
 * `grade AID WID`: Grade and approve hits as necessary for a given assignment ID and worker ID

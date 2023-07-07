@@ -281,6 +281,19 @@ def send_bonus(worker_id, user, assignment_id, test_only):
         logging.info("Worker ID: " + worker_id + " did not receive any bonus.")
 
 
+def send_manual_bonus(worker_id, assignment_id):
+    logging.info(
+        "Sending manual bonus to worker "
+        + worker_id
+        + " for assignment "
+        + assignment_id
+    )
+    with rd_study_server.app.app_context():  # needed to write to the database
+        logging.info("Using database " + str(db))
+        user = session.query(User).filter_by(worker_id=worker_id).first()
+        send_bonus(worker_id, user, assignment_id, False)
+
+
 # def send_bonus_error(worker_id, assignment_id):
 #     total_bonus = "4.5"
 #     reason_str = "Due to our issues with your HIT submission you have been compensated with the base pay. Your HIT is neither accepted nor rejected."
@@ -413,6 +426,10 @@ if __name__ == "__main__":
     elif arg0 == "batch_grade_test":
         hit_id = arg_arr[1]
         batch_grade(hit_id, True)
+    elif arg0 == "send_manual_bonus":
+        worker_id = arg_arr[1]
+        assignment_id = arg_arr[2]
+        send_manual_bonus(worker_id, assignment_id)
     elif arg0 == "reject":
         assignment_id = arg_arr[1]
         feedback = arg_arr[2]

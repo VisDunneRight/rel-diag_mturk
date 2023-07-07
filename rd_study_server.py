@@ -691,7 +691,7 @@ def record_choice_get_answer():
             or user[question_time_col] != None
         ):
             app.logger.warn(
-                "Unexpected setting question end time and answer again. worker_id "
+                "Unexpected setting question end time and answer again. Ignoring this POST... worker_id "
                 + str(worker_id)
                 + ", question "
                 + str(current_page)
@@ -700,7 +700,7 @@ def record_choice_get_answer():
 
         if user[question_start_col] == None:
             app.logger.warn(
-                "Tried to set question time for a question that has not been started. worker_id "
+                "Tried to set question time for a question that has not been started. Ignoring this POST... worker_id "
                 + str(worker_id)
                 + ", question "
                 + str(current_page)
