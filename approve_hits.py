@@ -79,76 +79,170 @@ def get_assignment_hits(connection, hit_id, status):
     )
 
 
-def approve_hits(connection, assignment_id_list, worker_id_list):
+NUM_QUESTIONS = 32
+
+
+def approve_hits(connection, assignment_id_list, worker_id_list, test_only):
     with rd_study_server.app.app_context():  # needed to write to the database
+        logging.info("Using database " + str(db))
         for i in range(len(assignment_id_list)):
-            time.sleep(2)
+            time.sleep(2)  # why?
 
             assignment_id = assignment_id_list[i]
             worker_id = worker_id_list[i]
 
-            logging.info("Worker " + str(i + 1) + "/" + str(len(assignment_id_list)))
             logging.info(
-                "--------------------- Evaluating "
+                "\nWorker "
+                + str(i + 1)
+                + "/"
+                + str(len(assignment_id_list))
+                + " --------- Evaluating "
                 + assignment_id
                 + " of worker "
                 + worker_id
-                + " ---------------------"
+                + " ---------"
             )
 
             user = session.query(User).filter_by(worker_id=worker_id).first()
 
-            logging.info(
-                "Assignment "
-                + assignment_id
-                + " by worker "
-                + worker_id
-                + " had "
+            # copied from rd_study_server.py
+            num_answered = 0
+
+            for question_num in range(1, NUM_QUESTIONS + 1):
+                q_col = "q" + str(question_num)
+
+                user_choice = getattr(user, q_col)
+
+                # Our questions start at 1, our index starts at 0
+                pattern_num = user.pattern_order[question_num - 1]
+
+                if user_choice != None and user_choice != "":
+                    num_answered = num_answered + 1
+            # end copy
+
+            if num_answered < NUM_QUESTIONS:
+                raise Exception(
+                    "Worker "
+                    + worker_id
+                    + " only answered "
+                    + str(num_answered)
+                    + "/"
+                    + str(NUM_QUESTIONS)
+                    + " questions! How did they get the assignment submitted!?"
+                )
+
+            if user.accept == None or user.accept == "":
+                raise Exception(
+                    "Null or blank value for the `accept` column in the database for worker "
+                    + worker_id
+                    + "! All submitted assignments should have `accept` set."
+                )
+            if not user.accept:
+                if user.failure_reason == None:
+                    raise Exception(
+                        "`accept` is False but `failure_reason` is null in the database for worker "
+                        + worker_id
+                        + "! All rejected assignments should have `failure_reason` set."
+                    )
+                if user.failure_reason == "":
+                    raise Exception(
+                        "`accept` is False but `failure_reason` is the empty string in the database for worker "
+                        + worker_id
+                        + "! All rejected assignments should have `failure_reason` set."
+                    )
+
+            results_message = (
+                " You answered "
                 + str(user.number_correct)
-                + " ("
-                + str(round(user.percentage_correct, 2))
-                + "%)"
-                + " correct. Time on questions and answers was "
+                + "/"
+                + str(NUM_QUESTIONS)
+                + " correct and your time on questions and answers was "
                 + "{:.2f}".format(
                     round(user.total_time_on_questions_and_answers / 60, 2)
                 )
-                + " minutes. "
-                + (
-                    "Accept"
-                    if user.accept
-                    else "Fail, reason given: " + user.failure_reason
-                )
-                + ". Total pay: $"
-                + "{:.2f}".format(round(user.total_pay_cents / 100, 2))
-                + " (bonuses for correctness: $"
-                + "{:.2f}".format(round(user.bonus_correctness_cents / 100, 2))
-                + ", time: $"
-                + "{:.2f}".format(round(user.bonus_time_cents / 100, 2))
-                + ")"
+                + " min."
             )
 
-            # Approve or reject assignment accordingly
-            if user.accept:
-                logging.info("Assignment " + assignment_id + " approved")
-                approve_specific_assignment(assignment_id)
-            else:
-                logging.info("Assignment " + assignment_id + " rejected")
-                connection.reject_assignment(
-                    AssignmentId=assignment_id,
-                    RequesterFeedback="We are sorry to inform you that your HIT has been rejected due to "
-                    + user.failure_reason,
+            if not user.accept:
+                reject_message = (
+                    "We are sorry to inform you that your HIT has been rejected because "
+                    + str(user.failure_reason)
+                    + results_message
+                    + ' Please recall the HIT description which reads "'
+                    + "Workers should be familiar with SQL at the level of an advanced undergraduate database class, in particular with nested SQL queries."
+                    + '" and "'
+                    + "To successfully complete the HIT, you need to answer at least 16 questions correctly within 40 minutes."
+                    + '" Recall also the consent form you agreed to at the beginning, which reads "'
+                    + "Qualifications: We are asking you to participate in this study because you are experienced with using SQL"
+                    + '" and "'
+                    + "HIT acceptance criteria: You must answer 16 of the 32 questions correctly."
+                    + '" You were also made aware that your HIT would be rejected on the final page before you submitted the HIT. Please write to us at nudatavisstudies@gmail.com if you believe we have made any errors and include your Mturk ID.'
                 )
 
-            # Send appropriate bonus if the assignment is accepted
-            time.sleep(2)
+            logging.info(
+                ("✅ ACCEPT" if user.accept else "❌ REJECT")
+                + " worker "
+                + worker_id
+                + " assignment "
+                + assignment_id
+                + ". They had "
+                + str(user.number_correct)
+                + "/"
+                + str(NUM_QUESTIONS)
+                + " ("
+                + str(round(user.percentage_correct * 100, 0))
+                + "%)"
+                + " correct. Time on Q&A was "
+                + "{:.2f}".format(
+                    round(user.total_time_on_questions_and_answers / 60, 2)
+                )
+                + " min. Pay: $"
+                + "{:.2f}".format(round(user.total_pay_cents / 100, 2))
+                + " (correctness +$"
+                + "{:.2f}".format(round(user.bonus_correctness_cents / 100, 2))
+                + ", time +$"
+                + "{:.2f}".format(round(user.bonus_time_cents / 100, 2))
+                + ")"
+                + (
+                    ""
+                    if user.accept
+                    else ' Rejection reason given: \n"' + reject_message + '"'
+                )
+            )
+
+            if test_only:
+                logging.info("Test only: Didn't accept/reject on AMT.")
+            else:
+                logging.info("Actually accept/reject on AMT.")
+
+                # Approve or reject assignment accordingly
+                if user.accept:
+                    logging.info("Assignment " + assignment_id + " approved on AMT")
+                    approve_specific_assignment(assignment_id)
+                else:
+                    logging.info("Assignment " + assignment_id + " rejected on AMT")
+                    connection.reject_assignment(
+                        AssignmentId=assignment_id,
+                        RequesterFeedback=reject_message,
+                    )
+
+            if test_only:
+                logging.info("Test only: Didn't update DB")
+            else:
+                logging.info("Actually updating that a payment was made in DB")
+                user.accept_reject_sent = datetime.utcnow().strftime(
+                    "%Y-%m-%d %H:%M:%S"
+                )
+                db.session.commit()
+
+            # # Send appropriate bonus if the assignment is accepted
+            time.sleep(2)  # Why?
             if user.accept:
                 logging.info("Calculating bonus for WorkerId: " + worker_id)
-                send_bonus(user, assignment_id)
-            user.accept_reject_sent = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
-            db.session.commit()
+                send_bonus(worker_id, user, assignment_id, test_only)
 
 
-def send_bonus(user, assignment_id):
+def send_bonus(worker_id, user, assignment_id, test_only):
     bonus_correctness_dollars = round(user.bonus_correctness_cents / 100, 2)
     bonus_time_dollars = round(user.bonus_time_cents / 100, 2)
     total_bonus_dollars = round(user.total_bonus_cents / 100, 2)
@@ -158,31 +252,33 @@ def send_bonus(user, assignment_id):
         reason_str = (
             "You received a total bonus of $"
             + "{:.2f}".format(total_bonus_dollars)
-            + ". $"
+            + "—$"
             + "{:.2f}".format(bonus_correctness_dollars)
             + " due to your correctness and $"
             + "{:.2f}".format(bonus_time_dollars)
             + " due to your completion time, bringing your total pay to $"
             + "{:.2f}".format(total_pay_dollars)
-            + "."
+            + ". Thank you again for participating in our study!"
         )
-        worker_id = (
-            session.query(User).filter_by(assignment_id=assignment_id).first().worker_id
+
+        logging.info(
+            "Bonus message to Worker ID " + worker_id + ':\n"' + reason_str + '"'
         )
-        logging.info("Sending to Worker ID " + worker_id + ": " + reason_str)
-        response = connection.send_bonus(
-            WorkerId=worker_id,
-            BonusAmount=str(total_bonus_dollars),
-            AssignmentId=assignment_id,
-            Reason=reason_str,
-        )
+        if test_only:
+            logging.info("Test only: Didn't bonus on AMT.")
+        else:
+            logging.info("Actually bonusing on AMT.")
+            response = connection.send_bonus(
+                WorkerId=worker_id,
+                BonusAmount=str(total_bonus_dollars),
+                AssignmentId=assignment_id,
+                Reason=reason_str,
+            )
+            logging.info("Actually updating that a bonus was sent in DB.")
+            user.bonus_sent = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+            db.session.commit()
     else:
-        worker_id = (
-            session.query(User).filter_by(assignment_id=assignment_id).first().worker_id
-        )
         logging.info("Worker ID: " + worker_id + " did not receive any bonus.")
-    user.bonus_sent = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
-    db.session.commit()
 
 
 # def send_bonus_error(worker_id, assignment_id):
@@ -266,7 +362,7 @@ def send_bonus(user, assignment_id):
 def approve_specific_assignment(assignment_id):
     connection.approve_assignment(
         AssignmentId=assignment_id,
-        RequesterFeedback="Congratulations! Your HIT has been approved. Thank you for your help with our study! :-)",
+        RequesterFeedback="Congratulations! Your HIT has been approved. Thank you for your help with our study! :-) If you have any further feedback on our study, please write to us at nudatavisstudies@gmail.com and include your Mturk ID.",
         OverrideRejection=True,
     )
 
@@ -282,8 +378,8 @@ def grade_specific_assignment(assignment_id, worker_id):
     approve_hits(connection, [assignment_id], [worker_id])
 
 
-def batch_grade(hit_id):
-    logging.info("batch grading HIT")
+def batch_grade(hit_id, test_only=True):
+    logging.info("batch grading HIT. Testing: " + str(test_only))
     assignments = get_assignment_hits(connection, hit_id, "Submitted")["Assignments"]
     assignment_id_list = []
     worker_id_list = []
@@ -304,7 +400,7 @@ def batch_grade(hit_id):
         + " assignments submitted waiting approval"
     )
 
-    approve_hits(connection, assignment_id_list, worker_id_list)
+    approve_hits(connection, assignment_id_list, worker_id_list, test_only)
 
 
 if __name__ == "__main__":
@@ -313,7 +409,10 @@ if __name__ == "__main__":
 
     if arg0 == "batch_grade":
         hit_id = arg_arr[1]
-        batch_grade(hit_id)
+        batch_grade(hit_id, False)
+    elif arg0 == "batch_grade_test":
+        hit_id = arg_arr[1]
+        batch_grade(hit_id, True)
     elif arg0 == "reject":
         assignment_id = arg_arr[1]
         feedback = arg_arr[2]

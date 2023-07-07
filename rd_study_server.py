@@ -128,7 +128,17 @@ if os.environ.get("LOCAL") == "True":
         "LOCAL_SQLALCHEMY_DATABASE_URI"
     )
 else:
-    app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL").replace(
+    db_url = os.environ.get("DATABASE_URL")
+    if db_url == None:
+        app.logger.info(
+            "DATABASE_URL environment var is None... falling back to REMOTE_DATABASE_URI"
+        )
+        db_url = os.environ.get(
+            "REMOTE_DATABASE_URI"
+        )  # this lets us use it locally too for recording hits we approve/reject on AMT and bonuses sent
+        if db_url == None:
+            raise Exception("Both DATABASE_URL and REMOTE_DATABASE_URI are None!")
+    app.config["SQLALCHEMY_DATABASE_URI"] = db_url.replace(
         "postgres://", "postgresql://", 1
     )  # 'REMOTE_SQLALCHEMY_DATABASE_URI'
     # replace is because https://stackoverflow.com/questions/62688256/sqlalchemy-exc-nosuchmoduleerror-cant-load-plugin-sqlalchemy-dialectspostgre
@@ -1114,6 +1124,7 @@ def results():
     )
 
     # TODO: Do not hard code variables
+    # TODO: Capture number answered
     # Calculate the bonus
     BASE_PAY = 6.00
     bonus_time = 0

@@ -376,6 +376,10 @@ Create your AWS account and an associated AMT account.
 ```bash
 set -o allexport && source .env.sandbox.test && set +o allexport
 ```
+likewise, for actual grading:
+```bash
+set -o allexport && source .env.live && set +o allexport
+```
 **Note!** All your `.env` files need to have LF and not CRLF line endings for this to work properly. Otherwise, you'll get errors like 
 `botocore.exceptions.HTTPClientError: An HTTP Client raised an unhandled exception: Invalid header value`. You can check this with, e.g., `cat -t .env.sandbox.text`.
 
@@ -460,6 +464,8 @@ Has lots of code for various things. Make sure to read the code before running i
 ## `approve_hits.py`
 Deals with submissions.
 
+**!!!Warning!!!** Hard-coded messages to workers here, including the `reject_message` variable.
+
 Depends on the `REMOTE_DATABASE_URI` environment variable being set to point to the Heroku Postges Database. Note: This will change regularly! There are two ways to get this value:
    1. Access through Heroku site, e.g., https://dashboard.heroku.com/apps/rd-study/settings
    2. Use the Heroku CLI:
@@ -474,10 +480,17 @@ Depends on the `REMOTE_DATABASE_URI` environment variable being set to point to 
     postgres://USERNAME:PASSWORD@HOST:PORT/DATABASE
     ```
 
+Ensure the environment variables are set. E.g., for live payment:
+
+```
+set -o allexport && source .env.local.live && set +o allexport
+```
+
 Pass in one of these arguments:
-* `batch-grade HID`: Check Submitted assignments for a given HIT ID and Approve them.
+* `batch_grade HID`: Check Submitted assignments for a given HIT ID and Approve them.
+* `batch_grade_test HID`: Check Submitted assignments for a given HIT ID and Approve them.
 * `reject AID FEEDBACK`: Reject the given assignment ID with a given feedback. E.g., rejecting speeders.
-* `approve`: Approve the given assignment ID like normal.
+* `approve AID`: Approve the given assignment ID like normal.
 * `grade AID WID`: Grade and approve hits as necessary for a given assignment ID and worker ID
 
 E.g., using your `HID`:

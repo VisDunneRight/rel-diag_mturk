@@ -2,10 +2,20 @@ import sys
 import boto3
 import time
 import os
-from datetime import datetime
+from datetime import datetime, date
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import config
+import json
+
+
+def json_serial(obj):  # Copied from post_hits
+    """JSON serializer for objects not serializable by default json code"""
+
+    if isinstance(obj, (datetime, date)):
+        return obj.isoformat()
+    raise TypeError("Type %s not serializable" % type(obj))
+
 
 appConfig = config.Config()
 
@@ -101,21 +111,24 @@ def clear():
 
 
 # Extend HIT to have an additional num_additional_assignments assignments
-
-
 def extend_hit(num_additional_assignments):
-    hit_id = "306996CF6WKT6MUWN06276YLZXHB10"  # XXX Hard coded!!!
+    hit_id = "3KVQ0UJWPZM3M85UBIWFNPA9NMR5WA"  # XXX Hard coded!!!
 
     response = conn.create_additional_assignments_for_hit(
         HITId=hit_id, NumberOfAdditionalAssignments=num_additional_assignments
     )
 
-    print("Added " + str(num_additional_assignments) + " for hit " + hit_id)
+    print(
+        "Added "
+        + str(num_additional_assignments)
+        + " for hit "
+        + hit_id
+        + ". Response: "
+    )
+    print(json.dumps(response, default=json_serial, sort_keys=True, indent=4))
 
 
 # More details on a specific HIT
-
-
 def hit_detail(hit_id, show_graph=False):
     hit_obj = conn.get_hit(HITId=hit_id)
     hit = hit_obj["HIT"]
