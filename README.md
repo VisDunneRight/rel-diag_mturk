@@ -445,10 +445,12 @@ python ./post_hits.py full
 Has lots of code for various things. Make sure to read the code before running it! Run in the terminal. Pass in one of these arguments followed by parameters:
 
 * `summary`: Provides a summary of the last 100 hits
+
+**!!!Warning!!!** Everything below here needs to be checked to see if it needs a paginator added to deal with more than 100 records.
+
 * `balance`: Gets current prepaid HIT balance.
 * `clear`: Deletes all HITs except the ones in a **!!!WARNING!!!** hard-coded `except_list`. Will auto-reject all assignments pending in the HIT!
 * `extend NUM`: Add `NUM` more assignments. **!!!WARNING!!!** hard-coded `hit_id`.
-* `hit_detail HID`: Get details inc. showing a graph for HIT with ID `HID`.
 * `hits_detail HID1 HID2`: Get details for two HIT IDs.
 * `get_assignments HID STATUS`: Get assignments for HIT ID `HID` with status `STATUS` one of `['Approved', 'Rejected', 'Submitted']`.
 * `get_worker_id_list HID`: Get worker IDs for HIT with ID `HID` that are Approved or Rejected.

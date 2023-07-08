@@ -133,8 +133,6 @@ def hit_detail(hit_id, show_graph=False):
     hit_obj = conn.get_hit(HITId=hit_id)
     hit = hit_obj["HIT"]
 
-    assignments = conn.list_assignments_for_hit(HITId=hit_id, MaxResults=100)
-
     num_submitted = 0
     num_approved = 0
     num_rejected = 0
@@ -142,16 +140,25 @@ def hit_detail(hit_id, show_graph=False):
     timestamps = []
     worker_ids = []
 
-    for assignment in assignments["Assignments"]:
-        status = assignment["AssignmentStatus"]
-        if status == "Submitted":
-            num_submitted += 1
-        elif status == "Approved":
-            num_approved += 1
-        elif status == "Rejected":
-            num_rejected += 1
-        timestamps.append(assignment["SubmitTime"])
-        worker_ids.append(assignment["WorkerId"])
+    paginator = conn.get_paginator(
+        "list_assignments_for_hit"
+    )  # list_assignments_for_hit maxes at 100 so you need to paginate
+
+    response_iterator = paginator.paginate(HITId=hit_id)
+
+    for assignments in response_iterator:
+        for assignment in assignments["Assignments"]:
+            status = assignment["AssignmentStatus"]
+            if status == "Submitted":
+                num_submitted += 1
+            elif status == "Approved":
+                num_approved += 1
+            elif status == "Rejected":
+                num_rejected += 1
+            else:
+                print("Unknown status: " + status)
+            timestamps.append(assignment["SubmitTime"])
+            worker_ids.append(assignment["WorkerId"])
 
     print(
         hit_id
@@ -184,41 +191,6 @@ def hit_detail(hit_id, show_graph=False):
 
     if show_graph == True:
         draw_submissions_over_time_graph(timestamps)
-
-
-# Details on a set of HITs
-def hits_detail(hit_ids):
-    num_submitted = 0
-    num_approved = 0
-    num_rejected = 0
-    timestamps = []
-    worker_ids = []
-
-    for hit_id in hit_ids:
-        assignments = conn.list_assignments_for_hit(HITId=hit_id, MaxResults=100)
-
-        for assignment in assignments["Assignments"]:
-            status = assignment["AssignmentStatus"]
-            if status == "Submitted":
-                num_submitted += 1
-            elif status == "Approved":
-                num_approved += 1
-            elif status == "Rejected":
-                num_rejected += 1
-            timestamps.append(assignment["SubmitTime"])
-            worker_ids.append(assignment["WorkerId"])
-
-    print(
-        str(num_submitted)
-        + " are submitted "
-        + str(num_approved)
-        + " are approved and "
-        + str(num_rejected)
-        + " are rejected"
-    )
-
-    timestamps = sorted(timestamps)
-    draw_submissions_over_time_graph(timestamps)
 
 
 # List of submitted assignments for a hit
