@@ -22,7 +22,9 @@ Code and instructions for running the Relational Diagrams MTurk User Study using
 
 # Remarks
 
-Notice that some fields such as: `DATABASE_URL`, `AWS_ACCESS_KEY_ID`, and `AWS_SECRET_ACCESS_KEY` need to be specified accordingly when setting up the postgres database on heroku and using AWS keys with MTURK.
+Notice that some fields such as: `DATABASE_URL`, `AWS_ACCESS_KEY_ID`, and `AWS_SECRET_ACCESS_KEY` need to be specified accordingly when setting up the postgres database on Heroku and using AWS keys with MTurk.
+
+**!!Warning!!** Tutorial time is not currently captured correctly due to a database bug.
 
 # MTurk Quick Setup
 
@@ -314,11 +316,13 @@ heroku config:push --file=.env.live -a rd-study -o
 heroku ps:restart -a rd-study
 ```
 
-papertrail logging (paid)
+Papertrail logging (paid)—Note that this plan has a 65MB/day limit which you can easily exceed even running 60 participants.
 
 ```cmd
 heroku addons:create papertrail:fixa
 ```
+
+To export logs, you can use the scripts found in [`/logs/papertrail`](/logs/papertrail/).
 
 Access through Heroku site
 
