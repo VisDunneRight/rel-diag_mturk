@@ -12,7 +12,7 @@ connection = get_connection()
 
 def create_qualification():
     qual_response = connection.create_qualification_type(
-        Name="RD SQL qualification test",
+        Name="DX SQL qualification test",
         Keywords="test, qualification, SQL",
         Description="A basic SQL qualification test required in order to qualify for the HIT",
         QualificationTypeStatus="Active",

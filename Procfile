@@ -1,1 +1,1 @@
-web: gunicorn rd_study_server:app --preload --log-file - --log-level=info
+web: gunicorn dx_study_server:app --preload --log-file - --log-level=info

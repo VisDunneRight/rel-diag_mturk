@@ -94,7 +94,7 @@ def getReturnAndLogError(
 ):
     errorType = (
         errorType
-        + ". Email us at nudatavisstudies@gmail.com if you received this message in error. Please include the time you received this and your time zone, your MTurk worker ID, and what you were doing at the time you received this message."
+        + ". Email us at ANONYMOUS_EMAIL if you received this message in error. Please include the time you received this and your time zone, your MTurk worker ID, and what you were doing at the time you received this message."
     )
 
     if errorText == None:
@@ -221,12 +221,12 @@ def getPatternOrder():
         # We need to interleave the lists so that each mode has the same number of each pattern.
         # So create one list per mode
         perModeLists = []
-        for i in range(0, NUM_MODES):  # E.g., [1,2] in the RD study
+        for i in range(0, NUM_MODES):  # E.g., [1,2] in the DX Study
             modeList = []
             for i in [1, 2]:  # To go along with the *2 multiplier above
                 for pattern in range(
                     1, NUM_PATTERNS + 1
-                ):  # E.g., [1,2,3,4] in the RD study
+                ):  # E.g., [1,2,3,4] in the DX Study
                     modeList.append(pattern)
             random.shuffle(modeList)
             perModeLists.append(modeList)
@@ -827,12 +827,12 @@ def get_next_question():
         # current_page is [1,2,3,4,5...32]
         # sequence_num is [0, 1]
         # 0 & 1 SQL
-        # 0 & 2 RD
+        # 0 & 2 DX
         # 0 & 3 SQL
 
-        # 1 & 1 RD
+        # 1 & 1 DX
         # 1 & 2 SQL
-        # 1 & 3 RD
+        # 1 & 3 DX
 
         image_key_base = ""
         if sequence_num > 1:
@@ -916,7 +916,7 @@ def get_next_question():
 def assign_sequence_num_route():
     """
     Mode 1: Show SQL
-    Mode 2: Show RD
+    Mode 2: Show DX
 
     Sequence 0: 1,2,1,2,1,2...
     Sequence 1: 2,1,2,1,2,1...

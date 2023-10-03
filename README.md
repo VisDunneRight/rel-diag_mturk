@@ -127,7 +127,7 @@ Notice that some fields such as: `DATABASE_URL`, `AWS_ACCESS_KEY_ID`, and `AWS_S
         1. Create the database and list the ones present.
 
             ```sql
-            CREATE DATABASE rdstudy;
+            CREATE DATABASE dxstudy;
             \l
             ```
 
@@ -135,7 +135,7 @@ Notice that some fields such as: `DATABASE_URL`, `AWS_ACCESS_KEY_ID`, and `AWS_S
 
             ```sql
             CREATE USER flask WITH PASSWORD 'NEWPASSWORD';
-            GRANT ALL PRIVILEGES ON DATABASE rdstudy to flask;
+            GRANT ALL PRIVILEGES ON DATABASE dxstudy to flask;
             ```
 
         3. Exit `psql` by running:
@@ -200,7 +200,7 @@ Notice that some fields such as: `DATABASE_URL`, `AWS_ACCESS_KEY_ID`, and `AWS_S
 
         ```ini
         FLASK_DEBUG=True
-        FLASK_APP=rd_study_server.py
+        FLASK_APP=dx_study_server.py
         LOCAL=True
         TESTING=True
         AWS_SANDBOX=True
@@ -209,7 +209,7 @@ Notice that some fields such as: `DATABASE_URL`, `AWS_ACCESS_KEY_ID`, and `AWS_S
         AWS_CHECK_QUAL=True
         AWS_ALLOW_QUAL_ERROR=True
         FLASK_SECRET_KEY=XXXXX
-        LOCAL_SQLALCHEMY_DATABASE_URI=postgresql://flask:XXXXX@localhost:5432/rdstudy
+        LOCAL_SQLALCHEMY_DATABASE_URI=postgresql://flask:XXXXX@localhost:5432/dxstudy
         SQLALCHEMY_TRACK_MODIFICATIONS=False
         WEB_CONCURRENCY=2
         ```
@@ -240,7 +240,7 @@ Notice that some fields such as: `DATABASE_URL`, `AWS_ACCESS_KEY_ID`, and `AWS_S
 
 Run `db_create.py` to populate the database. This currently only works with running debugging from VSCode..., i.e., `debugpy`. It is unclear why...
 
-`sudo -u postgres psql -d rdstudy`
+`sudo -u postgres psql -d dxstudy`
 
 in postgres
 
@@ -266,22 +266,22 @@ heroku login
 to switch to our app
 
 ```cmd
-heroku domains -a rd-study
+heroku domains -a dx-study
 ```
 
-where `rd-study` is the app name on Heroku. 
+where `dx-study` is the app name on Heroku. 
 
 This opens the website:
 
 ```cmd
-heroku open -a rd-study
+heroku open -a dx-study
 
 ```
 
 To overwrite existing values, use
 
 ```cmd
-heroku config:push --file=.env.live -a rd-study -o
+heroku config:push --file=.env.live -a dx-study -o
 ```
 
 **Warning:** This fails silently if the file doesn't exist.
@@ -290,31 +290,31 @@ heroku config:push --file=.env.live -a rd-study -o
 
 
 ```cmd
-heroku run bash --app rd-study
+heroku run bash --app dx-study
 python3 db_create.py
 ```
 
 You can test it with gunicorn like so:
 
 ```cmd
-gunicorn --preload  rd_study_server:app --log-file - --log-level=debug
+gunicorn --preload  dx_study_server:app --log-file - --log-level=debug
 ``````
 To view the running site, use, for example: 
 * Local: <http://127.0.0.1:8000/?workerId=AA&assignmentId=BB&hitId=CC>
-* Live <https://rd-study.herokuapp.com?workerId=AA&assignmentId=BB&hitId=CC>
+* Live <https://dx-study.herokuapp.com?workerId=AA&assignmentId=BB&hitId=CC>
 
 For testing MTurk
 
 ```
-heroku config:push --file=.env.sandbox -a rd-study -o
-heroku ps:restart -a rd-study
+heroku config:push --file=.env.sandbox -a dx-study -o
+heroku ps:restart -a dx-study
 ```
 
 For live MTurk
 
 ```
-heroku config:push --file=.env.live -a rd-study -o
-heroku ps:restart -a rd-study
+heroku config:push --file=.env.live -a dx-study -o
+heroku ps:restart -a dx-study
 ```
 
 Papertrail logging (paid)—Note that this plan has a 65MB/day limit which you can easily exceed even running 60 participants. Recommended to use a higher plan.
@@ -332,7 +332,7 @@ To see the database with, e.g., PGAdmin:
 1. Get the value of `DATABASE_URL` on Heroku:
 
     ```cmd
-    heroku config:get DATABASE_URL -a rd-study
+    heroku config:get DATABASE_URL -a dx-study
     ```
 
     It is of the form
@@ -475,11 +475,11 @@ Deals with submissions.
 **!!!Warning!!!** Hard-coded messages to workers here, including the `reject_message` variable.
 
 Depends on the `REMOTE_DATABASE_URI` environment variable being set to point to the Heroku Postges Database. Note: This will change regularly! There are two ways to get this value:
-   1. Access through Heroku site, e.g., https://dashboard.heroku.com/apps/rd-study/settings
+   1. Access through Heroku site, e.g., https://dashboard.heroku.com/apps/dx-study/settings
    2. Use the Heroku CLI:
 
         ```cmd
-        heroku config:get DATABASE_URL -a rd-study
+        heroku config:get DATABASE_URL -a dx-study
         ```
 
     It is of the form

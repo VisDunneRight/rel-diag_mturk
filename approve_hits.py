@@ -8,7 +8,7 @@ from models import *
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import config
-import rd_study_server
+import dx_study_server
 
 # Heroku Database URL
 DATABASE_URL = os.environ.get("REMOTE_DATABASE_URI").replace(
@@ -83,7 +83,7 @@ NUM_QUESTIONS = 32
 
 
 def approve_hits(connection, assignment_id_list, worker_id_list, test_only):
-    with rd_study_server.app.app_context():  # needed to write to the database
+    with dx_study_server.app.app_context():  # needed to write to the database
         logging.info("Using database " + str(db))
         for i in range(len(assignment_id_list)):
             time.sleep(2)  # why?
@@ -105,7 +105,7 @@ def approve_hits(connection, assignment_id_list, worker_id_list, test_only):
 
             user = session.query(User).filter_by(worker_id=worker_id).first()
 
-            # copied from rd_study_server.py
+            # copied from dx_study_server.py
             num_answered = 0
 
             for question_num in range(1, NUM_QUESTIONS + 1):
@@ -176,7 +176,7 @@ def approve_hits(connection, assignment_id_list, worker_id_list, test_only):
                     + "Qualifications: We are asking you to participate in this study because you are experienced with using SQL"
                     + '" and "'
                     + "HIT acceptance criteria: You must answer 16 of the 32 questions correctly."
-                    + '" You were also made aware that your HIT would be rejected on the final page before you submitted the HIT. Please write to us at nudatavisstudies@gmail.com if you believe we have made any errors and include your Mturk ID.'
+                    + '" You were also made aware that your HIT would be rejected on the final page before you submitted the HIT. Please write to us at ANONYMOUS_EMAIL if you believe we have made any errors and include your Mturk ID.'
                 )
 
             logging.info(
@@ -288,7 +288,7 @@ def send_manual_bonus(worker_id, assignment_id):
         + " for assignment "
         + assignment_id
     )
-    with rd_study_server.app.app_context():  # needed to write to the database
+    with dx_study_server.app.app_context():  # needed to write to the database
         logging.info("Using database " + str(db))
         user = session.query(User).filter_by(worker_id=worker_id).first()
         send_bonus(worker_id, user, assignment_id, False)
@@ -375,7 +375,7 @@ def send_manual_bonus(worker_id, assignment_id):
 def approve_specific_assignment(assignment_id):
     connection.approve_assignment(
         AssignmentId=assignment_id,
-        RequesterFeedback="Congratulations! Your HIT has been approved. Thank you for your help with our study! :-) If you have any further feedback on our study, please write to us at nudatavisstudies@gmail.com and include your Mturk ID.",
+        RequesterFeedback="Congratulations! Your HIT has been approved. Thank you for your help with our study! :-) If you have any further feedback on our study, please write to us at ANONYMOUS_EMAIL and include your Mturk ID.",
         OverrideRejection=True,
     )
 

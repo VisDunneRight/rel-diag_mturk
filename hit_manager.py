@@ -464,7 +464,7 @@ def notify_workers(workers_file):
                 "interested in participating in this new study. "
                 "The base pay for the new HIT is $5.20 if you answer at least 5/12 questions correctly and it can reach up to $16.47 with bonuses "
                 "that are based on your performance and time metrics. You can find the HIT by searching for 'Understanding SQL Queries'. "
-                "The HIT is provided by the requester: Northeastern U. DataVis Studies"
+                "The HIT is provided by the requester: ANONYMOUS_GROUP"
             ),
             WorkerIds=[worker],
         )
@@ -501,7 +501,7 @@ def notify_workers_with_qualification(qualification_file, taken_hit_file):
                 "The base pay for the new HIT is $5.20 if you answer at least 5/12 questions correctly and it can reach up to $16.47 with bonuses "
                 "that are based on your performance and time metrics. The expected completion time for the HIT is about 30 minutes."
                 "You can find the HIT by searching for 'Understanding SQL Queries'. "
-                "The HIT is provided by the requester: Northeastern U. DataVis Studies"
+                "The HIT is provided by the requester: ANONYMOUS_GROUP"
             ),
             WorkerIds=[worker],
         )

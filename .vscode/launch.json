@@ -10,7 +10,7 @@
             "request": "launch",
             "module": "flask",
             "env": {
-                "FLASK_APP": "rd_study_server.py",
+                "FLASK_APP": "dx_study_server.py",
                 "FLASK_DEBUG": "1"
             },
             "args": [
