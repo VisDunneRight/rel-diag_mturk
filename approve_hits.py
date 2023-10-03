@@ -34,7 +34,7 @@ def get_connection():
     )
 
 
-# Set up the AMT connection
+# Set up the MTurk connection
 connection = get_connection()
 
 # # The answers to the questions
@@ -211,16 +211,16 @@ def approve_hits(connection, assignment_id_list, worker_id_list, test_only):
             )
 
             if test_only:
-                logging.info("Test only: Didn't accept/reject on AMT.")
+                logging.info("Test only: Didn't accept/reject on MTurk.")
             else:
-                logging.info("Actually accept/reject on AMT.")
+                logging.info("Actually accept/reject on MTurk.")
 
                 # Approve or reject assignment accordingly
                 if user.accept:
-                    logging.info("Assignment " + assignment_id + " approved on AMT")
+                    logging.info("Assignment " + assignment_id + " approved on MTurk")
                     approve_specific_assignment(assignment_id)
                 else:
-                    logging.info("Assignment " + assignment_id + " rejected on AMT")
+                    logging.info("Assignment " + assignment_id + " rejected on MTurk")
                     connection.reject_assignment(
                         AssignmentId=assignment_id,
                         RequesterFeedback=reject_message,
@@ -265,9 +265,9 @@ def send_bonus(worker_id, user, assignment_id, test_only):
             "Bonus message to Worker ID " + worker_id + ':\n"' + reason_str + '"'
         )
         if test_only:
-            logging.info("Test only: Didn't bonus on AMT.")
+            logging.info("Test only: Didn't bonus on MTurk.")
         else:
-            logging.info("Actually bonusing on AMT.")
+            logging.info("Actually bonusing on MTurk.")
             response = connection.send_bonus(
                 WorkerId=worker_id,
                 BonusAmount=str(total_bonus_dollars),

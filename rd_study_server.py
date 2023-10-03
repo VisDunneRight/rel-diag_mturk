@@ -94,7 +94,7 @@ def getReturnAndLogError(
 ):
     errorType = (
         errorType
-        + ". Email us at nudatavisstudies@gmail.com if you received this message in error. Please include the time you received this and your time zone, your AMT worker ID, and what you were doing at the time you received this message."
+        + ". Email us at nudatavisstudies@gmail.com if you received this message in error. Please include the time you received this and your time zone, your MTurk worker ID, and what you were doing at the time you received this message."
     )
 
     if errorText == None:
@@ -135,7 +135,7 @@ else:
         )
         db_url = os.environ.get(
             "REMOTE_DATABASE_URI"
-        )  # this lets us use it locally too for recording hits we approve/reject on AMT and bonuses sent
+        )  # this lets us use it locally too for recording hits we approve/reject on MTurk and bonuses sent
         if db_url == None:
             raise Exception("Both DATABASE_URL and REMOTE_DATABASE_URI are None!")
     app.config["SQLALCHEMY_DATABASE_URI"] = db_url.replace(
@@ -594,22 +594,23 @@ def tutorialClick():
             + str(time_spent)
         )
 
-        # Get the user
-        user = db.session.query(User).filter_by(worker_id=worker_id).one()
+        with app.app_context():  # TODO: test if this works right
+            # Get the user
+            user = db.session.query(User).filter_by(worker_id=worker_id).one()
 
-        # Apply the changes to the database
-        tutorial_time = getattr(user, "tutorial_time")
-        if tutorial_time == None:
-            tutorial_time = time_spent
-        else:
-            tutorial_time += time_spent
+            # Apply the changes to the database
+            tutorial_time = getattr(user, "tutorial_time")
+            if tutorial_time == None:
+                tutorial_time = time_spent
+            else:
+                tutorial_time += time_spent
 
-        setattr(user, "tutorial_time", int(tutorial_time / 1000))
-        setattr(user, "current_page", current_page)
-        db.session.commit()
+            setattr(user, "tutorial_time", int(tutorial_time / 1000))
+            setattr(user, "current_page", current_page)
+            db.session.commit()
 
         app.logger.info(
-            "worker_id " + worker_id + "Set tutorial_time to " + str(tutorial_time)
+            "worker_id " + worker_id + " Set tutorial_time to " + str(tutorial_time)
         )
 
     if request.method == "GET":

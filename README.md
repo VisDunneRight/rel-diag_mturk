@@ -1,23 +1,22 @@
-# Amazon Mechanical Turk (AMT) codebase for the Relational Diagrams User Study<!-- omit in toc -->
+# MTurk codebase for the study "SQL vs. Visual Diagrams on time and correctness matching relational query patterns"<!-- omit in toc -->
 
-Code and instructions for running the Relational Diagrams MTurk User Study using Heroku & Postgres.
+Code and instructions for running the study "SQL vs. Visual Diagrams on time and correctness matching relational query patterns" using Amazon Mechanical Turk (MTurk),  Heroku, and Postgres.
 
 * [Remarks](#remarks)
-* [MTurk Quick Setup](#mturk-quick-setup)
+* [MTurk Initial Setup and Overview](#mturk-initial-setup-and-overview)
 * [Useful Commands](#useful-commands)
-  * [Local testing of Flask server](#local-testing-of-flask-server)
-    * [Setup for using Ubuntu via WSL](#setup-for-using-ubuntu-via-wsl)
-    * [Setup using Ubuntu](#setup-using-ubuntu)
-  * [Deploying on Heroku](#deploying-on-heroku)
-  * [Possible `.env` files](#possible-env-files)
-* [Instructions for dealing with AMT interactions](#instructions-for-dealing-with-amt-interactions)
-  * [AWS / AMT setup](#aws--amt-setup)
-  * [Setup](#setup)
-  * [`create_qualification.py`](#create_qualificationpy)
-  * [`post_hits.py`](#post_hitspy)
-  * [`hit_manager.py`](#hit_managerpy)
-  * [`approve_hits.py`](#approve_hitspy)
-
+    * [Local testing of Flask server](#local-testing-of-flask-server)
+        * [Setup for using Ubuntu via WSL](#setup-for-using-ubuntu-via-wsl)
+        * [Setup using Ubuntu](#setup-using-ubuntu)
+    * [Deploying on Heroku](#deploying-on-heroku)
+    * [Possible `.env` files](#possible-env-files)
+* [Instructions for dealing with MTurk interactions](#instructions-for-dealing-with-mturk-interactions)
+    * [AWS / MTurk setup](#aws--mturk-setup)
+    * [Setup](#setup)
+    * [`create_qualification.py`](#create_qualificationpy)
+    * [`post_hits.py`](#post_hitspy)
+    * [`hit_manager.py`](#hit_managerpy)
+    * [`approve_hits.py`](#approve_hitspy)
 
 
 # Remarks
@@ -26,9 +25,9 @@ Notice that some fields such as: `DATABASE_URL`, `AWS_ACCESS_KEY_ID`, and `AWS_S
 
 **!!Warning!!** Tutorial time is not currently captured correctly due to a database bug.
 
-# MTurk Quick Setup
+# MTurk Initial Setup and Overview
 
-- Register on mturk.com and <https://requester.mturk.com/developer/sandbox>
+- Register on <https://mturk.com> and <https://requester.mturk.com/developer/sandbox>
 - Deploy to heroku by commiting and pushing the repository with `git push heroku master`.
 - Run `post_hits.py` to post the hits on Amazon Mechanical Turk
 - Amazon Mechanical Turk will post your HIT, and IFrame your url in when a user accepts it.
@@ -95,7 +94,7 @@ Notice that some fields such as: `DATABASE_URL`, `AWS_ACCESS_KEY_ID`, and `AWS_S
 
     1. Optional: Install pgadmin for managing the DB:
 
-        1. If using WSL, install on Windows by downloading from <https://www.pgadmin.org/download/pgadmin-4-windows/>. See details at <https://stackoverflow.com/questions/45707319/pgadmin-on-windows-10-with-postgres-when-installed-via-bash-on-ubuntu-on-windows>
+        1. If using WSL, install on Windows by downloading from [pgadmin.org](https://www.pgadmin.org/download/pgadmin-4-windows/). See details at [StackOverflow](https://stackoverflow.com/questions/45707319/pgadmin-on-windows-10-with-postgres-when-installed-via-bash-on-ubuntu-on-windows).
 
         2. If pure Ubuntu:
 
@@ -117,10 +116,10 @@ Notice that some fields such as: `DATABASE_URL`, `AWS_ACCESS_KEY_ID`, and `AWS_S
         sudo -u postgres psql
         ```
 
-        Inside the `psql` shell set the password. Make sure to set your own value for `newPassword` before running:
+        Inside the `psql` shell set the password. Make sure to set your own value for `NEWPASSWORD` before running:
 
         ```sql
-        ALTER USER postgres PASSWORD 'newPassword';
+        ALTER USER postgres PASSWORD 'NEWPASSWORD';
         ```
 
     4. Set up the postgres databases and user for the app. Still in the `psql` shell:
@@ -132,10 +131,10 @@ Notice that some fields such as: `DATABASE_URL`, `AWS_ACCESS_KEY_ID`, and `AWS_S
             \l
             ```
 
-        2. Then, create the user `flask`. Make sure to set your own value for `newPassword` before running:
+        2. Then, create the user `flask`. Make sure to set your own value for `NEWPASSWORD` before running:
 
             ```sql
-            CREATE USER flask WITH PASSWORD 'newPassword';
+            CREATE USER flask WITH PASSWORD 'NEWPASSWORD';
             GRANT ALL PRIVILEGES ON DATABASE rdstudy to flask;
             ```
 
@@ -251,7 +250,7 @@ in postgres
 flask run
 ```
 
-<http://127.0.0.1:5000/?workerId=AA&assignmentId=BB&hitId=CC>
+To view the running site, use, for example: <http://127.0.0.1:5000/?workerId=AA&assignmentId=BB&hitId=CC>
 
 ## Deploying on Heroku
 
@@ -295,28 +294,30 @@ heroku run bash --app rd-study
 python3 db_create.py
 ```
 
-test gunicorn
-`gunicorn --preload  rd_study_server:app --log-file - --log-level=debug`
+You can test it with gunicorn like so:
 
-<http://127.0.0.1:8000/?workerId=AA&assignmentId=BB&hitId=CC>
+```cmd
+gunicorn --preload  rd_study_server:app --log-file - --log-level=debug
+``````
+To view the running site, use, for example: 
+* Local: <http://127.0.0.1:8000/?workerId=AA&assignmentId=BB&hitId=CC>
+* Live <https://rd-study.herokuapp.com?workerId=AA&assignmentId=BB&hitId=CC>
 
-<https://rd-study.herokuapp.com?workerId=AA&assignmentId=BB&hitId=CC>
-
-For testing AMT
+For testing MTurk
 
 ```
 heroku config:push --file=.env.sandbox -a rd-study -o
 heroku ps:restart -a rd-study
 ```
 
-For live AMT
+For live MTurk
 
 ```
 heroku config:push --file=.env.live -a rd-study -o
 heroku ps:restart -a rd-study
 ```
 
-Papertrail logging (paid)—Note that this plan has a 65MB/day limit which you can easily exceed even running 60 participants.
+Papertrail logging (paid)—Note that this plan has a 65MB/day limit which you can easily exceed even running 60 participants. Recommended to use a higher plan.
 
 ```cmd
 heroku addons:create papertrail:fixa
@@ -324,35 +325,36 @@ heroku addons:create papertrail:fixa
 
 To export logs, you can use the scripts found in [`/logs/papertrail`](/logs/papertrail/).
 
-Access through Heroku site
+Access Papertrail through the Heroku site.
 
-To see the database with, e.g., PGAdmin, get the value of `DATABASE_URL` on Heroku:
+To see the database with, e.g., PGAdmin:
 
-```cmd
-heroku config:get DATABASE_URL -a rd-study
-```
+1. Get the value of `DATABASE_URL` on Heroku:
 
-It is of the form
+    ```cmd
+    heroku config:get DATABASE_URL -a rd-study
+    ```
 
-```
-postgres://USERNAME:PASSWORD@HOST:PORT/DATABASE
-```
+    It is of the form
 
-Set under Connection:
+    ```
+    postgres://USERNAME:PASSWORD@HOST:PORT/DATABASE
+    ```
 
-- Hostname/address: `HOST`
-- Port: `PORT`
-- Maintenance database: `DATABASE`
-- Username: `USERNAME`
-- Password: `PASSWORD`
+2. Set under Connection:
 
-Set under Advanced:
+    - Hostname/address: `HOST`
+    - Port: `PORT`
+    - Maintenance database: `DATABASE`
+    - Username: `USERNAME`
+    - Password: `PASSWORD`
 
-- DB restriction: `DATABASE`
+3. Set under Advanced:
 
-Click Save
+    - DB restriction: `DATABASE`
 
-Navigate to the database > Schemas > public > Tables > users.
+4. Click Save.
+5. Navigate to the database > Schemas > public > Tables > users.
 Right-click and select View/Edit Data > All Rows.
 
 ## Possible `.env` files
@@ -360,18 +362,18 @@ Right-click and select View/Edit Data > All Rows.
 Here are some options you can create:
 
 * [.env.local.sandbox](.env.local.sandbox) for local development and sandbox grading
-* [.env.local.live](.env.local.live) for local development and AMT live grading
-* [.env.sandbox.test](.env.sandbox.test) to use for testing the AMT Sandbox site.
-* [.env.sandbox](.env.sandbox) for more production-ready testing on the AMT Sandbox site. Turns off error display to users and requires qualifications.
-* [.env.live.test](.env.live.test) to use for the live AMT website.
-* [.env.live](.env.live) to use for the live AMT website. Turns off error display to users and requires qualifications.
+* [.env.local.live](.env.local.live) for local development and MTurk live grading
+* [.env.sandbox.test](.env.sandbox.test) to use for testing the MTurk Sandbox site.
+* [.env.sandbox](.env.sandbox) for more production-ready testing on the MTurk Sandbox site. Turns off error display to users and requires qualifications.
+* [.env.live.test](.env.live.test) to use for the live MTurk website.
+* [.env.live](.env.live) to use for the live MTurk website. Turns off error display to users and requires qualifications.
 
 
-# Instructions for dealing with AMT interactions
+# Instructions for dealing with MTurk interactions
 
-## AWS / AMT setup
+## AWS / MTurk setup
 
-Create your AWS account and an associated AMT account.
+Create your AWS account and an associated MTurk account.
 
 ## Setup
 
@@ -380,14 +382,14 @@ Create your AWS account and an associated AMT account.
 ```bash
 set -o allexport && source .env.sandbox.test && set +o allexport
 ```
-likewise, for actual grading:
+likewise, for actual grading of the submitted HITs:
 ```bash
 set -o allexport && source .env.live && set +o allexport
 ```
 **Note!** All your `.env` files need to have LF and not CRLF line endings for this to work properly. Otherwise, you'll get errors like 
 `botocore.exceptions.HTTPClientError: An HTTP Client raised an unhandled exception: Invalid header value`. You can check this with, e.g., `cat -t .env.sandbox.text`.
 
-You can check variables with `printenv | grep AWS`.
+You can check variables in general with `printenv | grep AWS`.
 
 ## `create_qualification.py`
 Creates a qualification using questions from `qualification_questions.xml` and answers from `qualification_answers.xml`. 
@@ -418,7 +420,7 @@ Creates a HIT. Uses the `AWS_SANDBOX`, `AWS_ACCESS_KEY_ID`, and `AWS_SECRET_ACCE
 **!!!WARNING!!!** The HITs you create programmatically here [***Do Not*** show up on the web management interface](https://stackoverflow.com/questions/50382623/hits-created-with-create-hit-with-externalquestion-using-boto3-not-visible-at-r)! Amazon has deprecated that feature—aargh! 
 
 1. Update the `<ExternalURL>` tag in [`external_question.xml`](./external_question.xml) to be the URL of your Heroku app.
-2. Update all these **hard-coded elements** in [`post_hits.py`](./post_hits.py) (some docs on [AMT docs](https://docs.aws.amazon.com/AWSMechTurk/latest/AWSMturkAPI/ApiReference_CreateHITOperation.html)), and read the file! 
+2. Update all these **hard-coded elements** in [`post_hits.py`](./post_hits.py) (some docs on [MTurk docs](https://docs.aws.amazon.com/AWSMechTurk/latest/AWSMturkAPI/ApiReference_CreateHITOperation.html)), and read the file! 
 
    1. `qualification_id`: The basic qualification.
    2. `custom_qualification_id`: A custom qualification for invited workers.
