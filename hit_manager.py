@@ -595,3 +595,4 @@ if __name__ == "__main__":
         get_prepaid_balance()
     else:
         print("Invalid command line argument")
+
