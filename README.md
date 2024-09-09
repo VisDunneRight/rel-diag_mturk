@@ -20,17 +20,17 @@ Code and instructions for running the study "SQL vs. Visual Diagrams on time and
 
 # Remarks
 
-Notice that some fields such as: `DATABASE_URL`, `AWS_ACCESS_KEY_ID`, and `AWS_SECRET_ACCESS_KEY` need to be specified accordingly when setting up the postgres database on Heroku and using AWS keys with MTurk.
+Notice that some fields such as: `DATABASE_URL`, `AWS_ACCESS_KEY_ID`, and `AWS_SECRET_ACCESS_KEY` need to be specified accordingly when setting up the Postgres database on Heroku and using AWS keys with MTurk.
 
 **!!Warning!!** Tutorial time is not currently captured correctly due to a database bug.
 
 # MTurk Initial Setup and Overview
 
 - Register on <https://mturk.com> and <https://requester.mturk.com/developer/sandbox>
-- Deploy to heroku by commiting and pushing the repository with `git push heroku master`.
+- Deploy to Heroku by committing and pushing the repository with `git push heroku master.`
 - Run `post_hits.py` to post the hits on Amazon Mechanical Turk
-- Amazon Mechanical Turk will post your HIT, and IFrame your url in when a user accepts it.
-- Once a user completes the hit it will be logged in the database. For more options check the hit_manager.py
+- Amazon Mechanical Turk will post your HIT, and IFrame your URL when a user accepts it.
+- Once a user completes the HIT it will be logged in the database. For more options, check the hit_manager.py
 
 # Useful Commands
 
@@ -44,7 +44,7 @@ Notice that some fields such as: `DATABASE_URL`, `AWS_ACCESS_KEY_ID`, and `AWS_S
    wsl --update
    ```
 
-2. Install Unbuntu from the Windows store so that it keeps up to date.
+2. Install Unbuntu from the Windows store to keep it current.
 3. With VSCode open from Windows, install <https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.vscode-remote-extensionpack>
 4. Within WSL Bash, run VSCode from the folder with:
 
@@ -85,7 +85,7 @@ Notice that some fields such as: `DATABASE_URL`, `AWS_ACCESS_KEY_ID`, and `AWS_S
    sudo update-alternatives --config python3
    ```
 
-3. Install postgres (and libssl-dev)
+3. Install Postgres (and libssl-dev)
 
    ```bash
    sudo apt install postgresql postgresql-contrib libssl-dev
@@ -115,7 +115,7 @@ Notice that some fields such as: `DATABASE_URL`, `AWS_ACCESS_KEY_ID`, and `AWS_S
       sudo -u postgres psql
       ```
 
-      Inside the `psql` shell set the password. Make sure to set your own value for `NEWPASSWORD` before running:
+      Inside the `psql` shell, set the password. Make sure to set your own value for `NEWPASSWORD` before running:
 
       ```sql
       ALTER USER postgres PASSWORD 'NEWPASSWORD';
@@ -183,7 +183,7 @@ Notice that some fields such as: `DATABASE_URL`, `AWS_ACCESS_KEY_ID`, and `AWS_S
 
 4. Create a `.env` file that holds your environmental variables.
 
-   1. Generate a `FLASK_SECRET_KEY`, e.g., running this in the Python intepreter:
+   1. Generate a `FLASK_SECRET_KEY`, e.g., running this in the Python interpreter:
 
       ```python
       import os
@@ -252,7 +252,7 @@ To view the running site, use, for example: <http://127.0.0.1:5000/?workerId=AA&
 
 ## Deploying on Heroku
 
-Create a pipeline on Heroku that will create from GitHub.
+Create a pipeline on Heroku that will be created from GitHub.
 
 Locally:
 
@@ -316,7 +316,7 @@ heroku config:push --file=.env.live -a rd-study -o
 heroku ps:restart -a rd-study
 ```
 
-Papertrail logging (paid)—Note that this plan has a 65MB/day limit which you can easily exceed even running 60 participants. Recommended to use a higher plan.
+Papertrail logging (paid)—Note that this plan has a 65MB/day limit which you can easily exceed even running 60 participants. We recommended you use a higher plan.
 
 ```cmd
 heroku addons:create papertrail:fixa
@@ -381,7 +381,7 @@ Create your AWS account and an associated MTurk account.
 set -o allexport && source .env.sandbox.test && set +o allexport
 ```
 
-likewise, for actual grading of the submitted HITs:
+likewise, for the actual grading of the submitted HITs:
 
 ```bash
 set -o allexport && source .env.live && set +o allexport
@@ -400,10 +400,10 @@ Uses the `AWS_SANDBOX`, `AWS_ACCESS_KEY_ID`, and `AWS_SECRET_ACCESS_KEY` environ
 Run in the terminal. Pass in one of these arguments:
 
 - `test`: Creates the basic qualification.
-- `custom`: Creates a custom qualification for invited workers only, e.g,. those who had errors taking the test.
+- `custom`: Creates a custom qualification for invited workers only, e.g., those who had errors taking the test.
 - `test_taken`: Creates a test taken qualification to eliminate workers who have taken the test previously.
 
-E.g., inside the virtual environment you'll need to run both:
+E.g., inside the virtual environment, you'll need to run both:
 
 ```
 python ./create_qualification.py test
@@ -427,7 +427,7 @@ Creates a HIT. Uses the `AWS_SANDBOX`, `AWS_ACCESS_KEY_ID`, and `AWS_SECRET_ACCE
 
    1. `qualification_id`: The basic qualification.
    2. `custom_qualification_id`: A custom qualification for invited workers.
-   3. `taken_test_qualification_id`: A test taken qualification to eliminate workers who took the test previously.
+   3. `taken_test_qualification_id`: A test taken qualification to eliminate workers who previously took the test.
    4. `base_pay`: The lowest level of reward.
    5. `approval_percentage`
    6. `minimum_qualification_score`
@@ -437,11 +437,11 @@ Creates a HIT. Uses the `AWS_SANDBOX`, `AWS_ACCESS_KEY_ID`, and `AWS_SECRET_ACCE
    10. `LifetimeInSeconds`
    11. `AssignmentDurationInSeconds`
 
-Run in inside the virtual environment with one of these arguments:
+Run inside the virtual environment with one of these arguments:
 
 - `full`: Regular full-duration HIT.
 - `pilot`: Shorter pilot HIT.
-- `custom WID QID`: Post a custom hit for worker with ID `WID` who has been given a custom qualification with ID `QID`.
+- `custom WID QID`: Post a custom hit for the worker with ID `WID` who has been given a custom qualification with ID `QID`.
 
 E.g.,
 
@@ -455,7 +455,7 @@ Has lots of code for various things. Make sure to read the code before running i
 
 - `summary`: Provides a summary of the last 100 hits
 
-**!!!Warning!!!** Everything below here needs to be checked to see if it needs a paginator added to deal with more than 100 records.
+**!!!Warning!!!** Everything below needs to be checked to see if it needs a paginator added to handle more than 100 records.
 
 - `balance`: Gets current prepaid HIT balance.
 - `clear`: Deletes all HITs except the ones in a **!!!WARNING!!!** hard-coded `except_list`. Will auto-reject all assignments pending in the HIT!
