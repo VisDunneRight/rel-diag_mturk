@@ -26,7 +26,7 @@ Notice that some fields such as: `DATABASE_URL`, `AWS_ACCESS_KEY_ID`, and `AWS_S
 
 # MTurk Initial Setup and Overview
 
-- Register on <https://mturk.com> and <https://requester.mturk.com/developer/sandbox>
+- Register on <https://requester.mturk.com/> for deployment and <https://requester.mturk.com/developer/sandbox> for testing.
 - Deploy to Heroku by committing and pushing the repository with `git push heroku master.`
 - Run `post_hits.py` to post the hits on Amazon Mechanical Turk
 - Amazon Mechanical Turk will post your HIT, and IFrame your URL when a user accepts it.
